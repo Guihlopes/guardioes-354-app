@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111318">
+  <meta name="description" content="Aplicativo dos membros do Motoclube Guardiões da 354.">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon.svg">
+  <title>Guardiões da 354</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0c0e12;--panel:#171a21;--line:#2a2e38;--text:#f5f5f6;--muted:#a4a9b5;--gold:#d7a83d}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#242832 0,#0c0e12 55%);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+    main{width:min(100% - 32px,520px);margin:auto;padding:calc(28px + env(safe-area-inset-top)) 0 calc(28px + env(safe-area-inset-bottom))}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:34px}.logo{width:60px;height:60px;flex:none}.eyebrow{font-size:.72rem;letter-spacing:.17em;color:var(--gold);font-weight:800}.club-name{font-size:1.08rem;font-weight:850;letter-spacing:.02em;margin-top:3px}
+    .hero{padding:28px 22px;border:1px solid #343945;border-radius:24px;background:linear-gradient(145deg,#20242d,#12141a);box-shadow:0 20px 55px #0005}
+    .tag{display:inline-flex;border:1px solid #5b4925;color:#f0c75c;background:#382d17;border-radius:999px;padding:6px 10px;font-size:.72rem;font-weight:750;letter-spacing:.06em}
+    h1{font-size:clamp(2rem,8vw,3.1rem);line-height:1.04;letter-spacing:-.045em;margin:18px 0 12px}h1 span{color:var(--gold)}p{color:var(--muted);line-height:1.6;margin:0}
+    .actions{display:grid;gap:10px;margin-top:24px}.btn{width:100%;border:0;border-radius:13px;padding:15px 16px;font:inherit;font-weight:800;cursor:pointer}.primary{background:var(--gold);color:#17130a}.secondary{background:#252a34;color:var(--text);border:1px solid #3a404d}
+    .section-title{font-size:1rem;margin:28px 0 12px}.features{display:grid;gap:10px}.feature{display:flex;gap:13px;align-items:flex-start;padding:16px;background:#15181e;border:1px solid var(--line);border-radius:16px}.feature-icon{font-size:1.25rem;width:30px}.feature strong{display:block;margin-bottom:4px}.feature p{font-size:.88rem}
+    .notice{display:none;margin-top:14px;padding:14px;border-radius:14px;background:#252a34;border:1px solid #3a404d;color:var(--muted);font-size:.9rem;line-height:1.55}.notice strong{color:var(--text)}footer{text-align:center;font-size:.75rem;color:#777e8d;margin-top:30px}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <img class="logo" src="./icons/icon.svg" alt="Símbolo dos Guardiões da 354">
+    <div><div class="eyebrow">MOTOCLUBE • SÃO GOTARDO — MG</div><div class="club-name">GUARDIÕES DA 354</div></div>
+  </header>
+  <section class="hero">
+    <span class="tag">APLICATIVO OFICIAL • EM CONSTRUÇÃO</span>
+    <h1>Uma irmandade.<br><span>Uma estrada.</span></h1>
+    <p>O espaço dos membros dos Guardiões da 354 para acompanhar passeios, eventos e comunicados do motoclube.</p>
+    <div class="actions">
+      <button id="install" class="btn primary" hidden>Instalar aplicativo</button>
+      <button id="ios-help" class="btn secondary">Como instalar no iPhone</button>
+    </div>
+    <div id="install-note" class="notice" role="status"></div>
+  </section>
+  <h2 class="section-title">O que estamos preparando</h2>
+  <section class="features">
+    <article class="feature"><div class="feature-icon">🔐</div><div><strong>Acesso exclusivo</strong><p>Entrada individual para membros autorizados.</p></div></article>
+    <article class="feature"><div class="feature-icon">🏍️</div><div><strong>Passeios e eventos</strong><p>Agenda do motoclube com informações e detalhes dos encontros.</p></div></article>
+    <article class="feature"><div class="feature-icon">🔔</div><div><strong>Comunicados</strong><p>Área para avisos e, futuramente, notificações no celular.</p></div></article>
+  </section>
+  <footer>Guardiões da 354 • Projeto independente do site existente</footer>
+</main>
+<script>
+  const installButton = document.querySelector('#install');
+  const note = document.querySelector('#install-note');
+  let installPrompt = null;
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault(); installPrompt = event; installButton.hidden = false;
+  });
+  installButton.addEventListener('click', async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; installButton.hidden = true;
+  });
+  document.querySelector('#ios-help').addEventListener('click', () => {
+    note.style.display = 'block';
+    note.innerHTML = '<strong>Para instalar no iPhone</strong><br>1. Abra este site no Safari.<br>2. Toque em Compartilhar.<br>3. Escolha “Adicionar à Tela de Início”.<br>4. Confirme em “Adicionar”.<br><br>Essa opção ficará disponível quando o aplicativo estiver publicado em um endereço HTTPS.';
+  });
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  }
+</script>
+</body>
+</html>
