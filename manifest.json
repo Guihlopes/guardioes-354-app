@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "Guardiões da 354",
+  "short_name": "Guardiões 354",
+  "description": "Aplicativo dos membros do Motoclube Guardiões da 354.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c0e12",
+  "theme_color": "#111318",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
