@@ -1,103 +1,189 @@
-
 <!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#111318">
-  <meta name="description" content="Aplicativo dos membros do Motoclube Guardiões da 354.">
+  <meta name="theme-color" content="#090a0c">
+  <meta name="description" content="Aplicativo exclusivo dos membros do Motoclube Guardiões da 354.">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
   <title>Guardiões da 354</title>
   <style>
     :root {
       color-scheme: dark;
-      --bg: #0c0e12;
-      --panel: #171a21;
-      --line: #2a2e38;
+      --bg: #08090b;
+      --panel: rgba(10, 11, 13, .91);
+      --line: rgba(225, 229, 235, .22);
       --text: #f5f5f6;
-      --muted: #a4a9b5;
-      --gold: #d7a83d;
+      --muted: #a2a5ab;
+      --red: #e11d2e;
+      --red-dark: #780b14;
     }
     * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
     body {
-      margin: 0; min-height: 100vh;
-      background: radial-gradient(ellipse at top, #242832, var(--bg) 60%);
-      color: var(--text); font-family: system-ui, sans-serif;
+      margin: 0; min-height: 100vh; min-height: 100svh;
+      color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(ellipse at 50% 18%, rgba(80, 83, 88, .22), transparent 42%),
+        linear-gradient(180deg, rgba(4,5,7,.25), rgba(4,5,7,.86)),
+        #090a0c;
+      overflow-x: hidden;
+      position: relative;
     }
-    main { width: min(100% - 32px, 520px); margin: auto; padding: 28px 0; }
-    header { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
-    .logo { width:58px; height:58px; }
-    .eyebrow { font-size:.7rem; letter-spacing:.13em; color:var(--gold); font-weight:800; }
-    .club-name { font-size:1rem; font-weight:850; margin-top:4px; }
+    /* Estrada abstrata em CSS: decorativa e leve, sem imagem de moto na lateral. */
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        linear-gradient(168deg, transparent 0 63%, rgba(225,29,46,.13) 63.2%, transparent 63.8%),
+        linear-gradient(172deg, transparent 0 70%, rgba(225,29,46,.22) 70.2%, transparent 70.55%),
+        radial-gradient(ellipse at 50% 100%, rgba(255,255,255,.08), transparent 38%),
+        repeating-linear-gradient(168deg, transparent 0 80px, rgba(255,255,255,.018) 81px, transparent 83px);
+      opacity: .85;
+    }
+    body::after {
+      content: ""; position: fixed; z-index: 0; pointer-events: none;
+      width: 150vw; height: 65vh; left: -25vw; bottom: -35vh;
+      border: 1px solid rgba(255,255,255,.12); border-radius: 50% 50% 0 0;
+      transform: perspective(400px) rotateX(58deg);
+      box-shadow: 0 -18px 0 -17px rgba(255,255,255,.13), 0 -44px 0 -43px rgba(225,29,46,.35);
+    }
+    main {
+      position: relative; z-index: 1;
+      width: min(100% - 30px, 490px);
+      min-height: 100vh; min-height: 100svh;
+      margin: auto; padding: clamp(22px, 5vh, 46px) 0 22px;
+      display: flex; flex-direction: column; align-items: stretch;
+    }
+    .brand { display:flex; justify-content:center; margin: 0 auto 18px; }
+    .logo {
+      display:block; width: clamp(150px, 42vw, 218px); height:auto;
+      max-height: 255px; object-fit:contain;
+      filter: drop-shadow(0 10px 24px rgba(0,0,0,.65));
+    }
     .panel {
-      padding:24px; border:1px solid #343945; border-radius:22px;
-      background:linear-gradient(145deg,#20242d,#12141a);
-      box-shadow:0 20px 55px #0005;
+      width:100%; padding: clamp(22px, 5vw, 34px);
+      border:1px solid var(--line); border-radius:26px;
+      background: linear-gradient(145deg, rgba(19,20,22,.97), var(--panel) 70%);
+      box-shadow: 0 24px 70px rgba(0,0,0,.55), inset 0 1px rgba(255,255,255,.035);
+      backdrop-filter: blur(12px);
     }
-    h1 { font-size:2rem; line-height:1.1; margin:0 0 10px; }
-    h1 span { color:var(--gold); }
-    p { color:var(--muted); line-height:1.6; }
-    label { display:block; font-size:.9rem; margin:18px 0 7px; }
+    .intro { text-align:center; margin-bottom: 25px; }
+    h1 {
+      font-size: clamp(1.8rem, 7vw, 2.35rem); line-height:1.08;
+      letter-spacing:.075em; text-transform:uppercase; margin:0;
+      font-weight:900;
+    }
+    h1 span { display:block; color:var(--red); margin-top:5px; }
+    .intro p { margin:15px 0 0; color:var(--muted); line-height:1.55; font-size:.98rem; }
+    label { display:block; font-size:.92rem; margin:17px 0 8px; color:#e6e7e9; }
     input {
-      width:100%; padding:14px; border-radius:12px;
-      border:1px solid #3a404d; background:#0f1116;
-      color:var(--text); font:inherit;
+      width:100%; min-height:53px; padding:14px 15px; border-radius:13px;
+      border:1px solid rgba(210,214,220,.32); background:rgba(255,255,255,.035);
+      color:var(--text); font:inherit; outline:none; transition:border-color .2s, box-shadow .2s;
     }
+    input:focus { border-color:rgba(225,29,46,.85); box-shadow:0 0 0 3px rgba(225,29,46,.12); }
+    input::placeholder { color:#777c84; }
     button {
-      width:100%; border:0; border-radius:12px; padding:14px;
-      font:inherit; font-weight:800; cursor:pointer; margin-top:12px;
+      width:100%; border:0; border-radius:13px; padding:15px;
+      font:inherit; font-weight:850; letter-spacing:.035em; cursor:pointer;
+      transition:transform .15s, filter .15s, border-color .15s;
     }
-    button:disabled { opacity:.6; cursor:wait; }
-    .primary { background:var(--gold); color:#17130a; }
-    .secondary { background:#252a34; color:var(--text); border:1px solid #3a404d; }
+    button:active { transform:scale(.99); }
+    button:disabled { opacity:.62; cursor:wait; }
+    .primary {
+      margin-top:22px; color:white; text-transform:uppercase;
+      background:linear-gradient(110deg, #c80f20, #ed1b2f 55%, #9d0b17);
+      border:1px solid #fa3141;
+      box-shadow:0 8px 25px rgba(195,10,29,.19), inset 0 1px rgba(255,255,255,.18);
+    }
+    .primary:hover { filter:brightness(1.08); }
+    .first-access-wrap { text-align:center; margin-top:16px; }
+    .first-access {
+      width:auto; margin:0; padding:5px 8px; background:transparent; border:0;
+      color:#c2c4c8; font-size:.88rem; font-weight:500; letter-spacing:0;
+      text-decoration:underline; text-underline-offset:4px;
+    }
+    .first-access:hover { color:white; }
+    .muted { color:var(--muted); font-size:.88rem; line-height:1.55; }
+    .access-note { text-align:center; margin:17px 0 0; }
+    .separator { display:flex; align-items:center; gap:15px; margin-top:19px; color:#737780; }
+    .separator::before, .separator::after { content:""; height:1px; flex:1; background:rgba(255,255,255,.17); }
+    .separator span { color:#b0b3b8; font-size:1.05rem; }
     .notice {
-      display:none; margin-top:16px; padding:13px; border-radius:12px;
-      background:#252a34; border:1px solid #3a404d;
-      line-height:1.5; overflow-wrap:anywhere;
+      display:none; margin-top:15px; padding:12px 14px; border-radius:12px;
+      background:rgba(30,31,34,.97); border:1px solid rgba(255,255,255,.18);
+      line-height:1.5; font-size:.9rem; overflow-wrap:anywhere;
     }
-    .muted { color:var(--muted); font-size:.88rem; }
     .hidden { display:none !important; }
-    .profile-row { padding:12px 0; border-bottom:1px solid var(--line); }
-    .profile-row:last-child { border-bottom:0; }
-    .value { font-weight:700; margin-top:4px; }
-    footer { text-align:center; color:#777e8d; font-size:.75rem; margin:26px 0; }
+    .profile-row { padding:13px 0; border-bottom:1px solid rgba(255,255,255,.12); }
+    .profile-row:last-of-type { border-bottom:0; }
+    .value { font-weight:750; margin-top:5px; }
+    .secondary {
+      margin-top:18px; background:rgba(255,255,255,.055); color:var(--text);
+      border:1px solid rgba(255,255,255,.2);
+    }
+    .install-area { display:flex; justify-content:center; margin-top:auto; padding:24px 0 0; }
+    .install-button {
+      width:auto; display:flex; align-items:center; gap:9px; padding:8px 12px;
+      margin:0; border:0; background:transparent; color:#b8bbc0;
+      font-size:.8rem; font-weight:500; letter-spacing:0; text-decoration:underline;
+      text-underline-offset:4px;
+    }
+    .install-button:hover { color:white; }
+    .phone-icon { width:14px; height:19px; border:1.5px solid currentColor; border-radius:3px; position:relative; display:inline-block; }
+    .phone-icon::after { content:""; position:absolute; bottom:2px; left:5px; width:2px; height:2px; border-radius:50%; background:currentColor; }
+    footer { text-align:center; color:#686c73; font-size:.7rem; margin:15px 0 0; }
+    @media (min-width: 700px) {
+      main { justify-content:center; padding-top:32px; padding-bottom:32px; }
+      .logo { width:190px; }
+      .brand { margin-bottom:15px; }
+      .install-area { margin-top:0; }
+    }
+    @media (max-height: 760px) {
+      main { padding-top:15px; padding-bottom:14px; }
+      .logo { width:clamp(112px, 25vh, 165px); max-height:165px; }
+      .brand { margin-bottom:12px; }
+      .intro { margin-bottom:16px; }
+      .panel { padding:20px; }
+      .install-area { padding-top:12px; }
+    }
   </style>
 </head>
 <body>
 <main>
-  <header>
-    <img class="logo" src="./icons/icon.svg" alt="Símbolo dos Guardiões da 354">
-    <div>
-      <div class="eyebrow">MOTOCLUBE • SÃO GOTARDO — MG</div>
-      <div class="club-name">GUARDIÕES DA 354</div>
-    </div>
-  </header>
+  <div class="brand">
+    <img class="logo" src="./icons/guardioes-logo.png" alt="Logo original do Motoclube Guardiões da 354">
+  </div>
 
   <section id="login-panel" class="panel">
-    <h1>Uma irmandade.<br><span>Uma estrada.</span></h1>
-    <p>O espaço exclusivo dos membros dos Guardiões da 354.</p>
+    <div class="intro">
+      <h1>Uma irmandade.<span>Uma estrada.</span></h1>
+      <p>O espaço exclusivo dos membros<br>dos Guardiões da 354.</p>
+    </div>
 
     <form id="login-form">
       <label for="email">E-mail cadastrado</label>
-      <input id="email" type="email" autocomplete="username"
-        placeholder="seuemail@exemplo.com" required>
+      <input id="email" type="email" autocomplete="username" placeholder="seuemail@exemplo.com" required>
 
       <label for="password">Senha</label>
-      <input id="password" type="password" autocomplete="current-password"
-        placeholder="Sua senha" required>
+      <input id="password" type="password" autocomplete="current-password" placeholder="Sua senha" required>
 
-      <button id="login-button" class="primary" type="submit">Entrar no aplicativo</button>
-      <button id="first-access-button" class="secondary" type="button">Primeiro acesso</button>
+      <button id="login-button" class="primary" type="submit">Entrar no aplicativo <span aria-hidden="true"> →</span></button>
+      <div class="first-access-wrap">
+        <button id="first-access-button" class="first-access" type="button">Primeiro acesso?</button>
+      </div>
     </form>
 
-    <p class="muted">O acesso é exclusivo para integrantes autorizados pelo motoclube.</p>
-    <button id="install-button" class="secondary hidden" type="button">Instalar aplicativo</button>
+    <div class="separator" aria-hidden="true"><span>🏍</span></div>
+    <p class="muted access-note">O acesso é exclusivo para integrantes autorizados pelo motoclube.</p>
   </section>
 
   <section id="profile-panel" class="panel hidden">
-    <h1>Bem-vindo!</h1>
-    <p>Confira seu perfil no motoclube.</p>
+    <div class="intro">
+      <h1>Bem-vindo!</h1>
+      <p>Confira seu perfil no motoclube.</p>
+    </div>
     <div class="profile-row"><div class="muted">Nome</div><div id="profile-name" class="value"></div></div>
     <div class="profile-row"><div class="muted">Cargo no motoclube</div><div id="profile-position" class="value"></div></div>
     <div class="profile-row"><div class="muted">Situação</div><div id="profile-status" class="value"></div></div>
@@ -107,7 +193,11 @@
   </section>
 
   <div id="notice" class="notice" role="status" aria-live="polite"></div>
-  <footer>Guardiões da 354 • Aplicativo independente do site existente</footer>
+
+  <div class="install-area">
+    <button id="install-button" class="install-button hidden" type="button"><span class="phone-icon" aria-hidden="true"></span> Instalar aplicativo</button>
+  </div>
+  <footer>GUARDIÕES DA 354 · SÃO GOTARDO — MG</footer>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -153,8 +243,7 @@
     document.querySelector('#profile-position').textContent = data.club_position || 'Membro';
     document.querySelector('#profile-status').textContent = data.member_status || 'Ativo';
     document.querySelector('#profile-rider').textContent = data.rider_type || 'Não informado';
-    document.querySelector('#profile-role').textContent =
-      data.role === 'admin' ? 'Administrador' : 'Membro';
+    document.querySelector('#profile-role').textContent = data.role === 'admin' ? 'Administrador' : 'Membro';
 
     loginPanel.classList.add('hidden');
     profilePanel.classList.remove('hidden');
@@ -180,7 +269,7 @@
       showNotice('Falha de conexão. Verifique sua internet e tente novamente.');
     } finally {
       loginButton.disabled = false;
-      loginButton.textContent = 'Entrar no aplicativo';
+      loginButton.textContent = 'Entrar no aplicativo →';
     }
   });
 
@@ -198,10 +287,7 @@
     firstAccessButton.textContent = 'Verificando...';
 
     try {
-      const { data, error } = await db.functions.invoke('primeiro-acesso', {
-        body: { email }
-      });
-
+      const { data, error } = await db.functions.invoke('primeiro-acesso', { body: { email } });
       if (error) {
         showNotice('Não foi possível solicitar o primeiro acesso. Tente novamente.');
       } else {
@@ -211,7 +297,7 @@
       showNotice('Falha de conexão. Verifique sua internet e tente novamente.');
     } finally {
       firstAccessButton.disabled = false;
-      firstAccessButton.textContent = 'Primeiro acesso';
+      firstAccessButton.textContent = 'Primeiro acesso?';
     }
   });
 
@@ -235,13 +321,11 @@
 
   let installPrompt = null;
   const installButton = document.querySelector('#install-button');
-
   window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
     installPrompt = event;
     installButton.classList.remove('hidden');
   });
-
   installButton.addEventListener('click', async () => {
     if (!installPrompt) return;
     await installPrompt.prompt();
