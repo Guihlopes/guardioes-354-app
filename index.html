@@ -1,467 +1,241 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#090a0c">
-  <meta name="description" content="Aplicativo exclusivo dos membros do Motoclube Guardiões da 354.">
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
-  <title>Guardiões da 354</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #08090b;
-      --panel: rgba(10, 11, 13, .91);
-      --line: rgba(225, 229, 235, .22);
-      --text: #f5f5f6;
-      --muted: #a2a5ab;
-      --red: #e11d2e;
-      --red-dark: #780b14;
-    }
-    * { box-sizing: border-box; }
-    html { min-height: 100%; background: var(--bg); }
-    body {
-      margin: 0; min-height: 100vh; min-height: 100svh;
-      color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(ellipse at 50% 18%, rgba(80, 83, 88, .22), transparent 42%),
-        linear-gradient(180deg, rgba(4,5,7,.25), rgba(4,5,7,.86)),
-        #090a0c;
-      overflow-x: hidden;
-      position: relative;
-    }
-    /* Estrada abstrata em CSS: decorativa e leve, sem imagem de moto na lateral. */
-    body::before {
-      content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background:
-        linear-gradient(168deg, transparent 0 63%, rgba(225,29,46,.13) 63.2%, transparent 63.8%),
-        linear-gradient(172deg, transparent 0 70%, rgba(225,29,46,.22) 70.2%, transparent 70.55%),
-        radial-gradient(ellipse at 50% 100%, rgba(255,255,255,.08), transparent 38%),
-        repeating-linear-gradient(168deg, transparent 0 80px, rgba(255,255,255,.018) 81px, transparent 83px);
-      opacity: .85;
-    }
-    body::after {
-      content: ""; position: fixed; z-index: 0; pointer-events: none;
-      width: 150vw; height: 65vh; left: -25vw; bottom: -35vh;
-      border: 1px solid rgba(255,255,255,.12); border-radius: 50% 50% 0 0;
-      transform: perspective(400px) rotateX(58deg);
-      box-shadow: 0 -18px 0 -17px rgba(255,255,255,.13), 0 -44px 0 -43px rgba(225,29,46,.35);
-    }
-    main {
-      position: relative; z-index: 1;
-      width: min(100% - 30px, 490px);
-      min-height: 100vh; min-height: 100svh;
-      margin: auto; padding: clamp(22px, 5vh, 46px) 0 22px;
-      display: flex; flex-direction: column; align-items: stretch;
-    }
-    .brand { display:flex; justify-content:center; margin: 0 auto 18px; }
-    .logo {
-      display:block; width: clamp(150px, 42vw, 218px); height:auto;
-      max-height: 255px; object-fit:contain;
-      filter: drop-shadow(0 10px 24px rgba(0,0,0,.65));
-    }
-    .panel {
-      width:100%; padding: clamp(22px, 5vw, 34px);
-      border:1px solid var(--line); border-radius:26px;
-      background: linear-gradient(145deg, rgba(19,20,22,.97), var(--panel) 70%);
-      box-shadow: 0 24px 70px rgba(0,0,0,.55), inset 0 1px rgba(255,255,255,.035);
-      backdrop-filter: blur(12px);
-    }
-    .intro { text-align:center; margin-bottom: 25px; }
-    h1 {
-      font-size: clamp(1.8rem, 7vw, 2.35rem); line-height:1.08;
-      letter-spacing:.075em; text-transform:uppercase; margin:0;
-      font-weight:900;
-    }
-    h1 span { display:block; color:var(--red); margin-top:5px; }
-    .intro p { margin:15px 0 0; color:var(--muted); line-height:1.55; font-size:.98rem; }
-    label { display:block; font-size:.92rem; margin:17px 0 8px; color:#e6e7e9; }
-    input {
-      width:100%; min-height:53px; padding:14px 15px; border-radius:13px;
-      border:1px solid rgba(210,214,220,.32); background:rgba(255,255,255,.035);
-      color:var(--text); font:inherit; outline:none; transition:border-color .2s, box-shadow .2s;
-    }
-    input:focus { border-color:rgba(225,29,46,.85); box-shadow:0 0 0 3px rgba(225,29,46,.12); }
-    input::placeholder { color:#777c84; }
-    button {
-      width:100%; border:0; border-radius:13px; padding:15px;
-      font:inherit; font-weight:850; letter-spacing:.035em; cursor:pointer;
-      transition:transform .15s, filter .15s, border-color .15s;
-    }
-    button:active { transform:scale(.99); }
-    button:disabled { opacity:.62; cursor:wait; }
-    .primary {
-      margin-top:22px; color:white; text-transform:uppercase;
-      background:linear-gradient(110deg, #c80f20, #ed1b2f 55%, #9d0b17);
-      border:1px solid #fa3141;
-      box-shadow:0 8px 25px rgba(195,10,29,.19), inset 0 1px rgba(255,255,255,.18);
-    }
-    .primary:hover { filter:brightness(1.08); }
-    .first-access-wrap { text-align:center; margin-top:16px; }
-    .first-access {
-      width:auto; margin:0; padding:5px 8px; background:transparent; border:0;
-      color:#c2c4c8; font-size:.88rem; font-weight:500; letter-spacing:0;
-      text-decoration:underline; text-underline-offset:4px;
-    }
-    .first-access:hover { color:white; }
-    .muted { color:var(--muted); font-size:.88rem; line-height:1.55; }
-    .access-note { text-align:center; margin:17px 0 0; }
-    .separator { display:flex; align-items:center; gap:15px; margin-top:19px; color:#737780; }
-    .separator::before, .separator::after { content:""; height:1px; flex:1; background:rgba(255,255,255,.17); }
-    .separator span { color:#b0b3b8; font-size:1.05rem; }
-    .notice {
-      display:none; margin-top:15px; padding:12px 14px; border-radius:12px;
-      background:rgba(30,31,34,.97); border:1px solid rgba(255,255,255,.18);
-      line-height:1.5; font-size:.9rem; overflow-wrap:anywhere;
-    }
-    .hidden { display:none !important; }
-    .profile-row { padding:13px 0; border-bottom:1px solid rgba(255,255,255,.12); }
-    .profile-row:last-of-type { border-bottom:0; }
-    .value { font-weight:750; margin-top:5px; }
-    .secondary {
-      margin-top:18px; background:rgba(255,255,255,.055); color:var(--text);
-      border:1px solid rgba(255,255,255,.2);
-    }
-    .install-area { display:flex; justify-content:center; margin-top:auto; padding:24px 0 0; }
-    .install-button {
-      width:auto; display:flex; align-items:center; gap:9px; padding:8px 12px;
-      margin:0; border:0; background:transparent; color:#b8bbc0;
-      font-size:.8rem; font-weight:500; letter-spacing:0; text-decoration:underline;
-      text-underline-offset:4px;
-    }
-    .install-button:hover { color:white; }
-    .phone-icon { width:14px; height:19px; border:1.5px solid currentColor; border-radius:3px; position:relative; display:inline-block; }
-    .phone-icon::after { content:""; position:absolute; bottom:2px; left:5px; width:2px; height:2px; border-radius:50%; background:currentColor; }
-    footer { text-align:center; color:#686c73; font-size:.7rem; margin:15px 0 0; }
-    @media (min-width: 700px) {
-      main { justify-content:center; padding-top:32px; padding-bottom:32px; }
-      .logo { width:190px; }
-      .brand { margin-bottom:15px; }
-      .install-area { margin-top:0; }
-    }
-    @media (max-height: 760px) {
-      main { padding-top:15px; padding-bottom:14px; }
-      .logo { width:clamp(112px, 25vh, 165px); max-height:165px; }
-      .brand { margin-bottom:12px; }
-      .intro { margin-bottom:16px; }
-      .panel { padding:20px; }
-      .install-area { padding-top:12px; }
-    }
-
-    .dashboard { width:100%; }
-    .dash-top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:22px; }
-    .dash-brand { display:flex; align-items:center; gap:12px; min-width:0; }
-    .dash-mini-logo { width:48px; height:48px; object-fit:contain; border-radius:10px; }
-    .dash-kicker { color:var(--red); text-transform:uppercase; font-size:.68rem; font-weight:850; letter-spacing:.14em; }
-    .dash-title { font-size:1.2rem; font-weight:900; margin-top:3px; }
-    .logout-small { width:auto; padding:9px 11px; margin:0; background:rgba(255,255,255,.04); border:1px solid var(--line); color:#ddd; font-size:.78rem; letter-spacing:0; }
-    .welcome-card { padding:22px; border:1px solid rgba(225,29,46,.34); border-radius:22px; background:linear-gradient(135deg,rgba(42,15,19,.72),rgba(15,16,18,.96) 64%); box-shadow:0 16px 38px rgba(0,0,0,.24); }
-    .welcome-small { color:#c3c4c7; font-size:.78rem; text-transform:uppercase; letter-spacing:.13em; font-weight:750; }
-    .welcome-card h2 { font-size:1.8rem; line-height:1.1; margin:9px 0 8px; font-weight:900; }
-    .welcome-card h2 span { color:var(--red); }
-    .welcome-card p { margin:0; color:#b9bbc0; line-height:1.5; }
-    .status-chip { display:inline-flex; align-items:center; gap:7px; margin-top:16px; padding:7px 10px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); font-size:.75rem; color:#e5e5e6; }
-    .status-dot { width:7px; height:7px; background:#b7b9bd; border-radius:50%; box-shadow:0 0 0 3px rgba(255,255,255,.06); }
-    .section-head { display:flex; justify-content:space-between; align-items:end; gap:12px; margin:26px 0 13px; }
-    .section-head h3 { margin:0; font-size:1.03rem; font-weight:850; }
-    .section-head p { margin:4px 0 0; font-size:.8rem; color:var(--muted); }
-    .shortcut-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-    .shortcut { text-align:left; min-height:142px; padding:16px; border:1px solid var(--line); border-radius:18px; background:linear-gradient(145deg,rgba(26,28,32,.98),rgba(13,14,16,.98)); color:var(--text); margin:0; letter-spacing:0; font-weight:500; }
-    .shortcut:disabled { opacity:1; cursor:default; }
-    .shortcut-icon { display:flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:12px; background:rgba(225,29,46,.12); border:1px solid rgba(225,29,46,.28); color:#f04452; font-size:1.15rem; margin-bottom:13px; }
-    .shortcut strong { display:block; font-size:.94rem; margin-bottom:5px; }
-    .shortcut small { display:block; color:var(--muted); line-height:1.4; font-size:.76rem; }
-    .soon-label { display:inline-block; margin-top:10px; color:#c4c5c8; font-size:.65rem; text-transform:uppercase; letter-spacing:.08em; }
-    .member-card { margin-top:20px; padding:18px; border:1px solid var(--line); border-radius:18px; background:rgba(18,19,21,.92); }
-    .member-card-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:15px; }
-    .member-card-head h3 { margin:0; font-size:1rem; }
-    .profile-pill { border:1px solid rgba(225,29,46,.35); background:rgba(225,29,46,.1); color:#ffb3ba; padding:5px 8px; border-radius:999px; font-size:.68rem; }
-    .member-info { display:grid; grid-template-columns:1fr 1fr; gap:14px 10px; }
-    .member-info .muted { font-size:.72rem; }
-    .member-info .value { font-size:.86rem; overflow-wrap:anywhere; }
-    .dash-footer { text-align:center; margin:24px 0 0; color:#73767c; font-size:.68rem; letter-spacing:.06em; }
-    @media (max-width:360px) { .shortcut-grid { gap:8px; } .shortcut { padding:12px; min-height:132px; } .welcome-card h2 { font-size:1.55rem; } }
-
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090a0c">
+<meta name="description" content="Aplicativo exclusivo dos membros do Motoclube Guardiões da 354.">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+<title>Guardiões da 354</title>
+<style>
+:root{color-scheme:dark;--bg:#090a0c;--panel:#131518;--panel2:#191b1f;--line:#303238;--text:#f4f4f5;--muted:#a4a6ad;--red:#df1e31;--red2:#a60d1c;--ok:#bfc7c1;--warn:#d9c08b}
+*{box-sizing:border-box}html{background:var(--bg);scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 0%,#25272b 0,transparent 44%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.6;cursor:wait}.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:.8rem}.app-shell{width:min(100% - 24px,1100px);margin:auto;padding:20px 0 30px}
+.login-wrap{width:min(100%,480px);margin:0 auto;min-height:90vh;display:flex;flex-direction:column;justify-content:center}.brand-login{text-align:center;margin-bottom:18px}.brand-logo{width:min(180px,48vw);max-height:210px;object-fit:contain;filter:drop-shadow(0 10px 24px #0008)}.eyebrow{font-size:.68rem;letter-spacing:.15em;color:#e54b59;font-weight:850;text-transform:uppercase}.panel{padding:clamp(18px,4vw,30px);border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,rgba(25,27,31,.97),rgba(12,13,15,.97));box-shadow:0 20px 55px #0005}.login-title{text-align:center;font-size:clamp(1.8rem,7vw,2.35rem);text-transform:uppercase;line-height:1.08;margin:0;letter-spacing:.04em}.login-title span{display:block;color:var(--red);margin-top:4px}.login-copy{text-align:center;color:var(--muted);line-height:1.55;margin:14px 0 22px}
+label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,select,textarea{width:100%;padding:12px 13px;border-radius:11px;border:1px solid #3a3c42;background:#0d0e10;color:var(--text);outline:none;min-height:46px}textarea{min-height:100px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:#d93646;box-shadow:0 0 0 3px #df1e311c}.btn{border:1px solid var(--line);background:#222429;color:var(--text);border-radius:11px;padding:11px 14px;font-weight:750}.btn:hover{filter:brightness(1.1)}.btn-primary{background:linear-gradient(110deg,#b70e20,#e02034);border-color:#f04454;color:white}.btn-quiet{background:transparent;border-color:transparent;color:#c2c3c7;font-size:.85rem;font-weight:550;text-decoration:underline;text-underline-offset:4px}.btn-block{width:100%;margin-top:18px}.login-bottom{text-align:center;margin-top:14px}.notice{display:none;padding:12px 14px;border:1px solid #464950;border-radius:11px;background:#202126;line-height:1.5;font-size:.88rem;margin-top:14px;overflow-wrap:anywhere}.notice.show{display:block}.login-footer{text-align:center;color:#6e7178;font-size:.7rem;margin-top:20px}
+.app-header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:6px 0 18px;border-bottom:1px solid #ffffff12;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px;min-width:0}.brand img{width:54px;height:54px;object-fit:contain}.brand-title{font-weight:900;letter-spacing:.04em;font-size:1rem}.brand-sub{font-size:.68rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:3px}.header-actions{display:flex;align-items:center;gap:8px}.icon-btn{width:40px;height:40px;padding:0;display:grid;place-items:center;background:#191a1d;border:1px solid var(--line);border-radius:12px;color:#eee}.desktop-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}.nav-btn{background:transparent;color:#aeb0b6;border:1px solid transparent;border-radius:10px;padding:10px 13px;font-size:.86rem;font-weight:700}.nav-btn.active{background:#df1e3119;color:white;border-color:#df1e3155}.nav-btn.active::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-right:8px;vertical-align:middle}
+.hero{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:20px}.hero-main{padding:24px;border:1px solid #df1e314d;border-radius:20px;background:linear-gradient(125deg,#341116a8,#151619 62%);min-height:190px}.hero-kicker{font-size:.72rem;text-transform:uppercase;letter-spacing:.13em;color:#e3a1a7;font-weight:800}.hero h1{font-size:clamp(1.8rem,5vw,2.7rem);line-height:1.05;margin:12px 0 10px}.hero h1 span{color:#ed394a}.hero p{margin:0;color:#c3c4c8;line-height:1.55;max-width:520px}.hero-side{padding:20px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,#1b1d21,#101113);display:flex;flex-direction:column;justify-content:space-between}.status-label{font-size:.73rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.status-value{font-size:1.15rem;font-weight:850;margin-top:7px}.status-mark{display:inline-flex;align-items:center;gap:7px;border:1px solid #ffffff1c;border-radius:999px;padding:7px 10px;font-size:.74rem;width:max-content;margin-top:16px}.dot{width:7px;height:7px;border-radius:50%;background:#d7dadb}
+.section-title{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:24px 0 13px}.section-title h2{font-size:1.12rem;margin:0}.section-title p{font-size:.8rem;color:var(--muted);margin:4px 0 0}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.tile{min-width:0;text-align:left;padding:17px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,#1b1d21,#101113);color:var(--text);min-height:146px}.tile:hover{border-color:#df1e3170;transform:translateY(-1px)}.tile-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#df1e311a;border:1px solid #df1e314d;color:#f05a68;font-size:1.15rem;margin-bottom:13px}.tile strong{display:block;font-size:.91rem}.tile small{display:block;color:var(--muted);font-size:.75rem;line-height:1.4;margin-top:5px}.tile .tag{display:inline-block;font-size:.63rem;color:#d3b9bc;margin-top:10px;text-transform:uppercase;letter-spacing:.05em}
+.two-col{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}.card{padding:19px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#181a1e,#101113);min-width:0}.card h3{font-size:1rem;margin:0 0 14px}.empty{border:1px dashed #41434a;border-radius:12px;padding:20px;text-align:center;color:var(--muted);font-size:.85rem;line-height:1.5}.list-row{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #ffffff12}.list-row:last-child{border-bottom:0}.list-icon{width:40px;height:40px;flex:none;display:grid;place-items:center;background:#ffffff08;border:1px solid #ffffff13;border-radius:11px}.list-main{min-width:0;flex:1}.list-main strong{display:block;font-size:.86rem}.list-main small{display:block;color:var(--muted);font-size:.75rem;margin-top:3px}.badge{font-size:.68rem;border:1px solid #ffffff20;border-radius:999px;padding:5px 8px;color:#d5d6d8;white-space:nowrap}
+.page-heading{display:flex;justify-content:space-between;align-items:start;gap:12px;margin-bottom:18px}.page-heading h1{font-size:1.65rem;margin:0}.page-heading p{color:var(--muted);font-size:.88rem;line-height:1.5;margin:7px 0 0}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.form-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.form-actions .btn{flex:1}.profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.profile-field{padding:14px;border:1px solid #ffffff12;border-radius:12px;background:#ffffff04}.profile-field .muted{font-size:.75rem}.profile-field strong{display:block;margin-top:6px;overflow-wrap:anywhere;font-size:.9rem}.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;font-size:.82rem}th,td{text-align:left;padding:12px;border-bottom:1px solid #ffffff12;white-space:nowrap}th{color:#c6c7cb;background:#ffffff06;font-size:.73rem;text-transform:uppercase;letter-spacing:.05em}tr:last-child td{border-bottom:0}.callout{padding:13px 14px;border-radius:12px;border:1px solid #df1e3145;background:#df1e310e;color:#d9dadd;font-size:.83rem;line-height:1.5;margin-bottom:14px}
+.mobile-nav{display:none}.app-footer{text-align:center;color:#656970;font-size:.7rem;padding:25px 0 0;letter-spacing:.06em}.hidden-page{display:none!important}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{grid-template-columns:1fr}.hero-side{min-height:125px}.two-col{grid-template-columns:1fr}.desktop-nav{display:none}.mobile-nav{display:flex;position:sticky;bottom:8px;z-index:10;margin-top:20px;padding:7px;background:#101114ed;border:1px solid #ffffff1c;border-radius:16px;backdrop-filter:blur(12px);justify-content:space-around;gap:2px;box-shadow:0 8px 25px #0008}.mobile-nav button{flex:1;background:transparent;color:#aeb0b6;border:0;border-radius:10px;padding:9px 3px;font-size:.65rem;font-weight:750}.mobile-nav button span{display:block;font-size:1.1rem;margin-bottom:4px}.mobile-nav button.active{color:#fff;background:#df1e311e}.mobile-nav button.active span{color:#f04454}}
+@media(max-width:430px){.app-shell{width:min(100% - 18px,1100px);padding-top:12px}.brand img{width:43px;height:43px}.brand-title{font-size:.86rem}.brand-sub{font-size:.58rem}.header-actions .logout-text{display:none}.hero-main{padding:20px;min-height:180px}.hero-side{padding:16px}.tile{padding:13px;min-height:135px}.tile-icon{width:34px;height:34px}.section-title{margin-top:20px}.form-grid,.profile-grid{grid-template-columns:1fr}.page-heading h1{font-size:1.4rem}}
+</style>
 </head>
 <body>
-<main>
-  <div class="brand">
-    <img class="logo" src="./icons/guardioes-logo.png" alt="Logo original do Motoclube Guardiões da 354">
+<div id="login-screen" class="app-shell">
+  <div class="login-wrap">
+    <div class="brand-login">
+      <img class="brand-logo" src="/icons/guardioes-logo.png?v=2" alt="Guardiões da 354" onerror="this.style.display='none'">
+      <div class="eyebrow">Motoclube · São Gotardo — MG</div>
+    </div>
+    <section class="panel">
+      <h1 class="login-title">Uma irmandade.<span>Uma estrada.</span></h1>
+      <p class="login-copy">O espaço exclusivo dos membros dos Guardiões da 354.</p>
+      <form id="login-form">
+        <label for="email">E-mail cadastrado</label><input id="email" type="email" autocomplete="username" placeholder="seuemail@exemplo.com" required>
+        <label for="password">Senha</label><input id="password" type="password" autocomplete="current-password" placeholder="Sua senha" required>
+        <button id="login-button" class="btn btn-primary btn-block" type="submit">Entrar no aplicativo →</button>
+        <div class="login-bottom"><button id="first-access-button" class="btn btn-quiet" type="button">Primeiro acesso?</button></div>
+      </form>
+      <p class="muted small" style="text-align:center;line-height:1.5;margin:16px 0 0">Acesso exclusivo para integrantes autorizados pelo motoclube.</p>
+      <div id="login-notice" class="notice" role="status" aria-live="polite"></div>
+    </section>
+    <div style="text-align:center;margin-top:18px"><button id="install-button" class="btn btn-quiet hidden" type="button">▯ Instalar aplicativo</button></div>
+    <div class="login-footer">GUARDIÕES DA 354 · APLICATIVO INDEPENDENTE</div>
   </div>
+</div>
 
-  <section id="login-panel" class="panel">
-    <div class="intro">
-      <h1>Uma irmandade.<span>Uma estrada.</span></h1>
-      <p>O espaço exclusivo dos membros<br>dos Guardiões da 354.</p>
+<div id="app-screen" class="app-shell hidden">
+  <header class="app-header">
+    <div class="brand">
+      <img src="/icons/guardioes-logo.png?v=2" alt="Guardiões da 354" onerror="this.style.display='none'">
+      <div><div class="brand-title">GUARDIÕES DA 354</div><div class="brand-sub">Área exclusiva dos integrantes</div></div>
     </div>
+    <div class="header-actions"><button class="icon-btn" id="header-notifications" title="Notificações" aria-label="Notificações">♧</button><button class="btn" id="header-logout" type="button">Sair <span class="logout-text">da conta</span></button></div>
+  </header>
+  <nav id="desktop-nav" class="desktop-nav" aria-label="Navegação principal">
+    <button class="nav-btn active" data-page="home">Início</button><button class="nav-btn" data-page="members">Membros</button><button class="nav-btn" data-page="agenda">Agenda</button><button class="nav-btn" data-page="announcements">Comunicados</button><button class="nav-btn" data-page="profile">Meu perfil</button><button class="nav-btn admin-only hidden" data-page="admin">Administração</button>
+  </nav>
 
-    <form id="login-form">
-      <label for="email">E-mail cadastrado</label>
-      <input id="email" type="email" autocomplete="username" placeholder="seuemail@exemplo.com" required>
-
-      <label for="password">Senha</label>
-      <input id="password" type="password" autocomplete="current-password" placeholder="Sua senha" required>
-
-      <button id="login-button" class="primary" type="submit">Entrar no aplicativo <span aria-hidden="true"> →</span></button>
-      <div class="first-access-wrap">
-        <button id="first-access-button" class="first-access" type="button">Primeiro acesso?</button>
+  <main>
+    <section id="page-home" class="app-page">
+      <div class="hero">
+        <div class="hero-main"><div class="hero-kicker">Uma irmandade. Uma estrada.</div><h1>Bem-vindo,<br><span id="home-first-name">integrante</span>.</h1><p>Este é o ponto de encontro digital dos Guardiões da 354. Acompanhe as informações do motoclube em um só lugar.</p></div>
+        <div class="hero-side"><div><div class="status-label">Seu acesso</div><div id="home-position" class="status-value">Integrante</div><div id="home-status" class="status-mark"><span class="dot"></span> Conta autorizada</div></div><div class="muted small" style="margin-top:15px">São Gotardo · Minas Gerais</div></div>
       </div>
-    </form>
-
-    <div class="separator" aria-hidden="true"><span>🏍</span></div>
-    <p class="muted access-note">O acesso é exclusivo para integrantes autorizados pelo motoclube.</p>
-  </section>
-
-  <section id="profile-panel" class="panel hidden">
-    <div class="intro">
-      <h1>Bem-vindo!</h1>
-      <p>Confira seu perfil no motoclube.</p>
-    </div>
-    <div class="profile-row"><div class="muted">Nome</div><div id="profile-name" class="value"></div></div>
-    <div class="profile-row"><div class="muted">Cargo no motoclube</div><div id="profile-position" class="value"></div></div>
-    <div class="profile-row"><div class="muted">Situação</div><div id="profile-status" class="value"></div></div>
-    <div class="profile-row"><div class="muted">Categoria</div><div id="profile-rider" class="value"></div></div>
-    <div class="profile-row"><div class="muted">Permissão no aplicativo</div><div id="profile-role" class="value"></div></div>
-    <button id="logout-button" class="secondary" type="button">Sair da conta</button>
-  </section>
-
-
-  <section id="dashboard-panel" class="dashboard hidden">
-    <div class="dash-top">
-      <div class="dash-brand">
-        <img class="dash-mini-logo" src="/icons/guardioes-logo.png?v=2" alt="Guardiões da 354">
-        <div>
-          <div class="dash-kicker">Área do integrante</div>
-          <div class="dash-title">GUARDIÕES DA 354</div>
-        </div>
+      <div class="section-title"><div><h2>Acesso rápido</h2><p>Escolha uma área do aplicativo.</p></div></div>
+      <div class="grid">
+        <button class="tile" data-go="members"><span class="tile-icon">♟</span><strong>Membros</strong><small>Consulte a área de integrantes.</small><span class="tag">Área do clube</span></button>
+        <button class="tile" data-go="agenda"><span class="tile-icon">▦</span><strong>Agenda</strong><small>Reuniões, eventos e passeios.</small><span class="tag">Programação</span></button>
+        <button class="tile" data-go="announcements"><span class="tile-icon">▤</span><strong>Comunicados</strong><small>Informações e avisos do motoclube.</small><span class="tag">Novidades</span></button>
+        <button class="tile" data-go="profile"><span class="tile-icon">♙</span><strong>Meu perfil</strong><small>Confira seus dados e categoria.</small><span class="tag">Minha conta</span></button>
       </div>
-      <button id="dashboard-logout-button" class="logout-small" type="button">Sair ↗</button>
-    </div>
-
-    <div class="welcome-card">
-      <div class="welcome-small">Uma irmandade. Uma estrada.</div>
-      <h2>Bem-vindo,<br><span id="dashboard-name">integrante</span>.</h2>
-      <p>Este é o espaço exclusivo para acompanhar a vida do nosso motoclube.</p>
-      <div class="status-chip"><span class="status-dot"></span> Acesso autorizado</div>
-    </div>
-
-    <div class="section-head">
-      <div>
-        <h3>Acesso rápido</h3>
-        <p>O que você procura hoje?</p>
-      </div>
-    </div>
-    <div class="shortcut-grid">
-      <button class="shortcut" type="button" data-dashboard-message="A área de membros será conectada ao banco de dados na próxima etapa.">
-        <span class="shortcut-icon" aria-hidden="true">♟</span>
-        <strong>Membros</strong>
-        <small>Integrantes e funções do motoclube</small>
-        <span class="soon-label">Em desenvolvimento</span>
-      </button>
-      <button class="shortcut" type="button" data-dashboard-message="A agenda de reuniões, eventos e passeios será adicionada na próxima etapa.">
-        <span class="shortcut-icon" aria-hidden="true">▦</span>
-        <strong>Agenda</strong>
-        <small>Reuniões, eventos e passeios</small>
-        <span class="soon-label">Em desenvolvimento</span>
-      </button>
-      <button class="shortcut" type="button" data-dashboard-message="A área de comunicados será adicionada na próxima etapa.">
-        <span class="shortcut-icon" aria-hidden="true">▤</span>
-        <strong>Comunicados</strong>
-        <small>Informações importantes do clube</small>
-        <span class="soon-label">Em desenvolvimento</span>
-      </button>
-      <button class="shortcut" type="button" data-dashboard-message="Seu perfil está exibido logo abaixo nesta tela.">
-        <span class="shortcut-icon" aria-hidden="true">♙</span>
-        <strong>Meu perfil</strong>
-        <small>Seu cargo e dados de integrante</small>
-        <span class="soon-label">Ver perfil abaixo</span>
-      </button>
-    </div>
-
-    <div id="dashboard-notice" class="notice" role="status" aria-live="polite"></div>
-
-    <section class="member-card">
-      <div class="member-card-head">
-        <h3>Meu perfil</h3>
-        <span id="dashboard-role" class="profile-pill">Membro</span>
-      </div>
-      <div class="member-info">
-        <div><div class="muted">Nome completo</div><div id="dashboard-full-name" class="value"></div></div>
-        <div><div class="muted">Cargo no motoclube</div><div id="dashboard-position" class="value"></div></div>
-        <div><div class="muted">Situação</div><div id="dashboard-status" class="value"></div></div>
-        <div><div class="muted">Categoria</div><div id="dashboard-rider" class="value"></div></div>
+      <div class="section-title"><div><h2>Próximas atividades</h2><p>Quando a agenda for conectada, os eventos aparecerão aqui.</p></div><button class="btn" data-go="agenda">Ver agenda</button></div>
+      <div class="two-col">
+        <div class="card"><h3>Agenda do motoclube</h3><div class="empty">Nenhum evento conectado ainda.<br><span class="small">A estrutura está pronta para receber os eventos reais.</span></div></div>
+        <div class="card"><h3>Últimos comunicados</h3><div class="empty">Os comunicados aparecerão aqui quando o módulo for conectado ao banco de dados.</div></div>
       </div>
     </section>
-    <div class="dash-footer">GUARDIÕES DA 354 · SÃO GOTARDO — MG</div>
-  </section>
 
-  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+    <section id="page-members" class="app-page hidden-page">
+      <div class="page-heading"><div><h1>Membros</h1><p>Área de integrantes do Guardiões da 354.</p></div><span class="badge">Acesso restrito</span></div>
+      <div class="callout">Esta tela já está preparada visualmente. A lista real de integrantes será ligada ao banco com regras de acesso antes de ser disponibilizada.</div>
+      <div class="card"><h3>Diretório de integrantes</h3><div class="empty">Ainda não há uma consulta de membros conectada nesta versão.<br>Os dados não são exibidos aqui para evitar expor informações pessoais sem as permissões adequadas.</div></div>
+    </section>
 
-  <div class="install-area">
-    <button id="install-button" class="install-button hidden" type="button"><span class="phone-icon" aria-hidden="true"></span> Instalar aplicativo</button>
-  </div>
-  <footer>GUARDIÕES DA 354 · SÃO GOTARDO — MG</footer>
-</main>
+    <section id="page-agenda" class="app-page hidden-page">
+      <div class="page-heading"><div><h1>Agenda</h1><p>Reuniões, eventos, encontros e passeios.</p></div><span class="badge">Calendário</span></div>
+      <div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:15px">
+        <div class="card"><div class="muted small">Eventos</div><div class="status-value">—</div></div><div class="card"><div class="muted small">Próxima reunião</div><div class="status-value">—</div></div><div class="card"><div class="muted small">Passeios</div><div class="status-value">—</div></div>
+      </div>
+      <div class="card"><h3>Programação do motoclube</h3><div class="empty">A agenda visual está preparada, mas ainda precisa de uma tabela no banco de dados para salvar e compartilhar eventos reais.</div></div>
+    </section>
+
+    <section id="page-announcements" class="app-page hidden-page">
+      <div class="page-heading"><div><h1>Comunicados</h1><p>Informações importantes para os integrantes.</p></div><span class="badge">Mural</span></div>
+      <div class="card"><h3>Mural do motoclube</h3><div class="empty">O mural está preparado para receber comunicados oficiais. A publicação e a leitura compartilhada serão ativadas quando o banco de dados estiver configurado.</div></div>
+    </section>
+
+    <section id="page-profile" class="app-page hidden-page">
+      <div class="page-heading"><div><h1>Meu perfil</h1><p>Informações da sua conta e do seu vínculo com o motoclube.</p></div><span id="profile-role-badge" class="badge">Membro</span></div>
+      <div class="card">
+        <div class="profile-grid">
+          <div class="profile-field"><div class="muted">Nome completo</div><strong id="profile-name">—</strong></div>
+          <div class="profile-field"><div class="muted">Cargo no motoclube</div><strong id="profile-position">—</strong></div>
+          <div class="profile-field"><div class="muted">Situação</div><strong id="profile-status">—</strong></div>
+          <div class="profile-field"><div class="muted">Categoria</div><strong id="profile-rider">—</strong></div>
+          <div class="profile-field"><div class="muted">Permissão no aplicativo</div><strong id="profile-role">—</strong></div>
+          <div class="profile-field"><div class="muted">E-mail da conta</div><strong id="profile-email">—</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-admin" class="app-page hidden-page">
+      <div class="page-heading"><div><h1>Administração</h1><p>Área reservada a administradores autorizados.</p></div><span class="badge">Admin</span></div>
+      <div class="callout">A interface administrativa está em preparação. Antes de habilitar ações reais, vamos implementar as operações no servidor e as políticas de acesso no banco; esconder esta tela não substitui essas proteções.</div>
+      <div class="grid">
+        <div class="card"><div class="muted small">Gestão de membros</div><div class="status-value">Preparada</div><p class="muted small">Cadastro e permissões serão conectados com segurança.</p></div>
+        <div class="card"><div class="muted small">Eventos e agenda</div><div class="status-value">Preparada</div><p class="muted small">Criação e edição de atividades.</p></div>
+        <div class="card"><div class="muted small">Comunicados</div><div class="status-value">Preparada</div><p class="muted small">Publicação de avisos oficiais.</p></div>
+        <div class="card"><div class="muted small">Configurações</div><div class="status-value">Preparada</div><p class="muted small">Preferências e ferramentas de gestão.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="mobile-nav" aria-label="Navegação móvel">
+    <button class="active" data-page="home"><span>⌂</span>Início</button><button data-page="members"><span>♟</span>Membros</button><button data-page="agenda"><span>▦</span>Agenda</button><button data-page="announcements"><span>▤</span>Avisos</button><button data-page="profile"><span>♙</span>Perfil</button>
+  </nav>
+  <div id="app-notice" class="notice" role="status" aria-live="polite"></div>
+  <div class="app-footer">GUARDIÕES DA 354 · SÃO GOTARDO — MG</div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+(() => {
   const SUPABASE_URL = 'https://nlaywsguzsiwvexwnakp.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_eIzAaMENq8u1smn5gVR3Lg_cj9bABxk';
-  const { createClient } = supabase;
-  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => [...document.querySelectorAll(s)];
+  let currentUser = null;
+  let currentProfile = null;
+  let installPrompt = null;
 
-  const loginPanel = document.querySelector('#login-panel');
-  const profilePanel = document.querySelector('#profile-panel');
-  const form = document.querySelector('#login-form');
-  const loginButton = document.querySelector('#login-button');
-  const firstAccessButton = document.querySelector('#first-access-button');
-  const notice = document.querySelector('#notice');
-
-  function showNotice(message) {
-    notice.textContent = message;
-    notice.style.display = 'block';
+  function notice(target, message) {
+    const el = $(target); el.textContent = message; el.classList.add('show'); el.style.display = 'block';
   }
-  function clearNotice() {
-    notice.textContent = '';
-    notice.style.display = 'none';
+  function clearNotice(target) {
+    const el = $(target); el.textContent = ''; el.classList.remove('show'); el.style.display = 'none';
   }
-
+  function showLogin() {
+    $('#app-screen').classList.add('hidden'); $('#login-screen').classList.remove('hidden');
+  }
+  function showApp() {
+    $('#login-screen').classList.add('hidden'); $('#app-screen').classList.remove('hidden');
+  }
+  function go(page) {
+    const allowed = ['home','members','agenda','announcements','profile','admin'];
+    if (!allowed.includes(page)) page = 'home';
+    if (page === 'admin' && currentProfile?.role !== 'admin') page = 'home';
+    $$('.app-page').forEach(el => el.classList.add('hidden-page'));
+    $('#page-' + page)?.classList.remove('hidden-page');
+    $$('[data-page]').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function fillProfile(user, p) {
+    const firstName = (p.full_name || 'Integrante').trim().split(/\s+/)[0];
+    $('#home-first-name').textContent = firstName;
+    $('#home-position').textContent = p.club_position || 'Membro';
+    $('#home-status').innerHTML = '<span class="dot"></span> ' + (p.member_status || 'Ativo');
+    $('#profile-name').textContent = p.full_name || '—';
+    $('#profile-position').textContent = p.club_position || 'Membro';
+    $('#profile-status').textContent = p.member_status || 'Ativo';
+    $('#profile-rider').textContent = p.rider_type || 'Não informado';
+    $('#profile-role').textContent = p.role === 'admin' ? 'Administrador' : 'Membro';
+    $('#profile-role-badge').textContent = p.role === 'admin' ? 'Administrador' : 'Membro';
+    $('#profile-email').textContent = user.email || '—';
+    $$('.admin-only').forEach(el => el.classList.toggle('hidden', p.role !== 'admin'));
+  }
   async function loadProfile(user) {
-    clearNotice();
-    const { data, error } = await db.from('member_profiles')
+    clearNotice('#login-notice');
+    const {data,error} = await db.from('member_profiles')
       .select('full_name, role, active, club_position, member_status, rider_type')
-      .eq('id', user.id).maybeSingle();
-
-    if (error) {
-      showNotice('Não foi possível consultar seu perfil. Tente novamente.');
-      return;
-    }
+      .eq('id',user.id).maybeSingle();
+    if (error) { notice('#login-notice','Não foi possível consultar seu perfil. Tente novamente.'); return false; }
     if (!data || !data.active) {
       await db.auth.signOut();
-      showNotice('Sua conta ainda não está autorizada a entrar no aplicativo.');
-      return;
+      notice('#login-notice','Sua conta ainda não está autorizada a entrar no aplicativo.');
+      return false;
     }
-
-    document.querySelector('#profile-name').textContent = data.full_name;
-    document.querySelector('#profile-position').textContent = data.club_position || 'Membro';
-    document.querySelector('#profile-status').textContent = data.member_status || 'Ativo';
-    document.querySelector('#profile-rider').textContent = data.rider_type || 'Não informado';
-    document.querySelector('#profile-role').textContent = data.role === 'admin' ? 'Administrador' : 'Membro';
-
-    loginPanel.classList.add('hidden');
-    profilePanel.classList.add('hidden');
-    document.querySelector('#dashboard-panel').classList.remove('hidden');
-    document.querySelector('#dashboard-name').textContent = data.full_name.split(' ')[0];
-    document.querySelector('#dashboard-full-name').textContent = data.full_name;
-    document.querySelector('#dashboard-position').textContent = data.club_position || 'Membro';
-    document.querySelector('#dashboard-status').textContent = data.member_status || 'Ativo';
-    document.querySelector('#dashboard-rider').textContent = data.rider_type || 'Não informado';
-    document.querySelector('#dashboard-role').textContent = data.role === 'admin' ? 'Administrador' : 'Membro';
+    currentUser = user; currentProfile = data; fillProfile(user,data); showApp(); go('home'); return true;
   }
-
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    clearNotice();
-    loginButton.disabled = true;
-    loginButton.textContent = 'Entrando...';
-
+  $('#login-form').addEventListener('submit', async (event) => {
+    event.preventDefault(); clearNotice('#login-notice');
+    const button = $('#login-button'); button.disabled = true; button.textContent = 'Entrando...';
     try {
-      const email = document.querySelector('#email').value.trim();
-      const password = document.querySelector('#password').value;
-      const { data, error } = await db.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        showNotice('Não foi possível entrar. Confira o e-mail e a senha ou verifique se o acesso foi liberado.');
-      } else if (data.user) {
-        await loadProfile(data.user);
-      }
-    } catch {
-      showNotice('Falha de conexão. Verifique sua internet e tente novamente.');
-    } finally {
-      loginButton.disabled = false;
-      loginButton.textContent = 'Entrar no aplicativo →';
-    }
+      const email = $('#email').value.trim(); const password = $('#password').value;
+      const {data,error} = await db.auth.signInWithPassword({email,password});
+      if (error) notice('#login-notice','Não foi possível entrar. Confira o e-mail e a senha ou verifique se o acesso foi liberado.');
+      else if (data.user) await loadProfile(data.user);
+    } catch { notice('#login-notice','Falha de conexão. Verifique sua internet e tente novamente.'); }
+    finally { button.disabled = false; button.textContent = 'Entrar no aplicativo →'; }
   });
-
-  firstAccessButton.addEventListener('click', async () => {
-    clearNotice();
-    const email = document.querySelector('#email').value.trim();
-
-    if (!email) {
-      showNotice('Digite seu e-mail cadastrado primeiro.');
-      document.querySelector('#email').focus();
-      return;
-    }
-
-    firstAccessButton.disabled = true;
-    firstAccessButton.textContent = 'Verificando...';
-
+  $('#first-access-button').addEventListener('click', async () => {
+    clearNotice('#login-notice'); const email = $('#email').value.trim();
+    if (!email) { notice('#login-notice','Digite seu e-mail cadastrado primeiro.'); $('#email').focus(); return; }
+    const button = $('#first-access-button'); button.disabled = true; button.textContent = 'Verificando...';
     try {
-      const { data, error } = await db.functions.invoke('primeiro-acesso', { body: { email } });
-      if (error) {
-        showNotice('Não foi possível solicitar o primeiro acesso. Tente novamente.');
-      } else {
-        showNotice(data?.message || 'Se o e-mail estiver autorizado, você receberá instruções.');
-      }
-    } catch {
-      showNotice('Falha de conexão. Verifique sua internet e tente novamente.');
-    } finally {
-      firstAccessButton.disabled = false;
-      firstAccessButton.textContent = 'Primeiro acesso?';
-    }
+      const {data,error} = await db.functions.invoke('primeiro-acesso',{body:{email}});
+      if (error) notice('#login-notice','Não foi possível solicitar o primeiro acesso. Tente novamente.');
+      else notice('#login-notice', data?.message || 'Se o e-mail estiver autorizado, você receberá instruções.');
+    } catch { notice('#login-notice','Falha de conexão. Verifique sua internet e tente novamente.'); }
+    finally { button.disabled = false; button.textContent = 'Primeiro acesso?'; }
   });
-
-  async function logoutUser() {
-    const { error } = await db.auth.signOut();
-    if (error) {
-      showNotice('Não foi possível encerrar a sessão. Tente novamente.');
-      return;
-    }
-    profilePanel.classList.add('hidden');
-    document.querySelector('#dashboard-panel').classList.add('hidden');
-    loginPanel.classList.remove('hidden');
-    document.querySelector('#password').value = '';
-    clearNotice();
+  async function logout() {
+    const {error} = await db.auth.signOut();
+    if (error) { notice('#app-notice','Não foi possível encerrar a sessão. Tente novamente.'); return; }
+    currentUser = null; currentProfile = null; $('#password').value = ''; clearNotice('#app-notice'); showLogin();
   }
-  document.querySelector('#logout-button').addEventListener('click', logoutUser);
-  document.querySelector('#dashboard-logout-button').addEventListener('click', logoutUser);
-
-  document.querySelectorAll('[data-dashboard-message]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const dashNotice = document.querySelector('#dashboard-notice');
-      dashNotice.textContent = button.dataset.dashboardMessage;
-      dashNotice.style.display = 'block';
-    });
+  $('#header-logout').addEventListener('click',logout);
+  $('#header-notifications').addEventListener('click',() => notice('#app-notice','O módulo de notificações será conectado quando o banco de dados estiver preparado.'));
+  $$('[data-page]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.page)));
+  $$('[data-go]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.go)));
+  $('#install-button').addEventListener('click',async() => {
+    if (!installPrompt) { notice('#login-notice','Para instalar, use o menu do navegador e escolha “Instalar aplicativo” ou “Adicionar à tela inicial”.'); return; }
+    await installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; $('#install-button').classList.add('hidden');
   });
-
+  window.addEventListener('beforeinstallprompt',event => { event.preventDefault(); installPrompt = event; $('#install-button').classList.remove('hidden'); });
   async function restoreSession() {
-    const { data } = await db.auth.getSession();
+    const {data} = await db.auth.getSession();
     if (data.session?.user) await loadProfile(data.session.user);
   }
   restoreSession();
-
-  let installPrompt = null;
-  const installButton = document.querySelector('#install-button');
-  window.addEventListener('beforeinstallprompt', (event) => {
-    event.preventDefault();
-    installPrompt = event;
-    installButton.classList.remove('hidden');
-  });
-  installButton.addEventListener('click', async () => {
-    if (!installPrompt) return;
-    await installPrompt.prompt();
-    await installPrompt.userChoice;
-    installPrompt = null;
-    installButton.classList.add('hidden');
-  });
-
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-    });
+    window.addEventListener('load',() => navigator.serviceWorker.register('./sw.js').catch(() => {}));
   }
+})();
 </script>
 </body>
 </html>
