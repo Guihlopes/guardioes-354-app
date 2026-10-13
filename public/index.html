@@ -21,25 +21,17 @@
     }
     * { box-sizing: border-box; }
     body {
-      margin: 0;
-      min-height: 100vh;
+      margin: 0; min-height: 100vh;
       background: radial-gradient(ellipse at top, #242832, var(--bg) 60%);
-      color: var(--text);
-      font-family: system-ui, sans-serif;
+      color: var(--text); font-family: system-ui, sans-serif;
     }
-    main {
-      width: min(100% - 32px, 520px);
-      margin: auto;
-      padding: 28px 0;
-    }
+    main { width: min(100% - 32px, 520px); margin: auto; padding: 28px 0; }
     header { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
     .logo { width:58px; height:58px; }
     .eyebrow { font-size:.7rem; letter-spacing:.13em; color:var(--gold); font-weight:800; }
     .club-name { font-size:1rem; font-weight:850; margin-top:4px; }
     .panel {
-      padding:24px;
-      border:1px solid #343945;
-      border-radius:22px;
+      padding:24px; border:1px solid #343945; border-radius:22px;
       background:linear-gradient(145deg,#20242d,#12141a);
       box-shadow:0 20px 55px #0005;
     }
@@ -84,7 +76,7 @@
 
   <section id="login-panel" class="panel">
     <h1>Uma irmandade.<br><span>Uma estrada.</span></h1>
-    <p>Entre com sua conta para acessar o aplicativo exclusivo dos membros.</p>
+    <p>O espaço exclusivo dos membros dos Guardiões da 354.</p>
 
     <form id="login-form">
       <label for="email">E-mail cadastrado</label>
@@ -96,39 +88,21 @@
         placeholder="Sua senha" required>
 
       <button id="login-button" class="primary" type="submit">Entrar no aplicativo</button>
+      <button id="first-access-button" class="secondary" type="button">Primeiro acesso</button>
     </form>
 
-    <p class="muted">O acesso é liberado somente para contas autorizadas pelo motoclube.</p>
-    <button id="install-button" class="secondary hidden" type="button">
-      Instalar aplicativo
-    </button>
+    <p class="muted">O acesso é exclusivo para integrantes autorizados pelo motoclube.</p>
+    <button id="install-button" class="secondary hidden" type="button">Instalar aplicativo</button>
   </section>
 
   <section id="profile-panel" class="panel hidden">
     <h1>Bem-vindo!</h1>
-    <p>Seu acesso foi autenticado. Confira seu perfil.</p>
-
-    <div class="profile-row">
-      <div class="muted">Nome</div>
-      <div id="profile-name" class="value"></div>
-    </div>
-    <div class="profile-row">
-      <div class="muted">Cargo no motoclube</div>
-      <div id="profile-position" class="value"></div>
-    </div>
-    <div class="profile-row">
-      <div class="muted">Situação</div>
-      <div id="profile-status" class="value"></div>
-    </div>
-    <div class="profile-row">
-      <div class="muted">Categoria</div>
-      <div id="profile-rider" class="value"></div>
-    </div>
-    <div class="profile-row">
-      <div class="muted">Permissão no aplicativo</div>
-      <div id="profile-role" class="value"></div>
-    </div>
-
+    <p>Confira seu perfil no motoclube.</p>
+    <div class="profile-row"><div class="muted">Nome</div><div id="profile-name" class="value"></div></div>
+    <div class="profile-row"><div class="muted">Cargo no motoclube</div><div id="profile-position" class="value"></div></div>
+    <div class="profile-row"><div class="muted">Situação</div><div id="profile-status" class="value"></div></div>
+    <div class="profile-row"><div class="muted">Categoria</div><div id="profile-rider" class="value"></div></div>
+    <div class="profile-row"><div class="muted">Permissão no aplicativo</div><div id="profile-role" class="value"></div></div>
     <button id="logout-button" class="secondary" type="button">Sair da conta</button>
   </section>
 
@@ -140,7 +114,6 @@
 <script>
   const SUPABASE_URL = 'https://nlaywsguzsiwvexwnakp.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_eIzAaMENq8u1smn5gVR3Lg_cj9bABxk';
-
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -148,13 +121,13 @@
   const profilePanel = document.querySelector('#profile-panel');
   const form = document.querySelector('#login-form');
   const loginButton = document.querySelector('#login-button');
+  const firstAccessButton = document.querySelector('#first-access-button');
   const notice = document.querySelector('#notice');
 
   function showNotice(message) {
     notice.textContent = message;
     notice.style.display = 'block';
   }
-
   function clearNotice() {
     notice.textContent = '';
     notice.style.display = 'none';
@@ -162,18 +135,14 @@
 
   async function loadProfile(user) {
     clearNotice();
-
-    const { data, error } = await db
-      .from('member_profiles')
+    const { data, error } = await db.from('member_profiles')
       .select('full_name, role, active, club_position, member_status, rider_type')
-      .eq('id', user.id)
-      .maybeSingle();
+      .eq('id', user.id).maybeSingle();
 
     if (error) {
       showNotice('Não foi possível consultar seu perfil. Tente novamente.');
       return;
     }
-
     if (!data || !data.active) {
       await db.auth.signOut();
       showNotice('Sua conta ainda não está autorizada a entrar no aplicativo.');
@@ -200,33 +169,58 @@
     try {
       const email = document.querySelector('#email').value.trim();
       const password = document.querySelector('#password').value;
-
-      const { data, error } = await db.auth.signInWithPassword({
-        email,
-        password
-      });
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
 
       if (error) {
-        showNotice('Não foi possível entrar. Confira o e-mail e a senha ou verifique se sua conta já foi liberada.');
+        showNotice('Não foi possível entrar. Confira o e-mail e a senha ou verifique se o acesso foi liberado.');
       } else if (data.user) {
         await loadProfile(data.user);
       }
     } catch {
-      showNotice('Não foi possível conectar ao serviço. Verifique sua internet e tente novamente.');
+      showNotice('Falha de conexão. Verifique sua internet e tente novamente.');
     } finally {
       loginButton.disabled = false;
       loginButton.textContent = 'Entrar no aplicativo';
     }
   });
 
+  firstAccessButton.addEventListener('click', async () => {
+    clearNotice();
+    const email = document.querySelector('#email').value.trim();
+
+    if (!email) {
+      showNotice('Digite seu e-mail cadastrado primeiro.');
+      document.querySelector('#email').focus();
+      return;
+    }
+
+    firstAccessButton.disabled = true;
+    firstAccessButton.textContent = 'Verificando...';
+
+    try {
+      const { data, error } = await db.functions.invoke('primeiro-acesso', {
+        body: { email }
+      });
+
+      if (error) {
+        showNotice('Não foi possível solicitar o primeiro acesso. Tente novamente.');
+      } else {
+        showNotice(data?.message || 'Se o e-mail estiver autorizado, você receberá instruções.');
+      }
+    } catch {
+      showNotice('Falha de conexão. Verifique sua internet e tente novamente.');
+    } finally {
+      firstAccessButton.disabled = false;
+      firstAccessButton.textContent = 'Primeiro acesso';
+    }
+  });
+
   document.querySelector('#logout-button').addEventListener('click', async () => {
     const { error } = await db.auth.signOut();
-
     if (error) {
       showNotice('Não foi possível encerrar a sessão. Tente novamente.');
       return;
     }
-
     profilePanel.classList.add('hidden');
     loginPanel.classList.remove('hidden');
     document.querySelector('#password').value = '';
@@ -237,7 +231,6 @@
     const { data } = await db.auth.getSession();
     if (data.session?.user) await loadProfile(data.session.user);
   }
-
   restoreSession();
 
   let installPrompt = null;
