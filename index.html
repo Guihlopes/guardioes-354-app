@@ -148,12 +148,47 @@
       .panel { padding:20px; }
       .install-area { padding-top:12px; }
     }
+
+    .dashboard { width:100%; }
+    .dash-top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:22px; }
+    .dash-brand { display:flex; align-items:center; gap:12px; min-width:0; }
+    .dash-mini-logo { width:48px; height:48px; object-fit:contain; border-radius:10px; }
+    .dash-kicker { color:var(--red); text-transform:uppercase; font-size:.68rem; font-weight:850; letter-spacing:.14em; }
+    .dash-title { font-size:1.2rem; font-weight:900; margin-top:3px; }
+    .logout-small { width:auto; padding:9px 11px; margin:0; background:rgba(255,255,255,.04); border:1px solid var(--line); color:#ddd; font-size:.78rem; letter-spacing:0; }
+    .welcome-card { padding:22px; border:1px solid rgba(225,29,46,.34); border-radius:22px; background:linear-gradient(135deg,rgba(42,15,19,.72),rgba(15,16,18,.96) 64%); box-shadow:0 16px 38px rgba(0,0,0,.24); }
+    .welcome-small { color:#c3c4c7; font-size:.78rem; text-transform:uppercase; letter-spacing:.13em; font-weight:750; }
+    .welcome-card h2 { font-size:1.8rem; line-height:1.1; margin:9px 0 8px; font-weight:900; }
+    .welcome-card h2 span { color:var(--red); }
+    .welcome-card p { margin:0; color:#b9bbc0; line-height:1.5; }
+    .status-chip { display:inline-flex; align-items:center; gap:7px; margin-top:16px; padding:7px 10px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); font-size:.75rem; color:#e5e5e6; }
+    .status-dot { width:7px; height:7px; background:#b7b9bd; border-radius:50%; box-shadow:0 0 0 3px rgba(255,255,255,.06); }
+    .section-head { display:flex; justify-content:space-between; align-items:end; gap:12px; margin:26px 0 13px; }
+    .section-head h3 { margin:0; font-size:1.03rem; font-weight:850; }
+    .section-head p { margin:4px 0 0; font-size:.8rem; color:var(--muted); }
+    .shortcut-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .shortcut { text-align:left; min-height:142px; padding:16px; border:1px solid var(--line); border-radius:18px; background:linear-gradient(145deg,rgba(26,28,32,.98),rgba(13,14,16,.98)); color:var(--text); margin:0; letter-spacing:0; font-weight:500; }
+    .shortcut:disabled { opacity:1; cursor:default; }
+    .shortcut-icon { display:flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:12px; background:rgba(225,29,46,.12); border:1px solid rgba(225,29,46,.28); color:#f04452; font-size:1.15rem; margin-bottom:13px; }
+    .shortcut strong { display:block; font-size:.94rem; margin-bottom:5px; }
+    .shortcut small { display:block; color:var(--muted); line-height:1.4; font-size:.76rem; }
+    .soon-label { display:inline-block; margin-top:10px; color:#c4c5c8; font-size:.65rem; text-transform:uppercase; letter-spacing:.08em; }
+    .member-card { margin-top:20px; padding:18px; border:1px solid var(--line); border-radius:18px; background:rgba(18,19,21,.92); }
+    .member-card-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:15px; }
+    .member-card-head h3 { margin:0; font-size:1rem; }
+    .profile-pill { border:1px solid rgba(225,29,46,.35); background:rgba(225,29,46,.1); color:#ffb3ba; padding:5px 8px; border-radius:999px; font-size:.68rem; }
+    .member-info { display:grid; grid-template-columns:1fr 1fr; gap:14px 10px; }
+    .member-info .muted { font-size:.72rem; }
+    .member-info .value { font-size:.86rem; overflow-wrap:anywhere; }
+    .dash-footer { text-align:center; margin:24px 0 0; color:#73767c; font-size:.68rem; letter-spacing:.06em; }
+    @media (max-width:360px) { .shortcut-grid { gap:8px; } .shortcut { padding:12px; min-height:132px; } .welcome-card h2 { font-size:1.55rem; } }
+
   </style>
 </head>
 <body>
 <main>
   <div class="brand">
-    <img class="logo" src="/icons/guardioes-logo-transparente.png?v=1" alt="Logo original do Motoclube Guardiões da 354">
+    <img class="logo" src="./icons/guardioes-logo.png" alt="Logo original do Motoclube Guardiões da 354">
   </div>
 
   <section id="login-panel" class="panel">
@@ -190,6 +225,76 @@
     <div class="profile-row"><div class="muted">Categoria</div><div id="profile-rider" class="value"></div></div>
     <div class="profile-row"><div class="muted">Permissão no aplicativo</div><div id="profile-role" class="value"></div></div>
     <button id="logout-button" class="secondary" type="button">Sair da conta</button>
+  </section>
+
+
+  <section id="dashboard-panel" class="dashboard hidden">
+    <div class="dash-top">
+      <div class="dash-brand">
+        <img class="dash-mini-logo" src="/icons/guardioes-logo.png?v=2" alt="Guardiões da 354">
+        <div>
+          <div class="dash-kicker">Área do integrante</div>
+          <div class="dash-title">GUARDIÕES DA 354</div>
+        </div>
+      </div>
+      <button id="dashboard-logout-button" class="logout-small" type="button">Sair ↗</button>
+    </div>
+
+    <div class="welcome-card">
+      <div class="welcome-small">Uma irmandade. Uma estrada.</div>
+      <h2>Bem-vindo,<br><span id="dashboard-name">integrante</span>.</h2>
+      <p>Este é o espaço exclusivo para acompanhar a vida do nosso motoclube.</p>
+      <div class="status-chip"><span class="status-dot"></span> Acesso autorizado</div>
+    </div>
+
+    <div class="section-head">
+      <div>
+        <h3>Acesso rápido</h3>
+        <p>O que você procura hoje?</p>
+      </div>
+    </div>
+    <div class="shortcut-grid">
+      <button class="shortcut" type="button" data-dashboard-message="A área de membros será conectada ao banco de dados na próxima etapa.">
+        <span class="shortcut-icon" aria-hidden="true">♟</span>
+        <strong>Membros</strong>
+        <small>Integrantes e funções do motoclube</small>
+        <span class="soon-label">Em desenvolvimento</span>
+      </button>
+      <button class="shortcut" type="button" data-dashboard-message="A agenda de reuniões, eventos e passeios será adicionada na próxima etapa.">
+        <span class="shortcut-icon" aria-hidden="true">▦</span>
+        <strong>Agenda</strong>
+        <small>Reuniões, eventos e passeios</small>
+        <span class="soon-label">Em desenvolvimento</span>
+      </button>
+      <button class="shortcut" type="button" data-dashboard-message="A área de comunicados será adicionada na próxima etapa.">
+        <span class="shortcut-icon" aria-hidden="true">▤</span>
+        <strong>Comunicados</strong>
+        <small>Informações importantes do clube</small>
+        <span class="soon-label">Em desenvolvimento</span>
+      </button>
+      <button class="shortcut" type="button" data-dashboard-message="Seu perfil está exibido logo abaixo nesta tela.">
+        <span class="shortcut-icon" aria-hidden="true">♙</span>
+        <strong>Meu perfil</strong>
+        <small>Seu cargo e dados de integrante</small>
+        <span class="soon-label">Ver perfil abaixo</span>
+      </button>
+    </div>
+
+    <div id="dashboard-notice" class="notice" role="status" aria-live="polite"></div>
+
+    <section class="member-card">
+      <div class="member-card-head">
+        <h3>Meu perfil</h3>
+        <span id="dashboard-role" class="profile-pill">Membro</span>
+      </div>
+      <div class="member-info">
+        <div><div class="muted">Nome completo</div><div id="dashboard-full-name" class="value"></div></div>
+        <div><div class="muted">Cargo no motoclube</div><div id="dashboard-position" class="value"></div></div>
+        <div><div class="muted">Situação</div><div id="dashboard-status" class="value"></div></div>
+        <div><div class="muted">Categoria</div><div id="dashboard-rider" class="value"></div></div>
+      </div>
+    </section>
+    <div class="dash-footer">GUARDIÕES DA 354 · SÃO GOTARDO — MG</div>
   </section>
 
   <div id="notice" class="notice" role="status" aria-live="polite"></div>
@@ -246,7 +351,14 @@
     document.querySelector('#profile-role').textContent = data.role === 'admin' ? 'Administrador' : 'Membro';
 
     loginPanel.classList.add('hidden');
-    profilePanel.classList.remove('hidden');
+    profilePanel.classList.add('hidden');
+    document.querySelector('#dashboard-panel').classList.remove('hidden');
+    document.querySelector('#dashboard-name').textContent = data.full_name.split(' ')[0];
+    document.querySelector('#dashboard-full-name').textContent = data.full_name;
+    document.querySelector('#dashboard-position').textContent = data.club_position || 'Membro';
+    document.querySelector('#dashboard-status').textContent = data.member_status || 'Ativo';
+    document.querySelector('#dashboard-rider').textContent = data.rider_type || 'Não informado';
+    document.querySelector('#dashboard-role').textContent = data.role === 'admin' ? 'Administrador' : 'Membro';
   }
 
   form.addEventListener('submit', async (event) => {
@@ -301,16 +413,27 @@
     }
   });
 
-  document.querySelector('#logout-button').addEventListener('click', async () => {
+  async function logoutUser() {
     const { error } = await db.auth.signOut();
     if (error) {
       showNotice('Não foi possível encerrar a sessão. Tente novamente.');
       return;
     }
     profilePanel.classList.add('hidden');
+    document.querySelector('#dashboard-panel').classList.add('hidden');
     loginPanel.classList.remove('hidden');
     document.querySelector('#password').value = '';
     clearNotice();
+  }
+  document.querySelector('#logout-button').addEventListener('click', logoutUser);
+  document.querySelector('#dashboard-logout-button').addEventListener('click', logoutUser);
+
+  document.querySelectorAll('[data-dashboard-message]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const dashNotice = document.querySelector('#dashboard-notice');
+      dashNotice.textContent = button.dataset.dashboardMessage;
+      dashNotice.style.display = 'block';
+    });
   });
 
   async function restoreSession() {
