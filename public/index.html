@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -7,62 +8,259 @@
   <meta name="description" content="Aplicativo dos membros do Motoclube Guardiões da 354.">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icons/icon.svg">
   <title>Guardiões da 354</title>
   <style>
-    :root{color-scheme:dark;--bg:#0c0e12;--panel:#171a21;--line:#2a2e38;--text:#f5f5f6;--muted:#a4a9b5;--gold:#d7a83d}
-    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#242832 0,#0c0e12 55%);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
-    main{width:min(100% - 32px,520px);margin:auto;padding:calc(28px + env(safe-area-inset-top)) 0 calc(28px + env(safe-area-inset-bottom))}
-    header{display:flex;align-items:center;gap:14px;margin-bottom:34px}.logo{width:60px;height:60px;flex:none}.eyebrow{font-size:.72rem;letter-spacing:.17em;color:var(--gold);font-weight:800}.club-name{font-size:1.08rem;font-weight:850;letter-spacing:.02em;margin-top:3px}
-    .hero{padding:28px 22px;border:1px solid #343945;border-radius:24px;background:linear-gradient(145deg,#20242d,#12141a);box-shadow:0 20px 55px #0005}
-    .tag{display:inline-flex;border:1px solid #5b4925;color:#f0c75c;background:#382d17;border-radius:999px;padding:6px 10px;font-size:.72rem;font-weight:750;letter-spacing:.06em}
-    h1{font-size:clamp(2rem,8vw,3.1rem);line-height:1.04;letter-spacing:-.045em;margin:18px 0 12px}h1 span{color:var(--gold)}p{color:var(--muted);line-height:1.6;margin:0}
-    .actions{display:grid;gap:10px;margin-top:24px}.btn{width:100%;border:0;border-radius:13px;padding:15px 16px;font:inherit;font-weight:800;cursor:pointer}.primary{background:var(--gold);color:#17130a}.secondary{background:#252a34;color:var(--text);border:1px solid #3a404d}
-    .section-title{font-size:1rem;margin:28px 0 12px}.features{display:grid;gap:10px}.feature{display:flex;gap:13px;align-items:flex-start;padding:16px;background:#15181e;border:1px solid var(--line);border-radius:16px}.feature-icon{font-size:1.25rem;width:30px}.feature strong{display:block;margin-bottom:4px}.feature p{font-size:.88rem}
-    .notice{display:none;margin-top:14px;padding:14px;border-radius:14px;background:#252a34;border:1px solid #3a404d;color:var(--muted);font-size:.9rem;line-height:1.55}.notice strong{color:var(--text)}footer{text-align:center;font-size:.75rem;color:#777e8d;margin-top:30px}
+    :root {
+      color-scheme: dark;
+      --bg: #0c0e12;
+      --panel: #171a21;
+      --line: #2a2e38;
+      --text: #f5f5f6;
+      --muted: #a4a9b5;
+      --gold: #d7a83d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at top, #242832, var(--bg) 60%);
+      color: var(--text);
+      font-family: system-ui, sans-serif;
+    }
+    main {
+      width: min(100% - 32px, 520px);
+      margin: auto;
+      padding: 28px 0;
+    }
+    header { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+    .logo { width:58px; height:58px; }
+    .eyebrow { font-size:.7rem; letter-spacing:.13em; color:var(--gold); font-weight:800; }
+    .club-name { font-size:1rem; font-weight:850; margin-top:4px; }
+    .panel {
+      padding:24px;
+      border:1px solid #343945;
+      border-radius:22px;
+      background:linear-gradient(145deg,#20242d,#12141a);
+      box-shadow:0 20px 55px #0005;
+    }
+    h1 { font-size:2rem; line-height:1.1; margin:0 0 10px; }
+    h1 span { color:var(--gold); }
+    p { color:var(--muted); line-height:1.6; }
+    label { display:block; font-size:.9rem; margin:18px 0 7px; }
+    input {
+      width:100%; padding:14px; border-radius:12px;
+      border:1px solid #3a404d; background:#0f1116;
+      color:var(--text); font:inherit;
+    }
+    button {
+      width:100%; border:0; border-radius:12px; padding:14px;
+      font:inherit; font-weight:800; cursor:pointer; margin-top:12px;
+    }
+    button:disabled { opacity:.6; cursor:wait; }
+    .primary { background:var(--gold); color:#17130a; }
+    .secondary { background:#252a34; color:var(--text); border:1px solid #3a404d; }
+    .notice {
+      display:none; margin-top:16px; padding:13px; border-radius:12px;
+      background:#252a34; border:1px solid #3a404d;
+      line-height:1.5; overflow-wrap:anywhere;
+    }
+    .muted { color:var(--muted); font-size:.88rem; }
+    .hidden { display:none !important; }
+    .profile-row { padding:12px 0; border-bottom:1px solid var(--line); }
+    .profile-row:last-child { border-bottom:0; }
+    .value { font-weight:700; margin-top:4px; }
+    footer { text-align:center; color:#777e8d; font-size:.75rem; margin:26px 0; }
   </style>
 </head>
 <body>
 <main>
   <header>
     <img class="logo" src="./icons/icon.svg" alt="Símbolo dos Guardiões da 354">
-    <div><div class="eyebrow">MOTOCLUBE • SÃO GOTARDO — MG</div><div class="club-name">GUARDIÕES DA 354</div></div>
-  </header>
-  <section class="hero">
-    <span class="tag">APLICATIVO OFICIAL • EM CONSTRUÇÃO</span>
-    <h1>Uma irmandade.<br><span>Uma estrada.</span></h1>
-    <p>O espaço dos membros dos Guardiões da 354 para acompanhar passeios, eventos e comunicados do motoclube.</p>
-    <div class="actions">
-      <button id="install" class="btn primary" hidden>Instalar aplicativo</button>
-      <button id="ios-help" class="btn secondary">Como instalar no iPhone</button>
+    <div>
+      <div class="eyebrow">MOTOCLUBE • SÃO GOTARDO — MG</div>
+      <div class="club-name">GUARDIÕES DA 354</div>
     </div>
-    <div id="install-note" class="notice" role="status"></div>
+  </header>
+
+  <section id="login-panel" class="panel">
+    <h1>Uma irmandade.<br><span>Uma estrada.</span></h1>
+    <p>Entre com sua conta para acessar o aplicativo exclusivo dos membros.</p>
+
+    <form id="login-form">
+      <label for="email">E-mail cadastrado</label>
+      <input id="email" type="email" autocomplete="username"
+        placeholder="seuemail@exemplo.com" required>
+
+      <label for="password">Senha</label>
+      <input id="password" type="password" autocomplete="current-password"
+        placeholder="Sua senha" required>
+
+      <button id="login-button" class="primary" type="submit">Entrar no aplicativo</button>
+    </form>
+
+    <p class="muted">O acesso é liberado somente para contas autorizadas pelo motoclube.</p>
+    <button id="install-button" class="secondary hidden" type="button">
+      Instalar aplicativo
+    </button>
   </section>
-  <h2 class="section-title">O que estamos preparando</h2>
-  <section class="features">
-    <article class="feature"><div class="feature-icon">🔐</div><div><strong>Acesso exclusivo</strong><p>Entrada individual para membros autorizados.</p></div></article>
-    <article class="feature"><div class="feature-icon">🏍️</div><div><strong>Passeios e eventos</strong><p>Agenda do motoclube com informações e detalhes dos encontros.</p></div></article>
-    <article class="feature"><div class="feature-icon">🔔</div><div><strong>Comunicados</strong><p>Área para avisos e, futuramente, notificações no celular.</p></div></article>
+
+  <section id="profile-panel" class="panel hidden">
+    <h1>Bem-vindo!</h1>
+    <p>Seu acesso foi autenticado. Confira seu perfil.</p>
+
+    <div class="profile-row">
+      <div class="muted">Nome</div>
+      <div id="profile-name" class="value"></div>
+    </div>
+    <div class="profile-row">
+      <div class="muted">Cargo no motoclube</div>
+      <div id="profile-position" class="value"></div>
+    </div>
+    <div class="profile-row">
+      <div class="muted">Situação</div>
+      <div id="profile-status" class="value"></div>
+    </div>
+    <div class="profile-row">
+      <div class="muted">Categoria</div>
+      <div id="profile-rider" class="value"></div>
+    </div>
+    <div class="profile-row">
+      <div class="muted">Permissão no aplicativo</div>
+      <div id="profile-role" class="value"></div>
+    </div>
+
+    <button id="logout-button" class="secondary" type="button">Sair da conta</button>
   </section>
-  <footer>Guardiões da 354 • Projeto independente do site existente</footer>
+
+  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+  <footer>Guardiões da 354 • Aplicativo independente do site existente</footer>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const installButton = document.querySelector('#install');
-  const note = document.querySelector('#install-note');
-  let installPrompt = null;
-  window.addEventListener('beforeinstallprompt', (event) => {
-    event.preventDefault(); installPrompt = event; installButton.hidden = false;
+  const SUPABASE_URL = 'https://nlaywsguzsiwvexwnakp.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_eIzAaMENq8u1smn5gVR3Lg_cj9bABxk';
+
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const loginPanel = document.querySelector('#login-panel');
+  const profilePanel = document.querySelector('#profile-panel');
+  const form = document.querySelector('#login-form');
+  const loginButton = document.querySelector('#login-button');
+  const notice = document.querySelector('#notice');
+
+  function showNotice(message) {
+    notice.textContent = message;
+    notice.style.display = 'block';
+  }
+
+  function clearNotice() {
+    notice.textContent = '';
+    notice.style.display = 'none';
+  }
+
+  async function loadProfile(user) {
+    clearNotice();
+
+    const { data, error } = await db
+      .from('member_profiles')
+      .select('full_name, role, active, club_position, member_status, rider_type')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (error) {
+      showNotice('Não foi possível consultar seu perfil. Tente novamente.');
+      return;
+    }
+
+    if (!data || !data.active) {
+      await db.auth.signOut();
+      showNotice('Sua conta ainda não está autorizada a entrar no aplicativo.');
+      return;
+    }
+
+    document.querySelector('#profile-name').textContent = data.full_name;
+    document.querySelector('#profile-position').textContent = data.club_position || 'Membro';
+    document.querySelector('#profile-status').textContent = data.member_status || 'Ativo';
+    document.querySelector('#profile-rider').textContent = data.rider_type || 'Não informado';
+    document.querySelector('#profile-role').textContent =
+      data.role === 'admin' ? 'Administrador' : 'Membro';
+
+    loginPanel.classList.add('hidden');
+    profilePanel.classList.remove('hidden');
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    clearNotice();
+    loginButton.disabled = true;
+    loginButton.textContent = 'Entrando...';
+
+    try {
+      const email = document.querySelector('#email').value.trim();
+      const password = document.querySelector('#password').value;
+
+      const { data, error } = await db.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        showNotice('Não foi possível entrar. Confira o e-mail e a senha ou verifique se sua conta já foi liberada.');
+      } else if (data.user) {
+        await loadProfile(data.user);
+      }
+    } catch {
+      showNotice('Não foi possível conectar ao serviço. Verifique sua internet e tente novamente.');
+    } finally {
+      loginButton.disabled = false;
+      loginButton.textContent = 'Entrar no aplicativo';
+    }
   });
+
+  document.querySelector('#logout-button').addEventListener('click', async () => {
+    const { error } = await db.auth.signOut();
+
+    if (error) {
+      showNotice('Não foi possível encerrar a sessão. Tente novamente.');
+      return;
+    }
+
+    profilePanel.classList.add('hidden');
+    loginPanel.classList.remove('hidden');
+    document.querySelector('#password').value = '';
+    clearNotice();
+  });
+
+  async function restoreSession() {
+    const { data } = await db.auth.getSession();
+    if (data.session?.user) await loadProfile(data.session.user);
+  }
+
+  restoreSession();
+
+  let installPrompt = null;
+  const installButton = document.querySelector('#install-button');
+
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    installPrompt = event;
+    installButton.classList.remove('hidden');
+  });
+
   installButton.addEventListener('click', async () => {
     if (!installPrompt) return;
-    installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; installButton.hidden = true;
+    await installPrompt.prompt();
+    await installPrompt.userChoice;
+    installPrompt = null;
+    installButton.classList.add('hidden');
   });
-  document.querySelector('#ios-help').addEventListener('click', () => {
-    note.style.display = 'block';
-    note.innerHTML = '<strong>Para instalar no iPhone</strong><br>1. Abra este site no Safari.<br>2. Toque em Compartilhar.<br>3. Escolha “Adicionar à Tela de Início”.<br>4. Confirme em “Adicionar”.<br><br>Essa opção ficará disponível quando o aplicativo estiver publicado em um endereço HTTPS.';
-  });
+
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
   }
 </script>
 </body>
