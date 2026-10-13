@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#111318"/>
-  <path d="M256 48 422 112v121c0 111-71 184-166 231C161 417 90 344 90 233V112Z" fill="#20242d" stroke="#d7a83d" stroke-width="14"/>
-  <path d="M256 100 370 144v88c0 79-46 136-114 176-68-40-114-97-114-176v-88Z" fill="none" stroke="#d7a83d" stroke-width="6"/>
-  <text x="256" y="246" fill="#f5f5f6" font-family="Arial,sans-serif" font-size="92" font-weight="900" text-anchor="middle">354</text>
-  <path d="M164 287h184" stroke="#d7a83d" stroke-width="8"/>
-  <text x="256" y="335" fill="#d7a83d" font-family="Arial,sans-serif" font-size="27" font-weight="800" letter-spacing="4" text-anchor="middle">GUARDIÕES</text>
-</svg>
