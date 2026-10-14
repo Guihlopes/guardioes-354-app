@@ -174,10 +174,10 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   let installPrompt = null;
 
   function notice(target, message) {
-    const el = $(target); el.textContent = message; el.classList.add('show'); el.style.display = 'block';
+    const el = $(target); if (!el) return; el.textContent = message; el.classList.add('show'); el.style.display = 'block';
   }
   function clearNotice(target) {
-    const el = $(target); el.textContent = ''; el.classList.remove('show'); el.style.display = 'none';
+    const el = $(target); if (!el) return; el.textContent = ''; el.classList.remove('show'); el.style.display = 'none';
   }
   function showLogin() {
     $('#app-screen').classList.add('hidden'); $('#login-screen').classList.remove('hidden');
@@ -199,13 +199,10 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     $('#home-first-name').textContent = firstName;
     $('#home-position').textContent = p.club_position || (p.full_name === 'Guilherme Henrique Lopes' ? 'Fundador/Vice-Presidente' : (p.rider_type === 'Garupa' ? 'Garupa' : 'Membro Ativo'));
     $('#home-status').innerHTML = '<span class="dot"></span> ' + (p.member_status || 'Ativo');
-    $('#profile-name').textContent = p.full_name || '—';
     $('#profile-position').textContent = p.club_position || (p.full_name === 'Guilherme Henrique Lopes' ? 'Fundador/Vice-Presidente' : 'Membro Ativo');
     $('#profile-status').textContent = p.member_status || 'Ativo';
-    $('#profile-rider').textContent = p.rider_type || 'Não informado';
     $('#profile-role').textContent = p.role === 'admin' ? 'Administrador' : 'Membro';
     $('#profile-role-badge').textContent = p.role === 'admin' ? 'Administrador' : 'Membro';
-    $('#profile-email').textContent = user.email || '—';
     if ($('#edit-full-name')) $('#edit-full-name').value = p.full_name || '';
     if ($('#edit-phone')) $('#edit-phone').value = p.phone || '';
     if ($('#edit-email')) $('#edit-email').value = user.email || '';
