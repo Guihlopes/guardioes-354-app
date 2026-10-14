@@ -218,7 +218,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   async function loadProfile(user) {
     clearNotice('#login-notice');
     const {data,error} = await db.from('member_profiles')
-      .select('full_name, role, active, club_position, member_status, rider_type, phone, motorcycle, pilot_id')
+      .select('full_name, role, active, club_position, member_status, rider_type')
       .eq('id',user.id).maybeSingle();
     if (error) { notice('#login-notice','Não foi possível consultar seu perfil. Tente novamente.'); return false; }
     if (!data || !data.active) {
