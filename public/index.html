@@ -48,6 +48,24 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   </div>
 </div>
 
+<div id="password-setup-screen" class="app-shell hidden">
+  <div class="login-wrap">
+    <div class="brand-login"><div class="eyebrow">Guardiões da 354 · Primeiro acesso</div></div>
+    <section class="panel">
+      <h1 class="login-title">Criar <span>sua senha</span></h1>
+      <p class="login-copy">Defina uma senha para acessar o aplicativo exclusivo dos integrantes.</p>
+      <form id="password-setup-form">
+        <label for="new-password">Nova senha</label>
+        <input id="new-password" type="password" autocomplete="new-password" minlength="8" placeholder="Mínimo de 8 caracteres" required>
+        <label for="confirm-password">Confirme a nova senha</label>
+        <input id="confirm-password" type="password" autocomplete="new-password" minlength="8" placeholder="Digite a senha novamente" required>
+        <button id="save-password-button" class="btn btn-primary btn-block" type="submit">Salvar senha e continuar →</button>
+      </form>
+      <div id="password-setup-notice" class="notice" role="status" aria-live="polite"></div>
+    </section>
+  </div>
+</div>
+
 <div id="app-screen" class="app-shell hidden">
   <header class="app-header">
     <div class="brand">
@@ -172,6 +190,22 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   let currentUser = null;
   let currentProfile = null;
   let installPrompt = null;
+  const initialAuthLinkType = new URLSearchParams((location.hash || '').replace(/^#/, '')).get('type');
+  let passwordSetupSession = false;
+
+  function showPasswordSetup() {
+    $('#login-screen').classList.add('hidden');
+    $('#app-screen').classList.add('hidden');
+    $('#password-setup-screen').classList.remove('hidden');
+  }
+
+  db.auth.onAuthStateChange((event, session) => {
+    if (event === 'PASSWORD_RECOVERY' || ((initialAuthLinkType === 'invite' || initialAuthLinkType === 'recovery') && session?.user)) {
+      passwordSetupSession = true;
+      currentUser = session?.user || currentUser;
+      showPasswordSetup();
+    }
+  });
 
   function notice(target, message) {
     const el = $(target); if (!el) return; el.textContent = message; el.classList.add('show'); el.style.display = 'block';
@@ -247,6 +281,44 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     } catch { notice('#login-notice','Falha de conexão. Verifique sua internet e tente novamente.'); }
     finally { button.disabled = false; button.textContent = 'Primeiro acesso?'; }
   });
+  $('#password-setup-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    clearNotice('#password-setup-notice');
+    const password = $('#new-password').value;
+    const confirmation = $('#confirm-password').value;
+    if (password.length < 8) {
+      notice('#password-setup-notice', 'A senha precisa ter pelo menos 8 caracteres.');
+      return;
+    }
+    if (password !== confirmation) {
+      notice('#password-setup-notice', 'As senhas não coincidem. Confira e tente novamente.');
+      return;
+    }
+    const button = $('#save-password-button');
+    button.disabled = true;
+    button.textContent = 'Salvando senha...';
+    try {
+      const {data, error} = await db.auth.updateUser({password});
+      if (error || !data?.user) {
+        notice('#password-setup-notice', 'Não foi possível salvar a senha. O link pode ter expirado; solicite um novo primeiro acesso.');
+        return;
+      }
+      currentUser = data.user;
+      passwordSetupSession = false;
+      $('#new-password').value = '';
+      $('#confirm-password').value = '';
+      $('#password-setup-screen').classList.add('hidden');
+      showLogin();
+      notice('#login-notice', 'Senha criada. Entre com seu e-mail e a nova senha.');
+      history.replaceState(null, '', location.pathname + location.search);
+    } catch {
+      notice('#password-setup-notice', 'Falha de conexão. Verifique sua internet e tente novamente.');
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Salvar senha e continuar →';
+    }
+  });
+
   async function logout() {
     const {error} = await db.auth.signOut();
     if (error) { notice('#app-notice','Não foi possível encerrar a sessão. Tente novamente.'); return; }
@@ -364,6 +436,12 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   });
   async function restoreSession() {
     const {data} = await db.auth.getSession();
+    if (data.session?.user && (passwordSetupSession || initialAuthLinkType === 'invite' || initialAuthLinkType === 'recovery')) {
+      currentUser = data.session.user;
+      passwordSetupSession = true;
+      showPasswordSetup();
+      return;
+    }
     if (data.session?.user) await loadProfile(data.session.user);
   }
   restoreSession();
