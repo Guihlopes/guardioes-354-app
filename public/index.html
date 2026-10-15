@@ -265,11 +265,45 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   async function loadMembers() {
     const box = $('#members-list'); if (!box) return;
     box.textContent = 'Carregando integrantes…';
-    const {data,error} = await db.from('member_profiles').select('id,full_name,club_position,member_status,rider_type,motorcycle,active').eq('active',true).order('full_name');
-    if (error) { box.textContent = 'Não foi possível carregar a lista. Verifique a configuração das permissões no Supabase.'; return; }
-    if (!data?.length) { box.textContent = 'Nenhum integrante ativo encontrado.'; return; }
+
+    // O diretório oficial contém os integrantes antes do primeiro acesso.
+    // Perfis pessoais só complementam telefone/moto/vínculo após a ativação.
+    const {data: directory, error: directoryError} = await db
+      .from('member_directory')
+      .select('full_name, motorcycle, member_type, club_roles, is_active, display_order')
+      .order('display_order', {ascending:true})
+      .order('full_name', {ascending:true});
+
+    if (directoryError) {
+      console.error('Falha ao carregar member_directory:', directoryError);
+      box.textContent = 'Não foi possível carregar o diretório oficial. Verifique as permissões de leitura de member_directory no Supabase.';
+      return;
+    }
+    if (!directory?.length) {
+      box.className = 'empty';
+      box.textContent = 'Nenhum integrante cadastrado no diretório oficial.';
+      return;
+    }
+
+    // Usa perfis apenas como complemento; não exige que cada integrante tenha login.
+    const {data: profiles, error: profilesError} = await db
+      .from('member_profiles')
+      .select('full_name, club_position, member_status, rider_type, motorcycle, active');
+    if (profilesError) console.warn('Perfis pessoais não puderam complementar o diretório:', profilesError);
+
+    const normalize = value => String(value || '').trim().toLocaleLowerCase('pt-BR');
+    const profileByName = new Map((profiles || []).map(p => [normalize(p.full_name), p]));
+    const members = directory.map(m => {
+      const p = profileByName.get(normalize(m.full_name)) || {};
+      const roles = Array.isArray(m.club_roles) ? m.club_roles.filter(Boolean).join(', ') : (m.club_roles || '');
+      const position = p.club_position || roles || (m.member_type || 'Integrante');
+      const motorcycle = p.motorcycle || m.motorcycle || 'Moto não informada';
+      const status = p.member_status || (m.is_active === false ? 'Inativo' : 'Ativo');
+      return {name:m.full_name, position, motorcycle, status};
+    });
+
     box.className = '';
-    box.innerHTML = data.map(m => `<div class="list-row"><div class="list-icon">♟</div><div class="list-main"><strong>${escapeHtml(m.full_name||'Integrante')}</strong><small>${escapeHtml(m.motorcycle||'Moto não informada')} · ${escapeHtml(m.club_position||m.rider_type||'Membro Ativo')}</small></div><span class="badge">${escapeHtml(m.member_status||'Ativo')}</span></div>`).join('');
+    box.innerHTML = members.map(m => `<div class="list-row"><div class="list-icon">♟</div><div class="list-main"><strong>${escapeHtml(m.name||'Integrante')}</strong><small>${escapeHtml(m.motorcycle)} · ${escapeHtml(m.position)}</small></div><span class="badge">${escapeHtml(m.status)}</span></div>`).join('');
   }
   function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
   async function loadPilotOptions() {
