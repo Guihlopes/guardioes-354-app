@@ -1102,7 +1102,7 @@ $('#member-card-photo-upload')?.addEventListener('change', async (event) => {
     if(signed.error || !signed.data){if(status)status.textContent='Foto enviada, mas não foi possível abrir o arquivo.';return;}
     const url=signed.data.signedUrl;
     const update=await db.from('member_profiles').update({photo_url:url}).eq('id',currentUser.id);
-    if(update.error){if(status)status.textContent='O banco precisa ter o campo photo_url.';notice('#app-notice','Foto enviada. Falta habilitar photo_url no perfil Supabase.');return;}
+    if(update.error){const detail=update.error.message||'Erro desconhecido';if(status)status.textContent='Não foi possível salvar a foto: '+detail;notice('#app-notice','Erro ao salvar foto: '+detail);return;}
     currentProfile.photo_url=url; if($('#member-card-photo'))$('#member-card-photo').src=url;
     if(status)status.textContent='Foto atualizada!';
   });
