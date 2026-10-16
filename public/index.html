@@ -366,7 +366,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
         </div>
       </div>
       <section id="admin-security-panel" class="hidden" style="margin:20px 0">
-        <div class="section-title"><div><h2>Permissões e histórico</h2><p>Registro das alterações administrativas feitas no aplicativo.</p></div><button class="btn" type="button" id="close-audit-log">Fechar</button></div>
+        <div class="section-title"><div><h2>Permissões e histórico</h2><p>Área de uso exclusivo do desenvolvedor do aplicativo.</p></div><button class="btn" type="button" id="close-audit-log">Fechar</button></div><div class="notice" style="margin-bottom:14px">⚠️ <strong>Área restrita ao desenvolvedor do app.</strong> Este painel é destinado exclusivamente à manutenção técnica, auditoria e diagnóstico do aplicativo Guardiões da 354. Não é uma ferramenta de uso da diretoria ou dos membros.</div>
         <div class="card" style="margin-bottom:14px">
           <h3 style="margin-top:0">Regras de acesso</h3>
           <div class="grid">
@@ -838,7 +838,9 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     }).join('')+'</div>';
     if(status)status.textContent=data.length+' registro(s) recentes';
   }
-  $('#open-audit-log')?.addEventListener('click',()=>{const panel=$('#admin-security-panel');panel?.classList.remove('hidden');loadAuditLog();panel?.scrollIntoView({behavior:'smooth',block:'start'});});
+  const isAppDeveloper = () => (currentUser?.email || '').toLowerCase() === 'gui.00sg@gmail.com';
+  $('#open-audit-log')?.classList.toggle('hidden', !isAppDeveloper());
+  $('#open-audit-log')?.addEventListener('click',()=>{if(!isAppDeveloper()){notice('#app-notice','Área de uso exclusivo do desenvolvedor do aplicativo.');return;}const panel=$('#admin-security-panel');panel?.classList.remove('hidden');loadAuditLog();panel?.scrollIntoView({behavior:'smooth',block:'start'});});
   $('#close-audit-log')?.addEventListener('click',()=>$('#admin-security-panel')?.classList.add('hidden'));
   $('#audit-refresh')?.addEventListener('click',loadAuditLog);
   $('#audit-apply-filters')?.addEventListener('click',loadAuditLog);
