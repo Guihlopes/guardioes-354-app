@@ -464,8 +464,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     // Perfis pessoais só complementam telefone/moto/vínculo após a ativação.
     const {data: directory, error: directoryError} = await db
       .from('member_directory')
-      .select('full_name, motorcycle, member_type, club_roles, is_active, display_order')
-      .order('display_order', {ascending:true})
+      .select('full_name, club_position, member_status, rider_type, app_role, is_founder')
       .order('full_name', {ascending:true});
 
     if (directoryError) {
@@ -489,10 +488,9 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const profileByName = new Map((profiles || []).map(p => [normalize(p.full_name), p]));
     const members = directory.map(m => {
       const p = profileByName.get(normalize(m.full_name)) || {};
-      const roles = Array.isArray(m.club_roles) ? m.club_roles.filter(Boolean).join(', ') : (m.club_roles || '');
-      const position = p.club_position || roles || (m.member_type || 'Integrante');
-      const motorcycle = p.motorcycle || m.motorcycle || 'Moto não informada';
-      const status = p.member_status || (m.is_active === false ? 'Inativo' : 'Ativo');
+      const position = p.club_position || m.club_position || (m.is_founder ? 'Fundador' : 'Integrante');
+      const motorcycle = p.motorcycle || 'Moto não informada';
+      const status = p.member_status || m.member_status || 'Ativo';
       return {name:m.full_name, position, motorcycle, status};
     });
 
