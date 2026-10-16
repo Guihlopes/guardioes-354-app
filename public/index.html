@@ -51,6 +51,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
 }
 #header-notifications{position:relative}#notification-dot{position:absolute;top:5px;right:5px;width:10px;height:10px;border-radius:50%;background:#ef3340;border:2px solid var(--panel);box-shadow:0 0 0 1px #ef334055}#notification-dot.hidden{display:none!important}
 .audience-box{border:1px solid var(--line);border-radius:14px;padding:15px;background:linear-gradient(145deg,#1b1d21,#111214);margin:12px 0}.audience-box h4{margin:0 0 5px;font-size:.98rem}.audience-box .audience-help{color:var(--muted);font-size:.8rem;line-height:1.45;margin:0 0 12px}.audience-box select[multiple]{width:100%;min-height:110px;padding:8px;border-radius:10px;background:#0e0f11;border:1px solid #393b42;color:var(--text)}.audience-section-title{display:flex;align-items:center;gap:8px;margin-bottom:8px}.audience-section-title .step{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:#df1e3124;color:#ff8b96;font-weight:700}.announcement-card{display:flex;gap:13px;padding:16px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(135deg,#1b1d21,#111214);margin:10px 0}.announcement-card .announcement-icon{flex:0 0 42px;width:42px;height:42px;border-radius:12px;background:#df1e311c;color:#f16b78;display:grid;place-items:center;font-size:1.15rem}.announcement-card .announcement-content{min-width:0;flex:1}.announcement-card h4{margin:0 0 6px;font-size:1rem}.announcement-card p{margin:0;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}.announcement-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font-size:.78rem;margin-top:10px}.notification-overlay{position:fixed;inset:0;background:#000b;z-index:1000;display:flex;justify-content:flex-end}.notification-panel{width:min(440px,100%);height:100%;overflow:auto;background:var(--panel);border-left:1px solid var(--line);padding:20px;box-shadow:-18px 0 50px #0008}.notification-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.notification-head h2{margin:0;font-size:1.25rem}.notification-item{padding:13px;border:1px solid var(--line);border-radius:12px;margin:9px 0;background:var(--panel2)}.notification-item.unread{border-color:#df1e31;background:linear-gradient(120deg,#df1e311c,var(--panel2))}.notification-item p{margin:6px 0;line-height:1.45}.notification-item small{color:var(--muted)}
+.vote-card{align-items:flex-start}.vote-card .vote-options{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.vote-card .vote-options .btn:disabled{opacity:.45}.vote-partials{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#090a0c}.vote-count{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #ffffff12}.vote-count:last-child{border-bottom:0}
 </style>
 </head>
 <body>
@@ -245,9 +246,18 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     </section>
     <section id="page-votes" class="app-page hidden-page">
       <div class="page-heading"><div><h1>Votações</h1><p>Deliberações com acesso definido pela diretoria.</p></div><span class="badge">Restrito</span></div>
-      <div class="card admin-only hidden" id="vote-create-card"><h3>Criar votação</h3><form id="vote-form"><label for="vote-title">Assunto da votação</label><input id="vote-title" required maxlength="180"><label for="vote-description">Descrição</label><textarea id="vote-description" maxlength="5000"></textarea><label for="vote-options">Opções (uma por linha)</label><textarea id="vote-options" required placeholder="Opção A&#10;Opção B"></textarea><label for="vote-targets">Quem pode ver e votar</label><select id="vote-targets"><option value="all">Todos os membros ativos</option><option value="board">Somente diretoria</option><option value="pilots">Somente pilotos</option><option value="prospects">Somente prospects</option></select><button class="btn btn-primary btn-block" type="submit">Criar votação</button></form></div>
-      <div class="card" style="margin-top:14px"><h3>Votações disponíveis</h3><div id="votes-list" class="empty">Carregando votações…</div></div>
-      <div class="card" style="margin-top:14px"><h3>Resultado e registro de votos</h3><div id="vote-results" class="empty">O relatório de quem votou em cada opção será exibido para a diretoria após o encerramento.</div></div>
+      <div class="card admin-only hidden" id="vote-create-card" style="margin-bottom:16px"><h3>＋ Criar votação</h3><p class="muted small">Defina o formato, o público e as opções. Os resultados parciais ficam visíveis durante a votação.</p><form id="vote-form">
+        <label for="vote-title">Título da votação</label><input id="vote-title" required maxlength="180" placeholder="Ex.: Escolha da data do próximo passeio">
+        <label for="vote-description">Descrição / contexto</label><textarea id="vote-description" maxlength="5000" placeholder="Explique o assunto para os integrantes"></textarea>
+        <label for="vote-type">Modalidade</label><select id="vote-type"><option value="simple">Escolher entre opções</option><option value="approval">Aprovação: Sim / Não / Abstenção</option></select>
+        <div id="vote-options-wrap"><label for="vote-options">Opções (uma por linha)</label><textarea id="vote-options" placeholder="Opção A&#10;Opção B"></textarea></div>
+        <label for="vote-closes-at">Encerrar em (opcional)</label><input id="vote-closes-at" type="datetime-local">
+        <div class="audience-box"><div class="audience-section-title"><span class="step">1</span><h4>Quem poderá ver e votar?</h4></div><p class="audience-help">Escolha um ou mais grupos, pessoas específicas ou ambos. Para limitar a uma pessoa, deixe os grupos vazios.</p>
+          <label for="vote-target-groups">Grupos (opcional)</label><select id="vote-target-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="board">Diretoria e fundadores</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select>
+          <label for="vote-target-members">Integrantes específicos (opcional)</label><select id="vote-target-members" multiple size="5"></select><small class="muted">No Windows, segure Ctrl para escolher mais de uma pessoa.</small></div>
+        <button class="btn btn-primary btn-block" type="submit">Publicar votação</button></form></div>
+      <div class="card" style="margin-top:14px"><div class="section-title"><div><h3 style="margin:0">Votações disponíveis</h3><p class="muted small">Vote e acompanhe as parciais enquanto a votação estiver aberta.</p></div><button class="btn" id="votes-refresh" type="button">Atualizar</button></div><div id="votes-list" class="empty">Carregando votações…</div></div>
+      <div class="card" style="margin-top:14px"><h3>Relatório da diretoria</h3><p class="muted small">Registro identificado de quem votou e qual opção escolheu.</p><div id="vote-results" class="empty">Os registros aparecem aqui para a diretoria.</div></div>
     </section>
     <section id="page-profile" class="app-page hidden-page">
       <div class="page-heading"><div><h1>Meu perfil</h1><p>Informações da sua conta e do seu vínculo com o motoclube.</p></div><span id="profile-role-badge" class="badge">Membro</span></div>
@@ -824,12 +834,47 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     if(error){box.textContent='Comunicados ainda não conectados. Aplique a configuração de banco indicada junto com este arquivo.';return;}
     box.innerHTML=data?.length?data.map(a=>`<article class="announcement-card"><div class="announcement-icon">▤</div><div class="announcement-content"><h4>${escapeHtml(a.title)}</h4><p>${escapeHtml(a.body)}</p><div class="announcement-meta"><span>◷ ${new Date(a.created_at).toLocaleString('pt-BR')}</span><span class="announcement-tag">Comunicado oficial</span></div></div></article>`).join(''):'<div class="empty">📭<br><strong>Nenhum comunicado por enquanto</strong><p class="muted">Quando a diretoria publicar um aviso, ele aparecerá aqui.</p></div>';
   }
-  async function loadVotes() {
+  async function loadVoteMemberChoices(){
+    const sel=$('#vote-target-members');if(!sel)return;
+    const {data,error}=await db.from('member_directory').select('full_name,email,member_status,rider_type,club_position').order('full_name',{ascending:true});
+    if(error){console.warn('Lista de integrantes das votações não carregada:',error);return;}
+    sel.innerHTML=(data||[]).filter(m=>m.email&&m.member_status!=='Inativo').map(m=>'<option value="'+escapeHtml(m.email)+'">'+escapeHtml(m.full_name)+' ('+escapeHtml(m.club_position||m.rider_type||'Integrante')+')</option>').join('');
+  }
+  $('#vote-type')?.addEventListener('change',()=>{const approval=$('#vote-type').value==='approval';$('#vote-options-wrap').classList.toggle('hidden',approval);$('#vote-options').required=!approval;});
+  $('#votes-refresh')?.addEventListener('click',loadVotes);
+  async function loadVotes(){
     const box=$('#votes-list');if(!box)return;
-    const {data,error}=await db.from('club_votes').select('id,title,description,options,closes_at,created_at').order('created_at',{ascending:false});
-    if(error){box.textContent='Votações ainda não conectadas. Aplique a configuração de banco indicada junto com este arquivo.';return;}
-    box.innerHTML=data?.length?data.map(v=>`<div class="list-row"><div class="list-icon">✓</div><div class="list-main"><strong>${escapeHtml(v.title)}</strong><small>${escapeHtml(v.description||'')}</small><div>${(v.options||[]).map(opt=>`<button class="btn" data-vote="${v.id}" data-option="${escapeHtml(opt)}">${escapeHtml(opt)}</button>`).join(' ')}</div></div></div>`).join(''):'<div class="empty">Nenhuma votação disponível.</div>';
-    box.querySelectorAll('[data-vote]').forEach(b=>b.addEventListener('click',async()=>{const {error}=await db.from('club_vote_ballots').insert({vote_id:b.dataset.vote,user_id:currentUser.id,option_selected:b.dataset.option});notice('#app-notice',error?'Não foi possível registrar o voto. Talvez você já tenha votado ou não tenha autorização.':'Voto registrado.');if(!error)loadVotes();}));
+    const {data,error}=await db.from('club_votes').select('id,title,description,options,closes_at,created_at,vote_type,visible_to_groups,visible_to_emails').order('created_at',{ascending:false});
+    if(error){box.textContent='Não foi possível carregar as votações. Confira a migração SQL.';return;}
+    const rows=data||[], ids=rows.map(v=>v.id);
+    let ballots=[],myBallots=[];
+    if(ids.length){
+      const {data:bs,error:be}=await db.from('club_vote_ballots').select('id,vote_id,user_id,voter_name,option_selected,created_at').in('vote_id',ids);
+      if(!be)ballots=bs||[];else console.warn('Resultados parciais indisponíveis:',be);
+      myBallots=ballots.filter(b=>b.user_id===currentUser.id);
+    }
+    const board=canManageAgenda(),now=Date.now();
+    box.innerHTML=rows.length?rows.map(v=>{
+      const allowedGroups=v.visible_to_groups||['all'];
+      const expired=v.closes_at&&new Date(v.closes_at).getTime()<=now;
+      const myVote=myBallots.find(b=>b.vote_id===v.id);
+      const opts=v.vote_type==='approval'?['Sim','Não','Abstenção']:(v.options||[]);
+      const vs=ballots.filter(b=>b.vote_id===v.id),total=vs.length;
+      const eligible=allowedGroups.includes('all')||allowedGroups.includes('board')||allowedGroups.includes('pilots')||allowedGroups.includes('pillion')||allowedGroups.includes('prospects')||(v.visible_to_emails||[]).length;
+      const counts=opts.map(opt=>({opt,count:vs.filter(b=>b.option_selected===opt).length}));
+      return '<article class="vote-card announcement-card"><div class="announcement-icon">✓</div><div class="announcement-content"><div class="announcement-meta"><span class="announcement-tag">'+(v.vote_type==='approval'?'Aprovação':'Votação')+'</span><span>'+(expired?'Encerrada': 'Aberta')+'</span>'+(v.closes_at?'<span>Até '+new Date(v.closes_at).toLocaleString('pt-BR')+'</span>':'')+'</div><h4 style="margin-top:9px">'+escapeHtml(v.title)+'</h4><p>'+escapeHtml(v.description||'')+'</p><div class="vote-options">'+opts.map(opt=>'<button class="btn" data-vote="'+v.id+'" data-option="'+escapeHtml(opt)+'" '+(myVote||expired?'disabled':'')+'>'+escapeHtml(opt)+(myVote&&myVote.option_selected===opt?' ✓':'')+'</button>').join(' ')+'</div><div class="vote-partials"><strong>Parcial ('+total+' voto(s))</strong>'+counts.map(c=>'<div class="vote-count"><span>'+escapeHtml(c.opt)+'</span><strong>'+c.count+'</strong></div>').join('')+'</div>'+(myVote?'<small class="muted">Seu voto: '+escapeHtml(myVote.option_selected)+'</small>':expired?'<small class="muted">Esta votação foi encerrada.</small>':'')+'</div></article>';
+    }).join(''):'<div class="empty">🗳️<br><strong>Nenhuma votação disponível</strong><p class="muted">Quando a diretoria publicar uma votação, ela aparecerá aqui.</p></div>';
+    box.querySelectorAll('[data-vote]').forEach(btn=>btn.addEventListener('click',async()=>{
+      btn.disabled=true;
+      const {error:voteError}=await db.from('club_vote_ballots').insert({vote_id:btn.dataset.vote,user_id:currentUser.id,voter_name:currentProfile.full_name,option_selected:btn.dataset.option});
+      notice('#app-notice',voteError?'Não foi possível registrar o voto. Talvez você já tenha votado ou a votação esteja encerrada.':'Voto registrado.');
+      await loadVotes();
+    }));
+    const report=$('#vote-results');
+    if(report){
+      if(!board){report.innerHTML='<div class="empty">Relatório restrito à diretoria e aos fundadores.</div>';}
+      else report.innerHTML=rows.length?rows.map(v=>'<div class="audience-box"><h4>'+escapeHtml(v.title)+'</h4>'+ballots.filter(b=>b.vote_id===v.id).map(b=>'<div class="announcement-meta"><strong>'+escapeHtml(b.voter_name||'Integrante')+'</strong><span>Votou: '+escapeHtml(b.option_selected)+'</span><span>'+new Date(b.created_at).toLocaleString('pt-BR')+'</span></div>').join('')+'</div>').join(''):'<div class="empty">Nenhuma votação criada.</div>';
+    }
   }
   $('#member-edit-cancel')?.addEventListener('click', () => $('#member-edit-modal').classList.add('hidden'));
   $('#member-edit-form')?.addEventListener('submit', async event => {
@@ -898,11 +943,18 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     notice('#app-notice',error?'Não foi possível publicar. Execute a migração SQL de Agenda e Comunicados no Supabase do aplicativo.':'Comunicado publicado.');if(!error){e.target.reset();loadAnnouncements();}
   });
   $('#vote-form')?.addEventListener('submit',async e=>{
-    e.preventDefault();if(currentProfile?.role!=='admin'){notice('#app-notice','Apenas administradores podem criar votações.');return;}
-    const options=$('#vote-options').value.split('\n').map(x=>x.trim()).filter(Boolean);
-    if(options.length<2){notice('#app-notice','Informe pelo menos duas opções, uma por linha.');return;}
-    const {error}=await db.from('club_votes').insert({title:$('#vote-title').value.trim(),description:$('#vote-description').value.trim(),options,target_group:$('#vote-targets').value,created_by:currentUser.id});
-    notice('#app-notice',error?'Não foi possível criar a votação. Verifique as tabelas e permissões do Supabase.':'Votação criada.');if(!error){e.target.reset();loadVotes();}
+    e.preventDefault();if(!canManageAgenda()){notice('#app-notice','Apenas a diretoria e os fundadores podem criar votações.');return;}
+    const selected=id=>Array.from($(id).selectedOptions).map(o=>o.value);
+    const groups=selected('#vote-target-groups'),emails=selected('#vote-target-members');
+    if(!groups.length&&!emails.length){notice('#app-notice','Escolha grupos ou integrantes específicos para votar.');return;}
+    const type=$('#vote-type').value;
+    const options=type==='approval'?['Sim','Não','Abstenção']:$('#vote-options').value.split('\n').map(x=>x.trim()).filter(Boolean);
+    if(type==='simple'&&options.length<2){notice('#app-notice','Informe pelo menos duas opções, uma por linha.');return;}
+    const closes=$('#vote-closes-at').value;
+    const payload={title:$('#vote-title').value.trim(),description:$('#vote-description').value.trim()||null,options,target_group:groups.includes('all')?'all':groups[0]||'custom',created_by:currentUser.id,vote_type:type,visible_to_groups:groups,visible_to_emails:emails,closes_at:closes?new Date(closes).toISOString():null};
+    const {error}=await db.from('club_votes').insert(payload);
+    notice('#app-notice',error?'Não foi possível criar a votação. Execute a migração de votações no Supabase.':'Votação publicada.');
+    if(!error){e.target.reset();$('#vote-type').value='simple';$('#vote-options-wrap').classList.remove('hidden');$('#vote-options').required=true;await loadVotes();}
   });
   async function restoreSession() {
     const {data} = await db.auth.getSession();
