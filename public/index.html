@@ -293,7 +293,9 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
           <div class="callout" style="margin-top:14px">Nome, categoria, situação (Ativo/Prospect), cargo e permissões são controlados pela diretoria. Você pode atualizar seu telefone e os dados de vínculo de piloto/garupa.</div>
           <div class="form-actions"><button class="btn btn-primary" type="submit">Salvar meus dados</button></div>
         </form>
-        <div class="section-title"><div><h2>Vínculo no motoclube</h2><p>Informações oficiais do seu cadastro.</p></div></div>
+        <div class="section-title"><div><h2>Notificações no celular</h2><p>Receba avisos mesmo quando o aplicativo estiver fechado.</p></div></div>
+        <div class="callout">Ative as notificações neste aparelho. No iPhone, o aplicativo precisa estar instalado na Tela de Início e o pedido deve ser aceito.</div>
+        <div class="form-actions"><button class="btn btn-primary" id="enable-push-button" type="button">Ativar notificações neste aparelho</button><span id="push-status" class="muted small" aria-live="polite">Verificando suporte…</span></div>
         <div class="profile-grid">
           <div class="profile-field"><div class="muted">Cargo</div><strong id="profile-position">—</strong></div>
           <div class="profile-field"><div class="muted">Situação</div><strong id="profile-status">—</strong></div>
@@ -323,6 +325,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
 (() => {
   const SUPABASE_URL = 'https://nlaywsguzsiwvexwnakp.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_eIzAaMENq8u1smn5gVR3Lg_cj9bABxk';
+  const PUSH_VAPID_PUBLIC_KEY = 'BEeJLsU2UZ-LPrDugMMPni_xN7MTHMmo8Kdc_wxgo_-ASfYKwYzX8iPLy7Qygr9SsvBR_R5PqRjqajYrHLFhXy8';
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
@@ -641,6 +644,34 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     }
   });
 
+  function urlBase64ToUint8Array(base64String) {
+    const padding='='.repeat((4-base64String.length%4)%4);
+    const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+    const raw=atob(base64);return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
+  }
+  async function updatePushStatus(){
+    const el=$('#push-status'),btn=$('#enable-push-button');if(!el||!btn)return;
+    if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)){el.textContent='Este navegador não oferece push. No iPhone, instale o app na Tela de Início e abra por lá.';btn.disabled=true;return;}
+    if(Notification.permission==='denied'){el.textContent='Notificações bloqueadas nas configurações do navegador/celular.';return;}
+    try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();el.textContent=sub?'Notificações ativadas neste aparelho.': 'Ainda não ativadas neste aparelho.';btn.textContent=sub?'Atualizar notificações deste aparelho':'Ativar notificações neste aparelho';}catch(e){el.textContent='Não foi possível verificar o suporte neste aparelho.';}
+  }
+  $('#enable-push-button')?.addEventListener('click',async()=>{
+    const btn=$('#enable-push-button'),status=$('#push-status');btn.disabled=true;status.textContent='Ativando notificações…';
+    try{
+      if(!currentUser)throw new Error('Entre no aplicativo antes de ativar as notificações.');
+      if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window))throw new Error('Este navegador não oferece notificações push. No iPhone, instale o app na Tela de Início e abra-o por lá.');
+      const permission=await Notification.requestPermission();if(permission!=='granted')throw new Error('Permissão não concedida. Autorize notificações nas configurações do navegador/celular.');
+      const reg=await navigator.serviceWorker.ready;
+      let sub=await reg.pushManager.getSubscription();
+      if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(PUSH_VAPID_PUBLIC_KEY)});
+      const json=sub.toJSON();
+      const {error}=await db.from('push_subscriptions').upsert({user_id:currentUser.id,endpoint:json.endpoint,subscription:json,updated_at:new Date().toISOString()},{onConflict:'endpoint'});
+      if(error)throw error;
+      status.textContent='Notificações ativadas neste aparelho!';btn.textContent='Atualizar notificações deste aparelho';
+    }catch(e){console.error('Falha ao ativar push:',e);status.textContent=e.message||'Não foi possível ativar as notificações.';}
+    finally{btn.disabled=false;}
+  });
+  updatePushStatus();
   async function loadMembers() {
     const box = $('#members-list'); if (!box) return;
     box.textContent = 'Carregando integrantes…';
