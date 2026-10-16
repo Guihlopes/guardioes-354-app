@@ -522,6 +522,11 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const unread=(data||[]).filter(n=>!n.read_at);
     const lines=(data||[]).map(n=>(n.read_at?'':'🔔 ')+n.title+' — '+n.body+' ('+new Date(n.created_at).toLocaleString('pt-BR')+')').join('\n');
     notice('#app-notice',lines?('Notificações ('+unread.length+' não lidas): '+lines):'Você não tem notificações.');
+    if(unread.length){
+      const ids=unread.map(n=>n.id);
+      const {error:readError}=await db.from('club_notifications').update({read_at:new Date().toISOString()}).in('id',ids);
+      if(readError)console.warn('Não foi possível marcar notificações como lidas:',readError);
+    }
     await refreshNotificationDot();
   });
   setInterval(refreshNotificationDot,60000);
