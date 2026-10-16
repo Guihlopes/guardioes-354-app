@@ -214,6 +214,10 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
           </div>
           <label for="agenda-location">Local / ponto de encontro</label><input id="agenda-location" maxlength="240" placeholder="Ex.: Posto de combustível, São Gotardo">
           <label for="agenda-description">Detalhes</label><textarea id="agenda-description" maxlength="5000" placeholder="Roteiro, horário de saída, orientações e outras informações"></textarea>
+          <div class="form-grid"><div><label for="agenda-visible-groups">Quem poderá ver</label><select id="agenda-visible-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select><small class="muted">Ctrl permite selecionar mais de um grupo.</small></div>
+          <div><label for="agenda-notify-groups">Quem receberá notificação</label><select id="agenda-notify-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select></div></div>
+          <label for="agenda-visible-members">Integrantes específicos que poderão ver (opcional)</label><select id="agenda-visible-members" multiple size="4"></select>
+          <label for="agenda-notify-members">Integrantes específicos que receberão notificação (opcional)</label><select id="agenda-notify-members" multiple size="4"></select>
           <div class="form-actions"><button id="agenda-submit" class="btn btn-primary" type="submit">Enviar sugestão</button><button id="agenda-cancel-edit" class="btn" type="button">Cancelar</button></div>
           <div id="agenda-form-notice" class="notice" role="status" aria-live="polite"></div>
         </form>
@@ -780,7 +784,11 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const id=$('#agenda-event-id').value;
     const startsAt=new Date($('#agenda-start').value);
     if(Number.isNaN(startsAt.getTime())){notice('#agenda-form-notice','Informe uma data e horário válidos.');return;}
-    const payload={title:$('#agenda-title').value.trim(),event_type:$('#agenda-type').value,starts_at:startsAt.toISOString(),location:$('#agenda-location').value.trim()||null,description:$('#agenda-description').value.trim()||null};
+    const selected = id => Array.from($(id).selectedOptions).map(o=>o.value);
+    const visibleGroups=canManageAgenda()?selected('#agenda-visible-groups'):['all'];
+    const notifyGroups=canManageAgenda()?selected('#agenda-notify-groups'):['all'];
+    if(canManageAgenda()&&(!visibleGroups.length||!notifyGroups.length)){notice('#agenda-form-notice','Escolha ao menos um grupo para visualização e para notificação.');return;}
+    const payload={title:$('#agenda-title').value.trim(),event_type:$('#agenda-type').value,starts_at:startsAt.toISOString(),location:$('#agenda-location').value.trim()||null,description:$('#agenda-description').value.trim()||null,visible_to_groups:visibleGroups,notify_to_groups:notifyGroups,visible_to_emails:canManageAgenda()?selected('#agenda-visible-members'):[],notify_to_emails:canManageAgenda()?selected('#agenda-notify-members'):[]};
     const button=$('#agenda-submit');button.disabled=true;
     try {
       let result;
@@ -856,7 +864,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     notice('#app-notice',error?'Arquivo enviado, mas não foi possível registrar seus dados.':'Documento publicado para os membros.');$('#document-form').reset();loadDocuments();
   });
   async function loadAnnouncementMemberChoices(){
-    const selectors=[$('#announcement-visible-members'),$('#announcement-notify-members')].filter(Boolean);
+    const selectors=[$('#announcement-visible-members'),$('#announcement-notify-members'),$('#agenda-visible-members'),$('#agenda-notify-members')].filter(Boolean);
     if(!selectors.length)return;
     const {data,error}=await db.from('member_directory').select('full_name,email,member_status,rider_type').order('full_name',{ascending:true});
     if(error){console.warn('Lista de integrantes para público do comunicado não carregada:',error);return;}
