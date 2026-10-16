@@ -178,7 +178,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   <main>
     <section id="page-home" class="app-page">
       <div class="hero">
-        <div class="hero-main"><div class="hero-kicker">Uma irmandade. Uma estrada.</div><h1>Bem-vindo,<br><span id="home-first-name">integrante</span>.</h1><p>Este é o ponto de encontro digital dos Guardiões da 354. Acompanhe as informações do motoclube em um só lugar.</p><div class="push-setup-card" style="margin-top:16px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#ffffff08"><strong>🔔 Receber avisos no celular</strong><p class="small muted" style="margin:5px 0 10px">Ative as notificações para receber avisos mesmo quando fechar o aplicativo.</p><button id="enable-push-button" class="btn btn-primary" type="button">Ativar notificações neste aparelho</button><div id="push-setup-notice" class="notice" role="status" aria-live="polite"></div></div></div>
+        <div class="hero-main"><div class="hero-kicker">Uma irmandade. Uma estrada.</div><h1>Bem-vindo,<br><span id="home-first-name">integrante</span>.</h1><p>Este é o ponto de encontro digital dos Guardiões da 354. Acompanhe as informações do motoclube em um só lugar.</p><div class="push-setup-card" style="margin-top:16px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#ffffff08"><strong>🔔 Receber avisos no celular</strong><p class="small muted" style="margin:5px 0 10px">Ative as notificações para receber avisos mesmo quando fechar o aplicativo.</p><button id="enable-push-home-button" class="btn btn-primary" type="button">Ativar notificações neste aparelho</button><div id="push-home-status" class="muted small" aria-live="polite" style="margin-top:8px"></div><div id="push-setup-notice" class="notice" role="status" aria-live="polite"></div></div></div>
         <div class="hero-side"><div><div class="status-label">Seu acesso</div><div id="home-position" class="status-value">Integrante</div><div id="home-status" class="status-mark"><span class="dot"></span> Conta autorizada</div></div><div class="muted small" style="margin-top:15px">São Gotardo · Minas Gerais</div></div>
       </div>
       <div class="section-title"><div><h2>Acesso rápido</h2><p>Escolha uma área do aplicativo.</p></div></div>
@@ -325,7 +325,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
 (() => {
   const SUPABASE_URL = 'https://nlaywsguzsiwvexwnakp.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_eIzAaMENq8u1smn5gVR3Lg_cj9bABxk';
-  const PUSH_VAPID_PUBLIC_KEY = 'BPyuTkPw_oyt29imLcRR5Qhoo8hZD1WQJxnkfi7qoNIXh9GApfWZL25BjQWGHwnEguubqFOzLIV1PnDwG8xPu2o';
+  const PUSH_VAPID_PUBLIC_KEY = 'BCzBqGahvOmnkCatqFl2CqGRB_9ZWKX1qro4LNQ6oWaHt8778rwaEy_6OUcpJSG9xM8-EKWQQn0pupzSGPgg0m0';
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
@@ -612,18 +612,23 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
   }
   async function updatePushStatus(){
-    const el=$('#push-status'),btn=$('#enable-push-button');if(!el||!btn)return;
-    if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)){el.textContent='Este navegador não oferece push. No iPhone, instale o app na Tela de Início e abra por lá.';btn.disabled=true;return;}
-    if(Notification.permission==='denied'){el.textContent='Notificações bloqueadas nas configurações do navegador/celular.';return;}
+    const buttons=[$('#enable-push-button'),$('#enable-push-home-button')].filter(Boolean);
+    const statuses=[$('#push-status'),$('#push-home-status')].filter(Boolean);
+    if(!buttons.length)return;
+    if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)){
+      statuses.forEach(el=>el.textContent='Este navegador não oferece push. No iPhone, instale o app na Tela de Início e abra por lá.');
+      buttons.forEach(btn=>btn.disabled=true);return;
+    }
+    if(Notification.permission==='denied'){statuses.forEach(el=>el.textContent='Notificações bloqueadas nas configurações do navegador/celular.');return;}
     try{
-      const reg=await navigator.serviceWorker.ready;
-      const sub=await reg.pushManager.getSubscription();
-      el.textContent=sub?'Notificações ativadas neste aparelho.':'Ainda não ativadas neste aparelho.';
-      btn.textContent=sub?'Atualizar notificações deste aparelho':'Ativar notificações neste aparelho';
-    }catch(e){el.textContent='Não foi possível verificar o suporte neste aparelho.';}
+      const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();
+      statuses.forEach(el=>el.textContent=sub?'Notificações ativadas neste aparelho.':'Ainda não ativadas neste aparelho.');
+      buttons.forEach(btn=>btn.textContent=sub?'Atualizar notificações deste aparelho':'Ativar notificações neste aparelho');
+    }catch(e){statuses.forEach(el=>el.textContent='Não foi possível verificar o suporte neste aparelho.');}
   }
-  $('#enable-push-button')?.addEventListener('click',async()=>{
-    const btn=$('#enable-push-button'),status=$('#push-status');btn.disabled=true;status.textContent='Ativando notificações…';
+  async function enablePushFromButton(btn){
+    const status=btn.id==='enable-push-home-button'?$('#push-home-status'):$('#push-status');
+    btn.disabled=true;if(status)status.textContent='Ativando notificações…';
     try{
       if(!currentUser)throw new Error('Entre no aplicativo antes de ativar as notificações.');
       if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window))throw new Error('Este navegador não oferece push. No iPhone, instale o app na Tela de Início e abra-o por lá.');
@@ -634,10 +639,13 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       const json=sub.toJSON();
       const {error}=await db.from('push_subscriptions').upsert({user_id:currentUser.id,endpoint:json.endpoint,subscription:json,updated_at:new Date().toISOString()},{onConflict:'endpoint'});
       if(error)throw error;
-      status.textContent='Notificações ativadas neste aparelho!';btn.textContent='Atualizar notificações deste aparelho';
-    }catch(e){console.error('Falha ao ativar push:',e);status.textContent=e.message||'Não foi possível ativar as notificações.';}
+      if(status)status.textContent='Notificações ativadas neste aparelho!';
+      $('[id="enable-push-button"],[id="enable-push-home-button"]').forEach(b=>b.textContent='Atualizar notificações deste aparelho');
+    }catch(e){console.error('Falha ao ativar push:',e);if(status)status.textContent=e.message||'Não foi possível ativar as notificações.';}
     finally{btn.disabled=false;}
-  });
+  }
+  $('#enable-push-button')?.addEventListener('click',e=>enablePushFromButton(e.currentTarget));
+  $('#enable-push-home-button')?.addEventListener('click',e=>enablePushFromButton(e.currentTarget));
   navigator.serviceWorker?.addEventListener('message',event=>{
     if(event.data?.type==='PUSH_NOTIFICATION_CLICK')go(event.data.page==='votes'?'votes':'agenda');
   });
