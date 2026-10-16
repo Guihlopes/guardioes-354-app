@@ -640,8 +640,16 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       setStatus('Solicitando permissão…');
       const permission=await Notification.requestPermission();
       if(permission!=='granted')throw new Error('Permissão não concedida. Ative notificações nas configurações do Chrome/Android.');
+      setStatus('Registrando Service Worker…');
+      let reg;
+      try{
+        reg=await withTimeout(navigator.serviceWorker.register(new URL('./sw.js',location.href).href),15000,'O registro do Service Worker');
+      }catch(swError){
+        throw new Error('Falha ao registrar Service Worker: '+(swError?.message||swError));
+      }
+      if(!reg)throw new Error('O navegador não retornou o registro do Service Worker.');
       setStatus('Conferindo Service Worker…');
-      const reg=await withTimeout(navigator.serviceWorker.ready,12000,'O Service Worker');
+      reg=await withTimeout(navigator.serviceWorker.ready,12000,'A ativação do Service Worker');
       setStatus('Registrando este aparelho…');
       let sub=await withTimeout(reg.pushManager.getSubscription(),12000,'A consulta de inscrição push');
       if(!sub){
