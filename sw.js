@@ -27,7 +27,7 @@ self.addEventListener('push', (event) => {
     body: payload.body || 'Você tem uma nova atualização no aplicativo.',
     icon: './icons/guardioes-logo.png',
     badge: './icons/favicon-32.png',
-    data: { url: payload.url || './' },
+    data: { url: payload.url || './', page: payload.page || 'agenda', source_id: payload.source_id || null },
     tag: payload.tag || 'guardioes-' + (payload.source_id || Date.now()),
     renotify: false
   };
@@ -40,9 +40,9 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil((async () => {
     const clientsList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const client of clientsList) {
-      if (client.url.startsWith(self.location.origin) && 'focus' in client) { await client.focus(); client.postMessage({ type: 'PUSH_NOTIFICATION_CLICK', url: target }); return; }
+      if (client.url.startsWith(self.location.origin) && 'focus' in client) { await client.focus(); client.postMessage({ type: 'PUSH_NOTIFICATION_CLICK', url: target, page: event.notification.data?.page || 'agenda', source_id: event.notification.data?.source_id || null }); return; }
     }
-    if (self.clients.openWindow) await self.clients.openWindow(target);
+    if (self.clients.openWindow) await self.clients.openWindow(target + (target.includes('?') ? '&' : '?') + 'pushPage=' + encodeURIComponent(event.notification.data?.page || 'agenda'));
   })());
 });
 
