@@ -918,9 +918,11 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       }));
       box.querySelectorAll('[data-vote-delete]').forEach(btn=>btn.addEventListener('click',async()=>{
         const item=rows.find(v=>String(v.id)===btn.dataset.voteDelete);if(!item||!confirm('Excluir a votação “'+item.title+'” e seus registros, se o banco permitir?'))return;
+        const {error:ballotError}=await db.from('club_vote_ballots').delete().eq('vote_id',item.id);
+        if(ballotError){console.error(ballotError);notice('#app-notice','Não foi possível remover os votos vinculados: '+ballotError.message);return;}
         const {error}=await db.from('club_votes').delete().eq('id',item.id);
-        if(error){console.error(error);notice('#app-notice','Não foi possível excluir a votação: '+error.message+' (se houver votos registrados, a exclusão pode exigir remover os votos vinculados).');return;}
-        await loadVotes();notice('#app-notice','Votação excluída.');
+        if(error){console.error(error);notice('#app-notice','Não foi possível excluir a votação: '+error.message);return;}
+        await loadVotes();notice('#app-notice','Votação e registros vinculados excluídos.');
       }));
     }
     box.querySelectorAll('[data-vote]').forEach(btn=>btn.addEventListener('click',async()=>{
