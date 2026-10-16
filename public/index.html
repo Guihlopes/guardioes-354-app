@@ -778,8 +778,9 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   }
   async function loadDocuments() {
     const box = $('#documents-list'); if (!box) return;
+    box.textContent = 'Carregando documentos…';
     const {data,error} = await db.from('club_documents').select('id,title,file_path,created_at').order('created_at',{ascending:false});
-    if (error) { box.textContent='Documentos ainda não conectados. Aplique a configuração de banco indicada junto com este arquivo.'; return; }
+    if (error) { console.error('Erro ao carregar documentos:', error); box.textContent='Não foi possível carregar os documentos. Verifique as permissões de leitura no Supabase.'; return; }
     const canEdit = canManageDocuments();
     box.innerHTML = data?.length ? data.map(d=>`<div class="list-row"><div class="list-icon">▧</div><div class="list-main"><strong>${escapeHtml(d.title)}</strong><small>${new Date(d.created_at).toLocaleDateString('pt-BR')}</small></div><button class="btn" data-download="${escapeHtml(d.file_path)}">Baixar</button>${canEdit?`<button class="btn" data-document-edit="${escapeHtml(d.id)}">Renomear</button><button class="btn" data-document-delete="${escapeHtml(d.id)}">Excluir</button>`:''}</div>`).join('') : '<div class="empty">Nenhum documento publicado.</div>';
     box.querySelectorAll('[data-download]').forEach(b=>b.addEventListener('click',async()=>{const {data,error}=await db.storage.from('club-documents').createSignedUrl(b.dataset.download,120);if(error){notice('#app-notice','Não foi possível gerar o link do documento.');return;}window.open(data.signedUrl,'_blank','noopener');}));
