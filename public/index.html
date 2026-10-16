@@ -847,21 +847,27 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const {data,error}=await db.from('club_votes').select('id,title,description,options,closes_at,created_at,vote_type,visible_to_groups,visible_to_emails').order('created_at',{ascending:false});
     if(error){box.textContent='Não foi possível carregar as votações. Confira a migração SQL.';return;}
     const rows=data||[], ids=rows.map(v=>v.id);
-    let ballots=[],myBallots=[];
+    let ballots=[],myBallots=[],countsData=[];
+    const board=canManageAgenda();
     if(ids.length){
-      const {data:bs,error:be}=await db.from('club_vote_ballots').select('id,vote_id,user_id,voter_name,option_selected,created_at').in('vote_id',ids);
-      if(!be)ballots=bs||[];else console.warn('Resultados parciais indisponíveis:',be);
-      myBallots=ballots.filter(b=>b.user_id===currentUser.id);
+      const {data:mine,error:mineError}=await db.from('club_vote_ballots').select('id,vote_id,user_id,voter_name,option_selected,created_at').eq('user_id',currentUser.id).in('vote_id',ids);
+      if(!mineError)myBallots=mine||[];
+      if(board){
+        const {data:bs,error:be}=await db.from('club_vote_ballots').select('id,vote_id,user_id,voter_name,option_selected,created_at').in('vote_id',ids);
+        if(!be)ballots=bs||[];else console.warn('Relatório identificado indisponível:',be);
+      }
+      const {data:counts,error:countsError}=await db.rpc('get_club_vote_counts',{vote_ids:ids});
+      if(!countsError)countsData=counts||[];else console.warn('Resultados parciais indisponíveis:',countsError);
     }
-    const board=canManageAgenda(),now=Date.now();
+    const now=Date.now();
     box.innerHTML=rows.length?rows.map(v=>{
       const allowedGroups=v.visible_to_groups||['all'];
       const expired=v.closes_at&&new Date(v.closes_at).getTime()<=now;
       const myVote=myBallots.find(b=>b.vote_id===v.id);
       const opts=v.vote_type==='approval'?['Sim','Não','Abstenção']:(v.options||[]);
-      const vs=ballots.filter(b=>b.vote_id===v.id),total=vs.length;
-      const eligible=allowedGroups.includes('all')||allowedGroups.includes('board')||allowedGroups.includes('pilots')||allowedGroups.includes('pillion')||allowedGroups.includes('prospects')||(v.visible_to_emails||[]).length;
-      const counts=opts.map(opt=>({opt,count:vs.filter(b=>b.option_selected===opt).length}));
+      const vs=ballots.filter(b=>b.vote_id===v.id);
+      const counts=opts.map(opt=>({opt,count:Number((countsData.find(c=>c.vote_id===v.id&&c.option_selected===opt)||{}).vote_count||0)}));
+      const total=counts.reduce((sum,c)=>sum+c.count,0);
       return '<article class="vote-card announcement-card"><div class="announcement-icon">✓</div><div class="announcement-content"><div class="announcement-meta"><span class="announcement-tag">'+(v.vote_type==='approval'?'Aprovação':'Votação')+'</span><span>'+(expired?'Encerrada': 'Aberta')+'</span>'+(v.closes_at?'<span>Até '+new Date(v.closes_at).toLocaleString('pt-BR')+'</span>':'')+'</div><h4 style="margin-top:9px">'+escapeHtml(v.title)+'</h4><p>'+escapeHtml(v.description||'')+'</p><div class="vote-options">'+opts.map(opt=>'<button class="btn" data-vote="'+v.id+'" data-option="'+escapeHtml(opt)+'" '+(myVote||expired?'disabled':'')+'>'+escapeHtml(opt)+(myVote&&myVote.option_selected===opt?' ✓':'')+'</button>').join(' ')+'</div><div class="vote-partials"><strong>Parcial ('+total+' voto(s))</strong>'+counts.map(c=>'<div class="vote-count"><span>'+escapeHtml(c.opt)+'</span><strong>'+c.count+'</strong></div>').join('')+'</div>'+(myVote?'<small class="muted">Seu voto: '+escapeHtml(myVote.option_selected)+'</small>':expired?'<small class="muted">Esta votação foi encerrada.</small>':'')+'</div></article>';
     }).join(''):'<div class="empty">🗳️<br><strong>Nenhuma votação disponível</strong><p class="muted">Quando a diretoria publicar uma votação, ela aparecerá aqui.</p></div>';
     box.querySelectorAll('[data-vote]').forEach(btn=>btn.addEventListener('click',async()=>{
