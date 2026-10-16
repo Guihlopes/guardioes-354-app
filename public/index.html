@@ -146,10 +146,10 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     <div class="header-actions"><button class="icon-btn" id="header-notifications" title="Notificações" aria-label="Notificações">♧</button><button class="btn" id="header-logout" type="button">Sair <span class="logout-text">da conta</span></button></div>
   </header>
   <nav class="mobile-nav" aria-label="Navegação móvel">
-    <button class="active" data-page="home"><span>⌂</span>Início</button><button data-page="members"><span>♟</span>Membros</button><button data-page="agenda"><span>▦</span>Agenda</button><button data-page="announcements"><span>▤</span>Avisos</button><button data-page="documents"><span>▧</span>Docs</button><button data-page="votes"><span>✓</span>Votos</button><button data-page="profile"><span>♙</span>Perfil</button>
+    <button class="active" data-page="home"><span>⌂</span>Início</button><button data-page="members"><span>♟</span>Membros</button><button data-page="agenda"><span>▦</span>Agenda e avisos</button><button data-page="documents"><span>▧</span>Docs</button><button data-page="votes"><span>✓</span>Votos</button><button data-page="profile"><span>♙</span>Perfil</button>
   </nav>
   <nav id="desktop-nav" class="desktop-nav" aria-label="Navegação principal">
-    <button class="nav-btn active" data-page="home">Início</button><button class="nav-btn" data-page="members">Membros</button><button class="nav-btn" data-page="agenda">Agenda</button><button class="nav-btn" data-page="announcements">Comunicados</button><button class="nav-btn" data-page="documents">Documentos</button><button class="nav-btn" data-page="votes">Votações</button><button class="nav-btn" data-page="profile">Meu perfil</button><button class="nav-btn admin-only hidden" data-page="admin">Administração</button>
+    <button class="nav-btn active" data-page="home">Início</button><button class="nav-btn" data-page="members">Membros</button><button class="nav-btn" data-page="agenda">Agenda e comunicados</button><button class="nav-btn" data-page="documents">Documentos</button><button class="nav-btn" data-page="votes">Votações</button><button class="nav-btn" data-page="profile">Meu perfil</button><button class="nav-btn admin-only hidden" data-page="admin">Administração</button>
   </nav>
 
   <main>
@@ -194,7 +194,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     </section>
 
     <section id="page-agenda" class="app-page hidden-page">
-      <div class="page-heading"><div><h1>Agenda</h1><p>Programação oficial dos Guardiões da 354.</p></div><span class="badge">Agenda</span></div>
+      <div class="page-heading"><div><h1>Agenda e Comunicados</h1><p>Atividades, reuniões e avisos oficiais dos Guardiões da 354 em um só lugar.</p></div><span class="badge">Mural oficial</span></div>
       <div class="card" style="margin-bottom:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
           <div><div class="muted small">Próxima atividade</div><div id="agenda-next" class="status-value" style="font-size:1.15rem">—</div></div>
@@ -218,16 +218,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
         </form>
       </div>
       <div class="card"><div class="section-title" style="margin-top:0"><div><h3 style="margin:0">Atividades agendadas</h3><p>Toque em uma atividade para ver os detalhes e confirmar sua participação.</p></div></div><div id="agenda-list" class="empty">Carregando agenda…</div></div>
-    </section>
-
-    <section id="page-announcements" class="app-page hidden-page">
-      <div class="page-heading"><div><h1>Comunicados</h1><p>Informações importantes para os integrantes.</p></div><span class="badge">Mural</span></div>
-      <div class="card admin-only hidden" id="announcement-compose-card"><h3>Novo comunicado (administração)</h3>
-        <form id="announcement-form"><label for="announcement-title">Título</label><input id="announcement-title" required maxlength="160">
-        <label for="announcement-body">Comunicado</label><textarea id="announcement-body" required maxlength="10000"></textarea>
-        <label for="announcement-targets">Quem deve receber</label><select id="announcement-targets"><option value="all">Todos os membros ativos</option><option value="pilots">Somente pilotos</option><option value="pillion">Somente garupas</option><option value="prospects">Somente prospects</option></select>
-        <button class="btn btn-primary btn-block" type="submit">Publicar comunicado</button></form></div>
-      <div class="card" style="margin-top:14px"><h3>Mural do motoclube</h3><div id="announcements-list" class="empty">Carregando comunicados…</div></div>
+      <div class="card" style="margin-top:14px"><h3>Comunicados recentes</h3><div id="announcements-list" class="empty">Carregando comunicados…</div></div>
     </section>
 
     <section id="page-documents" class="app-page hidden-page">
@@ -323,7 +314,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     $('#login-screen').classList.add('hidden'); $('#app-screen').classList.remove('hidden');
   }
   function go(page) {
-    const allowed = ['home','members','agenda','announcements','documents','votes','profile','admin'];
+    const allowed = ['home','members','agenda','documents','votes','profile','admin'];
     if (!allowed.includes(page)) page = 'home';
     if (page === 'admin' && currentProfile?.role !== 'admin') page = 'home';
     $$('.app-page').forEach(el => el.classList.add('hidden-page'));
