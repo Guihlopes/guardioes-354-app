@@ -184,15 +184,15 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       <div class="grid">
         <button class="tile" data-go="members"><span class="tile-icon">♟</span><strong>Membros</strong><small>Consulte a área de integrantes.</small><span class="tag">Área do clube</span></button>
         <button class="tile" data-go="agenda"><span class="tile-icon">▦</span><strong>Agenda</strong><small>Reuniões, eventos e passeios.</small><span class="tag">Programação</span></button>
-        <button class="tile" data-go="announcements"><span class="tile-icon">▤</span><strong>Comunicados</strong><small>Informações e avisos do motoclube.</small><span class="tag">Novidades</span></button>
+        <button class="tile" data-go="agenda"><span class="tile-icon">▤</span><strong>Comunicados</strong><small>Informações e avisos do motoclube.</small><span class="tag">Novidades</span></button>
         <button class="tile" data-go="documents"><span class="tile-icon">▧</span><strong>Documentos</strong><small>Estatuto e arquivos oficiais.</small><span class="tag">Biblioteca</span></button>
         <button class="tile" data-go="votes"><span class="tile-icon">✓</span><strong>Votações</strong><small>Participe das votações autorizadas.</small><span class="tag">Deliberações</span></button>
         <button class="tile" data-go="profile"><span class="tile-icon">♙</span><strong>Meu perfil</strong><small>Confira seus dados e categoria.</small><span class="tag">Minha conta</span></button>
       </div>
-      <div class="section-title"><div><h2>Próximas atividades</h2><p>Quando a agenda for conectada, os eventos aparecerão aqui.</p></div><button class="btn" data-go="agenda">Ver agenda</button></div>
+      <div class="section-title"><div><h2>Próximas atividades</h2><p>Eventos e avisos atualizados automaticamente.</p></div><button class="btn" data-go="agenda">Ver agenda</button></div>
       <div class="two-col">
-        <div class="card"><h3>Agenda do motoclube</h3><div class="empty">Nenhum evento conectado ainda.<br><span class="small">A estrutura está pronta para receber os eventos reais.</span></div></div>
-        <div class="card"><h3>Últimos comunicados</h3><div class="empty">Os comunicados aparecerão aqui quando o módulo for conectado ao banco de dados.</div></div>
+        <div class="card"><h3>Agenda do motoclube</h3><div id="home-agenda-list" class="empty">Carregando agenda…</div></div>
+        <div class="card"><h3>Últimos comunicados</h3><div id="home-announcements-list" class="empty">Carregando comunicados…</div></div>
       </div>
     </section>
 
