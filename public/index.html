@@ -771,7 +771,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     }
   }
   $('#admin-refresh')?.addEventListener('click',loadAdminDashboard);
-  $('[data-admin-go]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.adminGo)));
+  $$('[data-admin-go]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.adminGo)));
 
   async function loadMembers() {
     const box = $('#members-list'); if (!box) return;
