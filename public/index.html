@@ -460,8 +460,6 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const box = $('#members-list'); if (!box) return;
     box.textContent = 'Carregando integrantes…';
 
-    // O diretório oficial contém os integrantes antes do primeiro acesso.
-    // Perfis pessoais só complementam telefone/moto/vínculo após a ativação.
     const {data: directory, error: directoryError} = await db
       .from('member_directory')
       .select('full_name, club_position, member_status, rider_type, app_role, is_founder')
@@ -478,7 +476,6 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       return;
     }
 
-    // Usa perfis apenas como complemento; não exige que cada integrante tenha login.
     const {data: profiles, error: profilesError} = await db
       .from('member_profiles')
       .select('full_name, club_position, member_status, rider_type, motorcycle, active');
@@ -486,16 +483,42 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
 
     const normalize = value => String(value || '').trim().toLocaleLowerCase('pt-BR');
     const profileByName = new Map((profiles || []).map(p => [normalize(p.full_name), p]));
+
+    // Ordem solicitada pela diretoria. Casais em que ambos são pilotos ficam juntos.
+    const hierarchy = [
+      {name:'Welton Santana Silva', position:'Presidente · Fundador', type:'Piloto', status:'Ativo'},
+      {name:'Gabriela Aparecida Elias', position:'Garupa do Presidente', type:'Garupa', status:'Ativo'},
+      {name:'Guilherme Henrique Lopes', position:'Vice-Presidente · Fundador', type:'Piloto', status:'Ativo'},
+      {name:'Bruna Silva Camargos', position:'Garupa do Vice-Presidente', type:'Garupa', status:'Ativo'},
+      {name:'Anilton Alan Nunes', position:'Diretor Geral', type:'Piloto', status:'Ativo'},
+      {name:'Jéssica Guilherme', position:'Diretor Geral · Piloto', type:'Piloto', status:'Ativo'},
+      {name:'Edson Tiago Ferreira de Almeida', position:'Diretor Social', type:'Piloto', status:'Ativo'},
+      {name:'Flavia Rodrigues Ribeiro', position:'Diretor Social · Piloto', type:'Piloto', status:'Ativo'},
+      {name:'Alan José de Sousa', position:'Membro Ativo', type:'Piloto', status:'Ativo'},
+      {name:'Gabrielle Alves da Silva', position:'Garupa de Alan José de Sousa', type:'Garupa', status:'Ativo'},
+      {name:'Luciano Carlos dos Santos', position:'Membro Ativo', type:'Piloto', status:'Ativo'},
+      {name:'Lucilene Souza Viana', position:'Garupa de Luciano Carlos dos Santos', type:'Garupa', status:'Ativo'},
+      {name:'Danilo Rodrigues de Oliveira', position:'Membro Ativo', type:'Piloto', status:'Ativo'},
+      {name:'Samuel José de Paulo', position:'Membro Ativo', type:'Piloto', status:'Ativo'},
+      {name:'Wallace Herculano de Oliveira Ferraz', position:'Prospect', type:'Piloto', status:'Prospect'},
+      {name:'Samira de Sá Souza Ferraz', position:'Garupa de Wallace Herculano de Oliveira Ferraz', type:'Garupa', status:'Prospect'},
+      {name:'Matheus Felipe Amâncio Lopes', position:'Prospect', type:'Piloto', status:'Prospect'},
+      {name:'Guilherme Lopes de Oliveira Dias', position:'Prospect', type:'Piloto', status:'Prospect'},
+      {name:'Amanda Cristina Ferreira', position:'Garupa de Guilherme Lopes de Oliveira Dias', type:'Garupa', status:'Prospect'}
+    ];
+    const rosterByName = new Map(hierarchy.map((item,index) => [normalize(item.name), {...item, order:index}]));
     const members = directory.map(m => {
       const p = profileByName.get(normalize(m.full_name)) || {};
-      const position = p.club_position || m.club_position || (m.is_founder ? 'Fundador' : 'Integrante');
+      const roster = rosterByName.get(normalize(m.full_name));
+      const position = roster?.position || p.club_position || m.club_position || (m.is_founder ? 'Fundador' : 'Integrante');
       const motorcycle = p.motorcycle || 'Moto não informada';
-      const status = p.member_status || m.member_status || 'Ativo';
-      return {name:m.full_name, position, motorcycle, status};
-    });
+      const status = roster?.status || p.member_status || m.member_status || 'Ativo';
+      const riderType = roster?.type || p.rider_type || m.rider_type || 'Piloto';
+      return {name:m.full_name, position, motorcycle, status, riderType, order:roster?.order ?? 9999};
+    }).sort((a,b) => a.order-b.order || a.name.localeCompare(b.name,'pt-BR'));
 
     box.className = '';
-    box.innerHTML = members.map(m => `<div class="list-row"><div class="list-icon">♟</div><div class="list-main"><strong>${escapeHtml(m.name||'Integrante')}</strong><small>${escapeHtml(m.motorcycle)} · ${escapeHtml(m.position)}</small></div><span class="badge">${escapeHtml(m.status)}</span></div>`).join('');
+    box.innerHTML = members.map(m => `<div class="list-row"><div class="list-icon">♟</div><div class="list-main"><strong>${escapeHtml(m.name||'Integrante')}</strong><small>${escapeHtml(m.position)} · ${escapeHtml(m.motorcycle)}</small></div><span class="badge">${escapeHtml(m.status)} · ${escapeHtml(m.riderType)}</span></div>`).join('');
   }
   function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
   async function loadPilotOptions() {
