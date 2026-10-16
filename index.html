@@ -1,53 +1,1305 @@
-
-<form id="profile-setup-form">
-  <label for="setup-phone">Telefone</label>
-  <input
-    id="setup-phone"
-    type="tel"
-    maxlength="30"
-    placeholder="(34) 99999-9999"
-    required
-  >
-
-  <label>Categoria cadastrada pela Diretoria</label>
-  <div id="setup-rider-type-display" class="profile-field">
-    <strong id="setup-rider-type-label">Piloto</strong>
-    <small class="muted">
-      Para alterar sua categoria, entre em contato com a Diretoria.
-    </small>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090a0c">
+<meta name="description" content="Aplicativo exclusivo dos membros do Motoclube Guardiões da 354.">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=3">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=3">
+<title>Guardiões da 354</title>
+<style>
+:root{color-scheme:dark;--bg:#090a0c;--panel:#131518;--panel2:#191b1f;--line:#303238;--text:#f4f4f5;--muted:#a4a6ad;--red:#df1e31;--red2:#a60d1c;--ok:#bfc7c1;--warn:#d9c08b}
+*{box-sizing:border-box}html{background:var(--bg);scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 0%,#25272b 0,transparent 44%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.6;cursor:wait}.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:.8rem}.app-shell{width:min(100% - 24px,1100px);margin:auto;padding:20px 0 30px}
+.login-wrap{width:min(100%,480px);margin:0 auto;min-height:0;display:flex;flex-direction:column;justify-content:center;padding:8px 0}.login-wrap .panel{padding:clamp(15px,3vw,24px)}.login-wrap .login-title{font-size:clamp(1.65rem,6vw,2.1rem)}.login-wrap .login-copy{margin:9px 0 14px}.login-wrap label{margin:10px 0 5px}.login-wrap input{min-height:42px;padding:10px 12px}.login-wrap .btn-block{margin-top:12px}.login-wrap .login-footer{margin-top:12px}
+.setup-modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;background:#000b;overflow-y:auto}.setup-modal.hidden{display:none!important}.setup-modal-card{width:min(100%,480px);max-height:calc(100dvh - 32px);overflow-y:auto;padding:22px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,#191b1f,#0d0e10);box-shadow:0 20px 70px #000a}.setup-modal-card h2{font-size:1.45rem;margin:10px 0}.setup-modal-card p{line-height:1.5}.setup-modal-card .btn-block{margin-top:16px}.brand-login{text-align:center;margin-bottom:18px}.brand-logo{width:min(180px,48vw);max-height:210px;object-fit:contain;filter:drop-shadow(0 10px 24px #0008)}.eyebrow{font-size:.68rem;letter-spacing:.15em;color:#e54b59;font-weight:850;text-transform:uppercase}.panel{padding:clamp(18px,4vw,30px);border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,rgba(25,27,31,.97),rgba(12,13,15,.97));box-shadow:0 20px 55px #0005}.login-title{text-align:center;font-size:clamp(1.8rem,7vw,2.35rem);text-transform:uppercase;line-height:1.08;margin:0;letter-spacing:.04em}.login-title span{display:block;color:var(--red);margin-top:4px}.login-copy{text-align:center;color:var(--muted);line-height:1.55;margin:14px 0 22px}
+label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,select,textarea{width:100%;padding:12px 13px;border-radius:11px;border:1px solid #3a3c42;background:#0d0e10;color:var(--text);outline:none;min-height:46px}textarea{min-height:100px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:#d93646;box-shadow:0 0 0 3px #df1e311c}.btn{border:1px solid var(--line);background:#222429;color:var(--text);border-radius:11px;padding:11px 14px;font-weight:750}.btn:hover{filter:brightness(1.1)}.btn-primary{background:linear-gradient(110deg,#b70e20,#e02034);border-color:#f04454;color:white}.btn-quiet{background:transparent;border-color:transparent;color:#c2c3c7;font-size:.85rem;font-weight:550;text-decoration:underline;text-underline-offset:4px}.btn-block{width:100%;margin-top:18px}.login-bottom{text-align:center;margin-top:14px}.notice{display:none;padding:12px 14px;border:1px solid #464950;border-radius:11px;background:#202126;line-height:1.5;font-size:.88rem;margin-top:14px;overflow-wrap:anywhere}.notice.show{display:block}.login-footer{text-align:center;color:#6e7178;font-size:.7rem;margin-top:20px}
+.app-header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:6px 0 18px;border-bottom:1px solid #ffffff12;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px;min-width:0}.brand img{width:54px;height:54px;object-fit:contain}.brand-title{font-weight:900;letter-spacing:.04em;font-size:1rem}.brand-sub{font-size:.68rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:3px}.header-actions{display:flex;align-items:center;gap:8px}.icon-btn{width:40px;height:40px;padding:0;display:grid;place-items:center;background:#191a1d;border:1px solid var(--line);border-radius:12px;color:#eee}.desktop-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}.nav-btn{background:transparent;color:#aeb0b6;border:1px solid transparent;border-radius:10px;padding:10px 13px;font-size:.86rem;font-weight:700}.nav-btn.active{background:#df1e3119;color:white;border-color:#df1e3155}.nav-btn.active::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-right:8px;vertical-align:middle}
+.hero{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:20px}.hero-main{padding:24px;border:1px solid #df1e314d;border-radius:20px;background:linear-gradient(125deg,#341116a8,#151619 62%);min-height:190px}.hero-kicker{font-size:.72rem;text-transform:uppercase;letter-spacing:.13em;color:#e3a1a7;font-weight:800}.hero h1{font-size:clamp(1.8rem,5vw,2.7rem);line-height:1.05;margin:12px 0 10px}.hero h1 span{color:#ed394a}.hero p{margin:0;color:#c3c4c8;line-height:1.55;max-width:520px}.hero-side{position:relative;padding:20px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,#1b1d21,#101113);display:flex;flex-direction:column;justify-content:space-between}.status-label{font-size:.73rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.status-value{font-size:1.15rem;font-weight:850;margin-top:7px}.status-mark{display:inline-flex;align-items:center;gap:7px;border:1px solid #ffffff1c;border-radius:999px;padding:7px 10px;font-size:.74rem;width:max-content;margin-top:16px}.dot{width:7px;height:7px;border-radius:50%;background:#22c55e}
+.section-title{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:24px 0 13px}.section-title h2{font-size:1.12rem;margin:0}.section-title p{font-size:.8rem;color:var(--muted);margin:4px 0 0}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.tile{min-width:0;text-align:left;padding:17px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,#1b1d21,#101113);color:var(--text);min-height:146px}.tile:hover{border-color:#df1e3170;transform:translateY(-1px)}.tile-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#df1e311a;border:1px solid #df1e314d;color:#f05a68;font-size:1.15rem;margin-bottom:13px}.tile strong{display:block;font-size:.91rem}.tile small{display:block;color:var(--muted);font-size:.75rem;line-height:1.4;margin-top:5px}.tile .tag{display:inline-block;font-size:.63rem;color:#d3b9bc;margin-top:10px;text-transform:uppercase;letter-spacing:.05em}
+.two-col{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}.card{padding:19px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#181a1e,#101113);min-width:0}.card h3{font-size:1rem;margin:0 0 14px}.empty{border:1px dashed #41434a;border-radius:12px;padding:20px;text-align:center;color:var(--muted);font-size:.85rem;line-height:1.5}.list-row{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #ffffff12}.list-row:last-child{border-bottom:0}.member-row[role="button"]{cursor:pointer;transition:background .15s}.member-row[role="button"]:hover{background:#ffffff08}.member-row[role="button"]:focus-visible{outline:2px solid #df1e31;outline-offset:2px}.member-row[role="button"] .badge{flex-shrink:0}.member-row{flex-wrap:wrap;align-items:center}.member-summary{display:flex;gap:12px;align-items:center;width:100%;min-width:0}.member-details{display:none;flex:1 0 100%;margin:2px 0 4px 52px;padding:10px 12px;border-left:2px solid #df1e31;background:#ffffff06;border-radius:0 10px 10px 0;color:var(--muted);font-size:.8rem;line-height:1.7}.member-row.member-expanded .member-details{display:block}.member-details strong{color:var(--text)}.member-chevron{color:var(--muted);font-size:.75rem;margin-left:4px}.list-icon{width:40px;height:40px;flex:none;display:grid;place-items:center;background:#ffffff08;border:1px solid #ffffff13;border-radius:11px}.list-main{min-width:0;flex:1}.list-main strong{display:block;font-size:.86rem}.list-main small{display:block;color:var(--muted);font-size:.75rem;margin-top:3px}.badge{font-size:.68rem;border:1px solid #ffffff20;border-radius:999px;padding:5px 8px;color:#d5d6d8;white-space:nowrap}
+.page-heading{display:flex;justify-content:space-between;align-items:start;gap:12px;margin-bottom:18px}.page-heading h1{font-size:1.65rem;margin:0}.page-heading p{color:var(--muted);font-size:.88rem;line-height:1.5;margin:7px 0 0}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.form-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.form-actions .btn{flex:1}.profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.profile-field{padding:14px;border:1px solid #ffffff12;border-radius:12px;background:#ffffff04}.profile-field .muted{font-size:.75rem}.profile-field strong{display:block;margin-top:6px;overflow-wrap:anywhere;font-size:.9rem}.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;font-size:.82rem}th,td{text-align:left;padding:12px;border-bottom:1px solid #ffffff12;white-space:nowrap}th{color:#c6c7cb;background:#ffffff06;font-size:.73rem;text-transform:uppercase;letter-spacing:.05em}tr:last-child td{border-bottom:0}.callout{padding:13px 14px;border-radius:12px;border:1px solid #df1e3145;background:#df1e310e;color:#d9dadd;font-size:.83rem;line-height:1.5;margin-bottom:14px}
+.mobile-nav{display:none}.mobile-menu-wrap{display:none;position:relative}.mobile-menu-panel{position:absolute;right:0;top:calc(100% + 8px);width:min(260px,80vw);padding:8px;background:#151619;border:1px solid #ffffff22;border-radius:14px;box-shadow:0 14px 35px #000b;z-index:60}.mobile-menu-panel button{display:flex;align-items:center;gap:11px;width:100%;padding:12px 13px;background:transparent;border:0;border-radius:9px;color:#eee;text-align:left;font-size:.88rem;font-weight:700}.mobile-menu-panel button:hover{background:#ffffff0c}.mobile-menu-panel button span{width:22px;text-align:center;font-size:1.05rem;color:#f04454}.mobile-menu-panel .menu-logout{border-top:1px solid #ffffff18;margin-top:6px;padding-top:14px;color:#ff6976}.member-pass{position:relative;overflow:hidden;border:1px solid #df1e315c;border-radius:18px;padding:20px;background:radial-gradient(circle at 100% 0%,#df1e3126,transparent 42%),linear-gradient(135deg,#191a1e,#090a0c)}.member-pass-top{display:flex;align-items:center;gap:12px}.member-pass-logo{width:52px;height:52px;object-fit:contain}.member-pass-name{font-size:1.1rem;font-weight:900;line-height:1.2;overflow-wrap:anywhere}.member-pass-sub{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:#f05a68;margin-top:4px}.member-pass-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}.member-pass-field{padding:10px;border:1px solid #ffffff12;background:#ffffff05;border-radius:10px;min-width:0}.member-pass-field small{display:block;color:#a4a6ad;font-size:.66rem;text-transform:uppercase;letter-spacing:.07em}.member-pass-field strong{display:block;font-size:.84rem;margin-top:5px;overflow-wrap:anywhere}.past-event-row{padding:12px 0;border-bottom:1px solid #ffffff12}.past-event-row:last-child{border-bottom:0}.app-footer{text-align:center;color:#656970;font-size:.7rem;padding:25px 0 0;letter-spacing:.06em}.hidden-page{display:none!important}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{grid-template-columns:1fr}.hero-side{min-height:0;padding:12px 14px 11px;justify-content:flex-start;gap:5px}.hero-side>div:last-child{margin-top:2px!important;font-size:.72rem}.hero-side .status-label{font-size:.64rem}.hero-side .status-value{font-size:.98rem;margin-top:3px;padding-right:88px}.hero-side .status-mark{position:absolute;top:10px;right:10px;margin:0;padding:5px 8px;font-size:.66rem}.hero-side .dot{background:#22c55e;box-shadow:0 0 0 2px #22c55e22}.two-col{grid-template-columns:1fr}.desktop-nav{display:none}.mobile-nav{display:none!important}.mobile-menu-wrap{display:block}.header-actions #header-logout{display:none}}
+@media(max-width:430px){.app-shell{width:min(100% - 18px,1100px);padding-top:12px}.brand img{width:43px;height:43px}.brand-title{font-size:.86rem}.brand-sub{font-size:.58rem}.header-actions .logout-text{display:none}.hero-main{padding:20px;min-height:180px}.hero-side{padding:16px}.tile{padding:13px;min-height:135px}.tile-icon{width:34px;height:34px}.section-title{margin-top:20px}.form-grid,.profile-grid{grid-template-columns:1fr}.page-heading h1{font-size:1.4rem}}
+@media(max-width:600px){
+  #login-screen.app-shell,#first-access-screen.app-shell,#password-setup-screen.app-shell{width:min(100% - 20px,440px);padding:8px 0;min-height:100svh;display:flex;align-items:center}
+  #login-screen .login-wrap,#first-access-screen .login-wrap,#password-setup-screen .login-wrap{width:100%;padding:0;justify-content:center}
+  #login-screen .brand-login{margin-bottom:8px}
+  #login-screen .brand-logo{width:clamp(150px,42vw,190px);height:auto;max-height:180px;filter:drop-shadow(0 5px 12px #0008)}
+  #login-screen .eyebrow{font-size:.64rem;letter-spacing:.11em}
+  #login-screen .panel,#first-access-screen .panel,#password-setup-screen .panel{padding:14px 16px;border-radius:17px}
+  #login-screen .login-title,#first-access-screen .login-title,#password-setup-screen .login-title{font-size:clamp(1.55rem,6.4vw,1.9rem);line-height:1.06}
+  #login-screen .login-copy,#first-access-screen .login-copy,#password-setup-screen .login-copy{font-size:.86rem;line-height:1.35;margin:7px 0 10px}
+  #login-screen label,#first-access-screen label,#password-setup-screen label{font-size:.84rem;margin:8px 0 4px}
+  #login-screen input,#first-access-screen input,#password-setup-screen input{min-height:42px;padding:8px 11px;font-size:.96rem;border-radius:9px}
+  #login-screen .btn-block,#first-access-screen .btn-block,#password-setup-screen .btn-block{min-height:42px;margin-top:9px;padding:9px 12px}
+  #login-screen .login-bottom,#first-access-screen .login-bottom{margin-top:6px}
+  #login-screen .btn-quiet,#first-access-screen .btn-quiet{font-size:.82rem;padding:6px 8px}
+  #login-screen .panel>p.muted{font-size:.74rem;line-height:1.3!important;margin:8px 0 0!important}
+  #login-screen .login-footer{font-size:.62rem;margin-top:7px}
+  #login-screen #install-button{font-size:.78rem;padding:6px 8px}
+  #login-screen .login-wrap>div:has(#install-button){margin-top:4px!important}
+}
+@media(max-width:600px) and (max-height:740px){
+  #login-screen .brand-logo{width:132px;max-height:132px}
+  #login-screen .brand-login{margin-bottom:5px}
+  #login-screen .panel,#first-access-screen .panel,#password-setup-screen .panel{padding:12px 14px}
+  #login-screen .login-copy,#first-access-screen .login-copy,#password-setup-screen .login-copy{margin:5px 0 8px}
+  #login-screen .login-footer{margin-top:5px}
+}
+#header-notifications{position:relative}#notification-dot{position:absolute;top:5px;right:5px;width:10px;height:10px;border-radius:50%;background:#ef3340;border:2px solid var(--panel);box-shadow:0 0 0 1px #ef334055}#notification-dot.hidden{display:none!important}
+.audience-box{border:1px solid var(--line);border-radius:14px;padding:15px;background:linear-gradient(145deg,#1b1d21,#111214);margin:12px 0}.audience-box h4{margin:0 0 5px;font-size:.98rem}.audience-box .audience-help{color:var(--muted);font-size:.8rem;line-height:1.45;margin:0 0 12px}.audience-box select[multiple]{width:100%;min-height:110px;padding:8px;border-radius:10px;background:#0e0f11;border:1px solid #393b42;color:var(--text)}.audience-section-title{display:flex;align-items:center;gap:8px;margin-bottom:8px}.audience-section-title .step{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:#df1e3124;color:#ff8b96;font-weight:700}.announcement-card{display:flex;gap:13px;padding:16px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(135deg,#1b1d21,#111214);margin:10px 0}.announcement-card .announcement-icon{flex:0 0 42px;width:42px;height:42px;border-radius:12px;background:#df1e311c;color:#f16b78;display:grid;place-items:center;font-size:1.15rem}.announcement-card .announcement-content{min-width:0;flex:1}.announcement-card h4{margin:0 0 6px;font-size:1rem}.announcement-card p{margin:0;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}.announcement-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font-size:.78rem;margin-top:10px}.notification-overlay{position:fixed;inset:0;background:#000b;z-index:1000;display:flex;justify-content:flex-end}.notification-panel{width:min(440px,100%);height:100%;overflow:auto;background:var(--panel);border-left:1px solid var(--line);padding:20px;box-shadow:-18px 0 50px #0008}.notification-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.notification-head h2{margin:0;font-size:1.25rem}.notification-item{padding:13px;border:1px solid var(--line);border-radius:12px;margin:9px 0;background:var(--panel2)}.notification-item.unread{border-color:#df1e31;background:linear-gradient(120deg,#df1e311c,var(--panel2))}.notification-item p{margin:6px 0;line-height:1.45}.notification-item small{color:var(--muted)}
+.vote-card{align-items:flex-start}.vote-card .vote-options{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.vote-card .vote-options .btn:disabled{opacity:.45}.vote-partials{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#090a0c}.vote-count{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #ffffff12}.vote-count:last-child{border-bottom:0}
+.vote-card{width:100%;min-width:0;box-sizing:border-box}.vote-card .announcement-content{min-width:0;width:100%}.vote-card .vote-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;width:100%;box-sizing:border-box}.vote-card .vote-options .btn{min-width:0;white-space:normal;overflow-wrap:anywhere;min-height:42px}.vote-card .form-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.vote-card .form-actions .btn{flex:1 1 110px;min-height:40px}.vote-card .vote-partials{width:100%;box-sizing:border-box}.vote-card .announcement-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.vote-card .announcement-meta span{overflow-wrap:anywhere}
+@media(max-width:600px){
+  #page-votes .page-heading{align-items:flex-start;gap:8px}#page-votes .page-heading h1{font-size:1.35rem}
+  #page-votes #votes-list{display:grid;gap:12px;min-width:0}
+  #page-votes .vote-card{display:grid;grid-template-columns:1fr;gap:10px;padding:13px;border-radius:15px;min-width:0}
+  #page-votes .vote-card>.announcement-icon{display:none}
+  #page-votes .vote-card .announcement-content{width:100%;min-width:0}
+  #page-votes .vote-card h4{font-size:1rem;line-height:1.35;margin:9px 0 6px!important;overflow-wrap:anywhere}
+  #page-votes .vote-card p{font-size:.86rem;line-height:1.45;overflow-wrap:anywhere}
+  #page-votes .vote-card .announcement-meta{font-size:.72rem;line-height:1.4}
+  #page-votes .vote-card .form-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
+  #page-votes .vote-card .form-actions .btn{width:100%;min-width:0;min-height:42px;padding:9px 8px}
+  #page-votes .vote-card .vote-options{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
+  #page-votes .vote-card .vote-options .btn{width:100%;min-width:0;min-height:44px;padding:10px 8px;font-size:.88rem}
+  #page-votes .vote-card .vote-partials{margin-top:10px;padding:11px;border-radius:12px}
+  #page-votes .vote-count{gap:8px;padding:9px 0;font-size:.85rem}
+  #page-votes #vote-create-card,#page-votes #vote-results{min-width:0;overflow-wrap:anywhere}
+}
+</style>
+</head>
+<body>
+<div id="login-screen" class="app-shell">
+  <div class="login-wrap">
+    <div class="brand-login">
+      <img class="brand-logo" src="/icons/guardioes-logo.png?v=2" alt="Guardiões da 354" onerror="this.style.display='none'">
+      <div class="eyebrow">Motoclube · São Gotardo — MG</div>
+    </div>
+    <section class="panel">
+      <h1 class="login-title">Uma irmandade.<span>Uma estrada.</span></h1>
+      <p class="login-copy">O espaço exclusivo dos membros dos Guardiões da 354.</p>
+      <form id="login-form">
+        <label for="email">E-mail cadastrado</label><input id="email" type="email" autocomplete="username" placeholder="seuemail@exemplo.com" required>
+        <label for="password">Senha</label><input id="password" type="password" autocomplete="current-password" placeholder="Sua senha" required>
+        <button id="login-button" class="btn btn-primary btn-block" type="submit">Entrar no aplicativo →</button>
+        <div class="login-bottom"><button id="first-access-button" class="btn btn-quiet" type="button">Primeiro acesso?</button></div>
+      </form>
+      <p class="muted small" style="text-align:center;line-height:1.5;margin:16px 0 0">Acesso exclusivo para integrantes autorizados pelo motoclube.</p>
+      <div id="login-notice" class="notice" role="status" aria-live="polite"></div>
+    </section>
+    <div style="text-align:center;margin-top:18px"><button id="install-button" class="btn btn-quiet hidden" type="button">▯ Instalar aplicativo</button></div>
+    <div class="login-footer">GUARDIÕES DA 354 · APLICATIVO INDEPENDENTE</div>
   </div>
+</div>
 
-  <div id="setup-motorcycle-wrap">
-    <label for="setup-motorcycle">
-      Motocicleta principal (marca, modelo e ano)
-    </label>
-    <input
-      id="setup-motorcycle"
-      maxlength="120"
-      placeholder="Ex.: Royal Enfield Himalayan 411 2021"
-    >
+<div id="install-help-overlay" class="notification-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="install-help-title" style="display:none"><section class="notification-panel"><div class="notification-head"><h2 id="install-help-title">📲 Instalar aplicativo</h2><button id="install-help-close" class="btn" type="button">Fechar ✕</button></div><div class="audience-box"><h4>Android · Chrome</h4><p>1. Abra este site no Chrome.<br>2. Toque nos três pontinhos (⋮).<br>3. Escolha <strong>Instalar aplicativo</strong> ou <strong>Adicionar à tela inicial</strong>.</p></div><div class="audience-box"><h4>iPhone · Safari</h4><p>1. Abra este site no Safari.<br>2. Toque em <strong>Compartilhar</strong> (quadrado com seta).<br>3. Escolha <strong>Adicionar à Tela de Início</strong> e confirme em Adicionar.</p></div><p class="muted small">Se a opção não aparecer, confira se abriu o endereço no navegador indicado, e não dentro de outro aplicativo.</p></section></div>
+<div id="first-access-screen" class="app-shell hidden">
+  <div class="login-wrap">
+    <div class="brand-login"><div class="eyebrow">Guardiões da 354 · Primeiro acesso</div></div>
+    <section class="panel">
+      <h1 class="login-title">Primeiro <span>acesso</span></h1>
+      <p class="login-copy">Informe o e-mail cadastrado pelo motoclube para receber o link de criação da senha.</p>
+      <form id="first-access-form">
+        <label for="first-access-email">E-mail cadastrado</label>
+        <input id="first-access-email" type="email" autocomplete="email" placeholder="seuemail@exemplo.com" required>
+        <button id="request-access-button" class="btn btn-primary btn-block" type="submit">Cadastrar e enviar link →</button>
+        <div class="login-bottom"><button id="back-to-login-button" class="btn btn-quiet" type="button">Voltar para entrar</button></div>
+      </form>
+      <div id="first-access-notice" class="notice" role="status" aria-live="polite"></div>
+    </section>
   </div>
+</div>
 
-  <div id="setup-pilot-wrap" class="hidden">
-    <label for="setup-pilot-id">Qual piloto acompanha você?</label>
-    <select id="setup-pilot-id">
-      <option value="">Selecione o piloto</option>
-    </select>
+<div id="password-setup-screen" class="app-shell hidden">
+  <div class="login-wrap">
+    <div class="brand-login"><div class="eyebrow">Guardiões da 354 · Primeiro acesso</div></div>
+    <section class="panel">
+      <h1 class="login-title">Criar <span>sua senha</span></h1>
+      <p class="login-copy">Defina uma senha para acessar o aplicativo exclusivo dos integrantes.</p>
+      <form id="password-setup-form">
+        <label for="new-password">Nova senha</label>
+        <input id="new-password" type="password" autocomplete="new-password" minlength="8" placeholder="Mínimo de 8 caracteres" required>
+        <label for="confirm-password">Confirme a nova senha</label>
+        <input id="confirm-password" type="password" autocomplete="new-password" minlength="8" placeholder="Digite a senha novamente" required>
+        <button id="save-password-button" class="btn btn-primary btn-block" type="submit">Salvar senha e continuar →</button>
+      </form>
+      <div id="password-setup-notice" class="notice" role="status" aria-live="polite"></div>
+    </section>
   </div>
+</div>
 
-  <button
-    id="save-profile-setup-button"
-    class="btn btn-primary btn-block"
-    type="submit"
-  >
-    Salvar e continuar →
-  </button>
+<div id="profile-setup-modal" class="setup-modal hidden" role="dialog" aria-modal="true" aria-labelledby="profile-setup-title">
+  <div class="setup-modal-card">
+    <div class="eyebrow">Guardiões da 354 · Complete seu cadastro</div>
+    <h2 id="profile-setup-title">Seus dados de integrante</h2>
+    <p class="muted small">Precisamos dessas informações para concluir seu primeiro acesso.</p>
+    <form id="profile-setup-form">
+      <label for="setup-phone">Telefone</label>
+      <input id="setup-phone" type="tel" maxlength="30" placeholder="(34) 99999-9999" required>
+      <label for="setup-rider-type">Categoria oficial (alterada somente pela diretoria)</label>
+      <select id="setup-rider-type" disabled>
+        <option value="Piloto">Piloto</option>
+        <option value="Garupa">Garupa</option>
+      </select>
+      <div id="setup-motorcycle-wrap">
+        <label for="setup-motorcycle">Motocicleta principal (marca, modelo e ano)</label>
+        <input id="setup-motorcycle" maxlength="120" placeholder="Ex.: Royal Enfield Himalayan 411 2021">
+      </div>
+      <div id="setup-pilot-wrap" class="hidden">
+        <label for="setup-pilot-id">Qual piloto acompanha você?</label>
+        <select id="setup-pilot-id"><option value="">Selecione o piloto</option></select>
+      </div>
+      <button id="save-profile-setup-button" class="btn btn-primary btn-block" type="submit">Salvar e continuar →</button>
+      <div id="profile-setup-notice" class="notice" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+</div>
 
-  <div
-    id="profile-setup-notice"
-    class="notice"
-    role="status"
-    aria-live="polite"
-  ></div>
-</form>
+<div id="app-screen" class="app-shell hidden">
+  <header class="app-header">
+    <div class="brand">
+      <img src="/icons/guardioes-logo.png?v=2" alt="Guardiões da 354" onerror="this.style.display='none'">
+      <div><div class="brand-title">GUARDIÕES DA 354</div><div class="brand-sub">Área exclusiva dos integrantes</div></div>
+    </div>
+    <div class="header-actions"><button class="icon-btn" id="header-notifications" title="Notificações" aria-label="Notificações">♧<span id="notification-dot" class="hidden" aria-hidden="true"></span></button><button class="btn" id="header-logout" type="button">Sair <span class="logout-text">da conta</span></button><div class="mobile-menu-wrap" id="mobile-menu-wrap"><button class="btn" id="mobile-menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu-panel">☰ Menu</button><div class="mobile-menu-panel hidden" id="mobile-menu-panel" role="menu" aria-label="Menu do aplicativo"><button type="button" data-mobile-page="home" role="menuitem"><span>⌂</span>Início</button><button type="button" data-mobile-page="members" role="menuitem"><span>♟</span>Membros</button><button type="button" data-mobile-page="agenda" role="menuitem"><span>▦</span>Agenda e comunicados</button><button type="button" data-mobile-page="documents" role="menuitem"><span>▧</span>Documentos</button><button type="button" data-mobile-page="votes" role="menuitem"><span>✓</span>Votações</button><button type="button" data-mobile-page="profile" role="menuitem"><span>♙</span>Meu perfil</button><button type="button" class="admin-only hidden" data-mobile-page="admin" role="menuitem"><span>⚙</span>Administração</button><button type="button" class="menu-logout" id="mobile-menu-logout" role="menuitem"><span>↪</span>Sair da conta</button></div></div></div>
+  </header>
+  <div id="notifications-overlay" class="notification-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="notifications-title" style="display:none"><section class="notification-panel"><div class="notification-head"><h2 id="notifications-title">🔔 Notificações</h2><button id="notifications-close" class="btn" type="button">Fechar ✕</button></div><div id="notifications-unread-summary" class="muted small" style="margin-bottom:12px"></div><div id="notifications-list"></div></section></div>
+  <nav class="mobile-nav" aria-label="Navegação móvel">
+    <button class="active" data-page="home"><span>⌂</span>Início</button><button data-page="members"><span>♟</span>Membros</button><button data-page="agenda"><span>▦</span>Agenda e avisos</button><button data-page="documents"><span>▧</span>Docs</button><button data-page="votes"><span>✓</span>Votos</button><button data-page="profile"><span>♙</span>Perfil</button><button class="admin-only hidden" data-page="admin"><span>⚙</span>Admin</button>
+  </nav>
+  <nav id="desktop-nav" class="desktop-nav" aria-label="Navegação principal">
+    <button class="nav-btn active" data-page="home">Início</button><button class="nav-btn" data-page="members">Membros</button><button class="nav-btn" data-page="agenda">Agenda e comunicados</button><button class="nav-btn" data-page="documents">Documentos</button><button class="nav-btn" data-page="votes">Votações</button><button class="nav-btn" data-page="profile">Meu perfil</button><button class="nav-btn admin-only hidden" data-page="admin">Administração</button>
+  </nav>
 
+  <main>
+    <section id="page-home" class="app-page">
+      <div class="hero">
+        <div class="hero-main"><div class="hero-kicker">Uma irmandade. Uma estrada.</div><h1>Bem-vindo,<br><span id="home-first-name">integrante</span>.</h1><p>Este é o ponto de encontro digital dos Guardiões da 354. Acompanhe as informações do motoclube em um só lugar.</p><div class="push-setup-card" style="margin-top:16px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#ffffff08"><strong>🔔 Receber avisos no celular</strong><p class="small muted" style="margin:5px 0 10px">Ative as notificações para receber avisos mesmo quando fechar o aplicativo.</p><button id="enable-push-home-button" class="btn btn-primary" type="button">Ativar notificações neste aparelho</button><div id="push-home-status" class="muted small" aria-live="polite" style="margin-top:8px"></div><div id="push-setup-notice" class="notice" role="status" aria-live="polite"></div></div></div>
+        <div class="hero-side"><div><div class="status-label">Seu acesso</div><div id="home-position" class="status-value">Integrante</div><div id="home-status" class="status-mark"><span class="dot"></span> Conta autorizada</div></div><div class="muted small" style="margin-top:15px">São Gotardo · Minas Gerais</div></div>
+      </div>
+      <div class="section-title"><div><h2>Acesso rápido</h2><p>Escolha uma área do aplicativo.</p></div></div>
+      <div class="grid">
+        <button class="tile" data-go="members"><span class="tile-icon">♟</span><strong>Membros</strong><small>Consulte a área de integrantes.</small><span class="tag">Área do clube</span></button>
+        <button class="tile" data-go="agenda"><span class="tile-icon">▦</span><strong>Agenda</strong><small>Reuniões, eventos e passeios.</small><span class="tag">Programação</span></button>
+        <button class="tile" data-go="agenda"><span class="tile-icon">▤</span><strong>Comunicados</strong><small>Informações e avisos do motoclube.</small><span class="tag">Novidades</span></button>
+        <button class="tile" data-go="documents"><span class="tile-icon">▧</span><strong>Documentos</strong><small>Estatuto e arquivos oficiais.</small><span class="tag">Biblioteca</span></button>
+        <button class="tile" data-go="votes"><span class="tile-icon">✓</span><strong>Votações</strong><small>Participe das votações autorizadas.</small><span class="tag">Deliberações</span></button>
+        <button class="tile" data-go="profile"><span class="tile-icon">♙</span><strong>Meu perfil</strong><small>Confira seus dados e categoria.</small><span class="tag">Minha conta</span></button>
+      </div>
+      <div class="section-title"><div><h2>Próximas atividades</h2><p>Eventos e avisos atualizados automaticamente.</p></div><button class="btn" data-go="agenda">Ver agenda</button></div>
+      <div class="two-col">
+        <div class="card"><h3>Agenda do motoclube</h3><div id="home-agenda-list" class="empty">Carregando agenda…</div></div>
+        <div class="card"><h3>Últimos comunicados</h3><div id="home-announcements-list" class="empty">Carregando comunicados…</div></div>
+      </div>
+    </section>
+
+    <section id="page-members" class="app-page hidden-page">
+      <div class="page-heading"><div><h1>Membros</h1><p>Área de integrantes do Guardiões da 354.</p></div><span class="badge">Acesso restrito</span></div>
+      <div class="callout">O diretório mostra os dados autorizados dos integrantes. Cargos e situação só podem ser alterados pela diretoria; cada membro edita apenas os próprios dados pessoais.</div>
+      <div class="card"><div class="section-title" style="margin-top:0"><div><h2>Integrantes</h2><p>Nome, motocicleta e vínculo com o motoclube.</p></div><button class="btn" id="members-refresh">Atualizar</button></div>
+      <div id="members-list" class="empty">Carregando integrantes autorizados…</div>
+      <div id="member-edit-modal" class="setup-modal hidden" role="dialog" aria-modal="true" aria-labelledby="member-edit-title">
+        <div class="setup-modal-card"><div class="eyebrow">Administração · Diretoria</div><h2 id="member-edit-title">Editar integrante</h2>
+          <form id="member-edit-form">
+            <input id="member-edit-name" type="hidden">
+            <label for="member-edit-position">Cargo / vínculo</label><select id="member-edit-position"><option>Presidente</option><option>Vice-Presidente</option><option>Diretor Geral</option><option>Diretor Social</option><option>Fundador</option><option>Membro Ativo</option><option>Membro</option><option>Prospect</option><option>Garupa</option></select>
+            <label for="member-edit-status">Situação</label><select id="member-edit-status"><option value="Ativo">Ativo</option><option value="Prospect">Prospect</option><option value="Inativo">Inativo</option></select>
+            <label for="member-edit-type">Categoria</label><select id="member-edit-type"><option value="Piloto">Piloto</option><option value="Garupa">Garupa</option></select>
+            <div class="form-actions"><button class="btn btn-primary" type="submit">Salvar alterações</button><button class="btn" id="member-edit-cancel" type="button">Cancelar</button></div>
+            <div id="member-edit-notice" class="notice" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+      </div></div>
+    </section>
+
+    <section id="page-agenda" class="app-page hidden-page">
+      <div class="page-heading"><div><h1>Agenda e Comunicados</h1><p>Atividades, reuniões e avisos oficiais dos Guardiões da 354 em um só lugar.</p></div><span class="badge">Mural oficial</span></div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div><div class="muted small">Próxima atividade</div><div id="agenda-next" class="status-value" style="font-size:1.15rem">—</div></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button id="agenda-suggest-toggle" class="btn btn-primary" type="button">＋ Sugerir atividade</button><button id="agenda-refresh" class="btn" type="button">Atualizar</button></div>
+        </div>
+      </div>
+      <div id="agenda-form-card" class="card hidden" style="margin-bottom:14px">
+        <h3 id="agenda-form-title">Sugerir atividade</h3>
+        <p class="muted small" style="line-height:1.5;margin-top:-5px">Sugestões aguardam aprovação da diretoria. Atividades cadastradas pela diretoria são publicadas automaticamente.</p>
+        <form id="agenda-form">
+          <input id="agenda-event-id" type="hidden">
+          <label for="agenda-title">Nome da atividade</label><input id="agenda-title" required maxlength="160" placeholder="Ex.: Passeio até Serra do Salitre">
+          <div class="form-grid">
+            <div><label for="agenda-type">Tipo</label><select id="agenda-type" required><option value="Passeio">Passeio</option><option value="Reunião">Reunião</option><option value="Encontro">Encontro</option><option value="Evento">Evento</option><option value="Ação social">Ação social</option></select></div>
+            <div><label for="agenda-start">Data e horário</label><input id="agenda-start" type="datetime-local" required></div>
+          </div>
+          <label for="agenda-location">Local / ponto de encontro</label><input id="agenda-location" maxlength="240" placeholder="Ex.: Posto de combustível, São Gotardo">
+          <label for="agenda-description">Detalhes</label><textarea id="agenda-description" maxlength="5000" placeholder="Roteiro, horário de saída, orientações e outras informações"></textarea>
+          <div class="form-grid"><div><label for="agenda-visible-groups">Quem poderá ver</label><select id="agenda-visible-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select><small class="muted">Ctrl permite selecionar mais de um grupo.</small></div>
+          <div><label for="agenda-notify-groups">Quem receberá notificação</label><select id="agenda-notify-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select></div></div>
+          <label for="agenda-visible-members">Integrantes específicos que poderão ver (opcional)</label><select id="agenda-visible-members" multiple size="4"></select>
+          <label for="agenda-notify-members">Integrantes específicos que receberão notificação (opcional)</label><select id="agenda-notify-members" multiple size="4"></select>
+          <div class="form-actions"><button id="agenda-submit" class="btn btn-primary" type="submit">Enviar sugestão</button><button id="agenda-cancel-edit" class="btn" type="button">Cancelar</button></div>
+          <div id="agenda-form-notice" class="notice" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+      <div class="card"><div class="section-title" style="margin-top:0"><div><h3 style="margin:0">Atividades agendadas</h3><p>Toque em uma atividade para ver os detalhes e confirmar sua participação.</p></div><button id="agenda-history-toggle" class="btn" type="button" aria-expanded="false">Passeios anteriores</button></div><div id="agenda-list" class="empty">Carregando agenda…</div><div id="agenda-history-wrap" class="hidden" style="margin-top:18px;padding-top:14px;border-top:1px solid #ffffff18"><h3>Histórico de atividades</h3><p class="muted small">Últimas atividades já realizadas.</p><div id="agenda-history-list" class="empty">Carregando histórico…</div></div></div>
+      <div class="card admin-only hidden" id="announcement-compose-card" style="margin-bottom:14px"><h3>Novo comunicado</h3>
+        <form id="announcement-form"><label for="announcement-title">Título</label><input id="announcement-title" required maxlength="160">
+        <label for="announcement-body">Comunicado</label><textarea id="announcement-body" required maxlength="10000"></textarea>
+        <div class="audience-box"><div class="audience-section-title"><span class="step">1</span><h4>Quem poderá ver este comunicado?</h4></div><p class="audience-help">Escolha grupos, pessoas específicas ou combine as opções. Se quiser apenas uma pessoa, selecione somente ela na lista individual abaixo.</p>
+          <label for="announcement-visible-groups">Grupos (opcional)</label><select id="announcement-visible-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select>
+          <label for="announcement-visible-members">Pessoas específicas (opcional)</label><select id="announcement-visible-members" multiple size="5"></select><small class="muted">Dica: segure Ctrl (Windows) para escolher mais de uma pessoa.</small></div>
+        <div class="audience-box"><div class="audience-section-title"><span class="step">2</span><h4>Quem deve receber a notificação?</h4></div><p class="audience-help">Este público é independente de quem pode ver o comunicado. Para notificar apenas uma pessoa, deixe os grupos vazios e selecione somente ela.</p>
+          <label for="announcement-notify-groups">Grupos (opcional)</label><select id="announcement-notify-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select>
+          <label for="announcement-notify-members">Pessoas específicas (opcional)</label><select id="announcement-notify-members" multiple size="5"></select><small class="muted">Você pode escolher um grupo, pessoas específicas ou ambos.</small></div>
+        <button class="btn btn-primary btn-block" type="submit">Publicar comunicado</button></form></div>
+      <div class="card" style="margin-top:14px"><h3>Comunicados recentes</h3><div id="announcements-list" class="empty">Carregando comunicados…</div></div>
+    </section>
+
+    <section id="page-documents" class="app-page hidden-page">
+      <div class="page-heading"><div><h1>Documentos</h1><p>Estatuto, regulamentos e arquivos oficiais do motoclube.</p></div><span class="badge">Biblioteca</span></div>
+      <div class="card hidden" id="document-upload-card"><h3>Enviar documento</h3><form id="document-form"><label for="document-title">Nome do documento</label><input id="document-title" required maxlength="160"><label for="document-file">Arquivo</label><input id="document-file" type="file" required accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"><button class="btn btn-primary btn-block" type="submit">Enviar documento</button></form></div>
+      <div class="card" style="margin-top:14px"><h3>Arquivos disponíveis</h3><div id="documents-list" class="empty">Carregando documentos…</div></div>
+    </section>
+    <section id="page-votes" class="app-page hidden-page">
+      <div class="page-heading"><div><h1>Votações</h1><p>Deliberações com acesso definido pela diretoria.</p></div><span class="badge">Restrito</span></div>
+      <div class="card hidden" id="vote-create-card" style="margin-bottom:16px"><h3>＋ Criar votação</h3><p class="muted small">Defina o formato, o público e as opções. Os resultados parciais ficam visíveis durante a votação.</p><form id="vote-form">
+        <label for="vote-title">Título da votação</label><input id="vote-title" required maxlength="180" placeholder="Ex.: Escolha da data do próximo passeio">
+        <label for="vote-description">Descrição / contexto</label><textarea id="vote-description" maxlength="5000" placeholder="Explique o assunto para os integrantes"></textarea>
+        <label for="vote-type">Modalidade</label><select id="vote-type"><option value="simple">Escolher entre opções</option><option value="approval">Aprovação: Sim / Não / Abstenção</option></select>
+        <div id="vote-options-wrap"><label for="vote-options">Opções (uma por linha)</label><textarea id="vote-options" placeholder="Opção A&#10;Opção B"></textarea></div>
+        <label for="vote-closes-at">Encerrar em (opcional)</label><input id="vote-closes-at" type="datetime-local">
+        <div class="audience-box"><div class="audience-section-title"><span class="step">1</span><h4>Quem poderá ver e votar?</h4></div><p class="audience-help">Escolha um ou mais grupos, pessoas específicas ou ambos. Para limitar a uma pessoa, deixe os grupos vazios.</p>
+          <label for="vote-target-groups">Grupos (opcional)</label><select id="vote-target-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="board">Diretoria e fundadores</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select>
+          <label for="vote-target-members">Integrantes específicos (opcional)</label><select id="vote-target-members" multiple size="5"></select><small class="muted">No Windows, segure Ctrl para escolher mais de uma pessoa.</small></div>
+        <button class="btn btn-primary btn-block" type="submit">Publicar votação</button><div id="vote-form-notice" class="notice" role="status" aria-live="polite"></div></form></div>
+      <div class="card" style="margin-top:14px"><div class="section-title"><div><h3 style="margin:0">Votações disponíveis</h3><p class="muted small">Vote e acompanhe as parciais enquanto a votação estiver aberta.</p></div><button class="btn" id="votes-refresh" type="button">Atualizar</button></div><div id="votes-list" class="empty">Carregando votações…</div></div>
+      <div class="card" style="margin-top:14px"><h3>Relatório da diretoria</h3><p class="muted small">Registro identificado de quem votou e qual opção escolheu.</p><div id="vote-results" class="empty">Os registros aparecem aqui para a diretoria.</div></div>
+    </section>
+    <section id="page-profile" class="app-page hidden-page">
+      <div class="page-heading"><div><h1>Meu perfil</h1><p>Informações da sua conta e do seu vínculo com o motoclube.</p></div><span id="profile-role-badge" class="badge">Membro</span></div>
+      <div class="card">
+        <form id="profile-edit-form">
+          <div class="form-grid">
+            <div><label for="edit-full-name">Nome completo</label><input id="edit-full-name" required maxlength="120" readonly></div>
+            <div><label for="edit-phone">Telefone</label><input id="edit-phone" type="tel" maxlength="30" placeholder="(34) 99999-9999"></div>
+            <div><label for="edit-email">E-mail</label><input id="edit-email" type="email" disabled></div>
+            <div><label for="edit-rider-type">Categoria oficial (somente diretoria altera)</label><select id="edit-rider-type" disabled><option value="Piloto">Piloto</option><option value="Garupa">Garupa</option></select></div>
+            <div><label for="edit-motorcycle">Motocicleta</label><input id="edit-motorcycle" maxlength="100" placeholder="Marca / modelo / ano"></div>
+            <div id="profile-pillion-wrap" class="hidden"><label for="edit-pilot-id">Piloto responsável</label><select id="edit-pilot-id"><option value="">Selecione o piloto</option></select></div>
+          </div>
+          <div class="callout" style="margin-top:14px">Nome, categoria, situação (Ativo/Prospect), cargo e permissões são controlados pela diretoria. Você pode atualizar seu telefone e os dados de vínculo de piloto/garupa.</div>
+          <div class="form-actions"><button class="btn btn-primary" type="submit">Salvar meus dados</button></div>
+        </form>
+        <div class="section-title"><div><h2>Carteirinha digital</h2><p>Identificação do integrante dos Guardiões da 354.</p></div><button class="btn" id="member-card-print" type="button">Imprimir / salvar</button></div><div class="member-pass" id="member-digital-card"><div class="member-pass-top"><img class="member-pass-logo" src="/icons/guardioes-logo.png?v=2" alt="Brasão Guardiões da 354"><div><div class="member-pass-sub">Motoclube · São Gotardo/MG</div><div class="member-pass-name" id="member-card-name">Integrante</div><div class="muted small" id="member-card-position">Membro ativo</div></div></div><div class="member-pass-grid"><div class="member-pass-field"><small>Categoria</small><strong id="member-card-rider">—</strong></div><div class="member-pass-field"><small>Situação</small><strong id="member-card-status">—</strong></div><div class="member-pass-field"><small>Motocicleta</small><strong id="member-card-bike">—</strong></div><div class="member-pass-field"><small>Identificação</small><strong id="member-card-id">Integrante</strong></div></div></div><div class="section-title"><div><h2>Notificações no celular</h2><p>Receba avisos mesmo quando o aplicativo estiver fechado.</p></div></div>
+        <div class="callout">Ative as notificações neste aparelho. No iPhone, o aplicativo precisa estar instalado na Tela de Início e o pedido deve ser aceito.</div>
+        <div class="form-actions"><button class="btn btn-primary" id="enable-push-button" type="button">Ativar notificações neste aparelho</button><span id="push-status" class="muted small" aria-live="polite">Verificando suporte…</span></div>
+        <div class="profile-grid">
+          <div class="profile-field"><div class="muted">Cargo</div><strong id="profile-position">—</strong></div>
+          <div class="profile-field"><div class="muted">Situação</div><strong id="profile-status">—</strong></div>
+          <div class="profile-field"><div class="muted">Permissão no aplicativo</div><strong id="profile-role">—</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-admin" class="app-page hidden-page">
+      <div class="page-heading"><div><h1>Central da Diretoria</h1><p>Use esta página como ponto de partida para organizar o motoclube.</p></div><span class="badge">Área restrita</span></div>
+      <div class="card" style="margin-bottom:16px;border-color:#b9152b">
+        <h3 style="margin-top:0">Por onde começar?</h3>
+        <p class="muted small">1. Confira os números abaixo. 2. Veja se há pendências. 3. Escolha uma área e use o botão para abrir a ferramenta correspondente.</p>
+        <div class="form-actions" style="margin-bottom:0">
+          <button class="btn btn-primary" id="admin-refresh" type="button">↻ Atualizar informações</button>
+          <span class="muted small" id="admin-updated-at">Os indicadores são carregados do banco.</span>
+        </div>
+      </div>
+      <div class="section-title"><div><h2>Resumo do motoclube</h2><p>Os números são consultados no banco e ajudam a identificar onde agir.</p></div></div>
+      <div class="grid" id="admin-stats-grid">
+        <div class="card"><div class="muted small">👥 Integrantes cadastrados</div><div class="status-value" id="admin-count-members">—</div><p class="muted small">Confira cargos e cadastros na Gestão de membros.</p><button class="btn" type="button" data-admin-go="members">Ver integrantes →</button></div>
+        <div class="card"><div class="muted small">🏍️ Prospects</div><div class="status-value" id="admin-count-prospects">—</div><p class="muted small">Acompanhe a situação dos integrantes em formação.</p><button class="btn" type="button" data-admin-go="members">Acompanhar →</button></div>
+        <div class="card"><div class="muted small">📅 Atividades pendentes</div><div class="status-value" id="admin-count-pending-events">—</div><p class="muted small">Veja sugestões de passeios que podem precisar de decisão.</p><button class="btn" type="button" data-admin-go="agenda">Revisar agenda →</button></div>
+        <div class="card"><div class="muted small">📁 Documentos oficiais</div><div class="status-value" id="admin-count-documents">—</div><p class="muted small">Estatuto, regulamentos, atas e arquivos do clube.</p><button class="btn" type="button" data-admin-go="documents">Abrir biblioteca →</button></div>
+        <div class="card"><div class="muted small">📣 Comunicados publicados</div><div class="status-value" id="admin-count-announcements">—</div><p class="muted small">Mantenha os membros informados sobre decisões e avisos.</p><button class="btn" type="button" data-admin-go="agenda">Ver comunicados →</button></div>
+        <div class="card"><div class="muted small">🗳️ Votações abertas</div><div class="status-value" id="admin-count-votes">—</div><p class="muted small">Acompanhe decisões que ainda estão recebendo votos.</p><button class="btn" type="button" data-admin-go="votes">Gerenciar votações →</button></div>
+      </div>
+      <div class="section-title"><div><h2>O que você pode fazer em cada área</h2><p>Escolha uma tarefa. Cada botão leva à tela onde ela é realizada.</p></div></div>
+      <div class="grid">
+        <div class="card">
+          <div class="muted small">01 · PESSOAS</div><h3>Gestão de membros</h3>
+          <p>Use quando entrar um novo integrante ou quando precisar corrigir um cadastro.</p>
+          <ul class="small muted" style="padding-left:20px"><li>Conferir nome, telefone e motocicleta.</li><li>Revisar categoria e situação.</li><li>Manter cargos alinhados à decisão oficial da diretoria.</li></ul>
+          <button class="btn btn-primary" type="button" data-admin-go="members">Abrir gestão de membros →</button>
+        </div>
+        <div class="card">
+          <div class="muted small">02 · PASSEIOS</div><h3>Eventos e agenda</h3>
+          <p>Use antes de um passeio e sempre que alguém sugerir uma atividade.</p>
+          <ul class="small muted" style="padding-left:20px"><li>Revisar sugestões recebidas.</li><li>Conferir data, destino e ponto de encontro.</li><li>Acompanhar confirmações de presença.</li></ul>
+          <button class="btn btn-primary" type="button" data-admin-go="agenda">Abrir agenda →</button>
+        </div>
+        <div class="card">
+          <div class="muted small">03 · AVISOS</div><h3>Comunicados oficiais</h3>
+          <p>Use para que decisões e avisos importantes não fiquem perdidos no WhatsApp.</p>
+          <ul class="small muted" style="padding-left:20px"><li>Publicar avisos para os integrantes.</li><li>Corrigir ou retirar comunicados antigos.</li><li>Usar mensagens claras com data e instruções.</li></ul>
+          <button class="btn btn-primary" type="button" data-admin-go="agenda">Abrir comunicados →</button>
+        </div>
+        <div class="card">
+          <div class="muted small">04 · ARQUIVOS</div><h3>Documentos oficiais</h3>
+          <p>Use como arquivo central dos documentos que os membros precisam consultar.</p>
+          <ul class="small muted" style="padding-left:20px"><li>Publicar estatuto, regulamentos e atas.</li><li>Usar nomes claros e datas nas versões.</li><li>Renomear ou excluir arquivos desatualizados.</li></ul>
+          <button class="btn btn-primary" type="button" data-admin-go="documents">Abrir documentos →</button>
+        </div>
+        <div class="card">
+          <div class="muted small">05 · DECISÕES</div><h3>Votações</h3>
+          <p>Use quando a irmandade precisar registrar uma decisão de forma organizada.</p>
+          <ul class="small muted" style="padding-left:20px"><li>Definir pergunta e prazo de encerramento.</li><li>Selecionar quem pode participar.</li><li>Conferir o resultado e registrar a decisão.</li></ul>
+          <button class="btn btn-primary" type="button" data-admin-go="votes">Abrir votações →</button>
+        </div>
+        <div class="card">
+          <div class="muted small">06 · SEGURANÇA</div><h3>Permissões e histórico</h3>
+          <p>Área para acompanhar a segurança e a responsabilidade administrativa.</p>
+          <ul class="small muted" style="padding-left:20px"><li>Restringir ações conforme o cargo.</li><li>Manter os Fundadores na hierarquia definida pelo motoclube.</li><li>Planejar um histórico de quem alterou cada informação.</li></ul>
+          <span class="badge">Próxima melhoria sugerida</span>
+        </div>
+      </div>
+      <div class="section-title"><div><h2>Pendências e alertas</h2><p>Confira esta lista antes de encerrar as tarefas administrativas.</p></div></div>
+      <div class="card"><div id="admin-attention-list" class="empty">Carregando pendências…</div></div>
+    </section>
+  </main>
+
+  <div id="app-notice" class="notice" role="status" aria-live="polite"></div>
+  <div class="app-footer">GUARDIÕES DA 354 · SÃO GOTARDO — MG</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(() => {
+  const SUPABASE_URL = 'https://nlaywsguzsiwvexwnakp.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_eIzAaMENq8u1smn5gVR3Lg_cj9bABxk';
+  const PUSH_VAPID_PUBLIC_KEY = 'BMHesRKdUbVl0jFSwy84ELM62KTh7Uu9UYOO-863vnZ_ou-pqGyJhzc5d94ZFP4CtrpjXAwudCedlOZW-fBAc1o';
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: window.localStorage
+    }
+  });
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => [...document.querySelectorAll(s)];
+  let currentUser = null;
+  let currentProfile = null;
+  let installPrompt = null;
+  const initialAuthLinkType = new URLSearchParams((location.hash || '').replace(/^#/, '')).get('type');
+  let passwordSetupSession = false;
+  let passwordWasSaved = false;
+
+  function showPasswordSetup() {
+    $('#login-screen').classList.add('hidden');
+    $('#app-screen').classList.add('hidden');
+    $('#password-setup-screen').classList.remove('hidden');
+  }
+
+  db.auth.onAuthStateChange((event, session) => {
+    if (!passwordWasSaved && (event === 'PASSWORD_RECOVERY' || ((initialAuthLinkType === 'invite' || initialAuthLinkType === 'recovery') && session?.user))) {
+      passwordSetupSession = true;
+      currentUser = session?.user || currentUser;
+      showPasswordSetup();
+    }
+  });
+
+  function notice(target, message) {
+    const el = $(target); if (!el) return; el.textContent = message; el.classList.add('show'); el.style.display = 'block';
+  }
+  function clearNotice(target) {
+    const el = $(target); if (!el) return; el.textContent = ''; el.classList.remove('show'); el.style.display = 'none';
+  }
+  function showLogin() {
+    $('#app-screen').classList.add('hidden'); $('#login-screen').classList.remove('hidden');
+  }
+  function showApp() {
+    $('#login-screen').classList.add('hidden'); $('#app-screen').classList.remove('hidden');
+  }
+  function go(page) {
+    const allowed = ['home','members','agenda','documents','votes','profile','admin'];
+    if (!allowed.includes(page)) page = 'home';
+    if (page === 'admin' && currentProfile?.role !== 'admin') page = 'home';
+    $$('.app-page').forEach(el => el.classList.add('hidden-page'));
+    $('#page-' + page)?.classList.remove('hidden-page');
+    $$('[data-page]').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+    window.scrollTo({top:0,behavior:'smooth'});
+    if (page === 'admin' && currentProfile?.role === 'admin') loadAdminDashboard();
+  }
+  function fillProfile(user, p) {
+    const firstName = (p.full_name || 'Integrante').trim().split(/\s+/)[0];
+    $('#home-first-name').textContent = firstName;
+    $('#home-position').textContent = p.club_position || (p.full_name === 'Guilherme Henrique Lopes' ? 'Fundador/Vice-Presidente' : (p.rider_type === 'Garupa' ? 'Garupa' : 'Membro Ativo'));
+    $('#home-status').innerHTML = '<span class="dot"></span> ' + (p.member_status || 'Ativo');
+    $('#profile-position').textContent = p.club_position || (p.full_name === 'Guilherme Henrique Lopes' ? 'Fundador/Vice-Presidente' : 'Membro Ativo');
+    $('#profile-status').textContent = p.member_status || 'Ativo';
+    $('#profile-role').textContent = p.role === 'admin' ? 'Administrador' : 'Membro';
+    $('#profile-role-badge').textContent = p.role === 'admin' ? 'Administrador' : 'Membro';
+    $('#member-card-name').textContent = p.full_name || 'Integrante';
+    $('#member-card-position').textContent = p.club_position || (p.member_status === 'Prospect' ? 'Prospect' : 'Membro Ativo');
+    $('#member-card-rider').textContent = p.rider_type || 'Não informado';
+    $('#member-card-status').textContent = p.member_status || 'Ativo';
+    $('#member-card-bike').textContent = p.rider_type === 'Garupa' ? 'Garupa' : (p.motorcycle || 'Não informada');
+    $('#member-card-id').textContent = p.role === 'admin' ? 'Diretoria autorizada' : (p.member_status === 'Prospect' ? 'Prospect' : 'Integrante');
+    if ($('#edit-full-name')) $('#edit-full-name').value = p.full_name || '';
+    if ($('#edit-phone')) $('#edit-phone').value = p.phone || '';
+    if ($('#edit-email')) $('#edit-email').value = user.email || '';
+    if ($('#edit-rider-type')) $('#edit-rider-type').value = p.rider_type || 'Piloto';
+    if ($('#edit-motorcycle')) $('#edit-motorcycle').value = p.motorcycle || '';
+    $('#profile-pillion-wrap')?.classList.toggle('hidden', p.rider_type !== 'Garupa');
+    $('#vote-create-card')?.classList.toggle('hidden', !canManageAgenda());
+    $$('.admin-only').forEach(el => el.classList.toggle('hidden', p.role !== 'admin'));
+    $('#document-upload-card')?.classList.toggle('hidden', !canManageDocuments());
+  }
+  async function loadProfile(user) {
+    clearNotice('#login-notice');
+    const {data,error} = await db.from('member_profiles')
+      .select('full_name, role, active, club_position, member_status, rider_type, phone, motorcycle, pilot_id')
+      .eq('id',user.id).maybeSingle();
+    if (error) { notice('#login-notice','Não foi possível consultar seu perfil. Tente novamente.'); return false; }
+    if (!data || !data.active) {
+      await db.auth.signOut();
+      notice('#login-notice','Sua conta ainda não está autorizada a entrar no aplicativo.');
+      return false;
+    }
+    currentUser = user; currentProfile = data; fillProfile(user,data); showApp(); await Promise.all([loadMembers(),loadPilotOptions(),loadDocuments(),loadAnnouncements(),loadVotes(),loadAgenda(),loadAnnouncementMemberChoices(),loadVoteMemberChoices()]); await refreshNotificationDot(); resetAgendaForm(); const pushPage=new URLSearchParams(location.search).get('pushPage'); go(['votes','agenda'].includes(pushPage)?pushPage:'home'); if(pushPage){const cleanUrl=new URL(location.href);cleanUrl.searchParams.delete('pushPage');history.replaceState({},'',cleanUrl.pathname+cleanUrl.search+cleanUrl.hash);} if (!data.phone || (data.rider_type === 'Piloto' && !data.motorcycle) || (data.rider_type === 'Garupa' && !data.pilot_id)) { openProfileSetup(data); } return true;
+  }
+  $('#login-form').addEventListener('submit', async (event) => {
+    event.preventDefault(); clearNotice('#login-notice');
+    const button = $('#login-button'); button.disabled = true; button.textContent = 'Entrando...';
+    try {
+      const email = $('#email').value.trim(); const password = $('#password').value;
+      if (!window.supabase || !db?.auth) throw new Error('Biblioteca de autenticação não carregou. Feche o app e abra novamente com internet.');
+      const {data,error} = await db.auth.signInWithPassword({email,password});
+      if (error) {
+        console.error('Falha de autenticação Supabase:', error);
+        notice('#login-notice', error.message?.toLowerCase().includes('fetch') || error.message?.toLowerCase().includes('network')
+          ? 'O celular não conseguiu alcançar o serviço de autenticação. Teste trocar Wi-Fi por dados móveis e tente novamente.'
+          : 'Não foi possível entrar: ' + (error.message || 'confira e-mail, senha e autorização da conta.'));
+      } else if (data.user) await loadProfile(data.user);
+    } catch (err) {
+      console.error('Exceção ao entrar no aplicativo:', err);
+      const detail = String(err?.message || '');
+      notice('#login-notice', detail.includes('Failed to fetch') || detail.includes('NetworkError')
+        ? 'Falha ao conectar ao Supabase. Teste alternar entre Wi-Fi e dados móveis. Se persistir, envie a mensagem técnica: ' + detail
+        : 'O aplicativo encontrou um erro ao iniciar o login: ' + (detail || 'erro desconhecido') + '. Atualize a página e tente novamente.');
+    }
+    finally { button.disabled = false; button.textContent = 'Entrar no aplicativo →'; }
+  });
+  $('#first-access-button').addEventListener('click', () => {
+    clearNotice('#login-notice');
+    $('#login-screen').classList.add('hidden');
+    $('#first-access-screen').classList.remove('hidden');
+    $('#first-access-email').value = '';
+    clearNotice('#first-access-notice');
+  });
+  $('#back-to-login-button').addEventListener('click', () => {
+    $('#first-access-screen').classList.add('hidden');
+    $('#login-screen').classList.remove('hidden');
+  });
+  $('#first-access-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    clearNotice('#first-access-notice');
+    const email = $('#first-access-email').value.trim();
+    const button = $('#request-access-button');
+    button.disabled = true;
+    button.textContent = 'Enviando link...';
+    try {
+      const {data,error} = await db.functions.invoke('primeiro-acesso',{body:{email}});
+      if (error) {
+        notice('#first-access-notice','Não foi possível solicitar o primeiro acesso. Confira o e-mail e tente novamente.');
+      } else {
+        notice('#first-access-notice','Verifique seu e-mail ou a caixa de spam. Se o endereço estiver autorizado, você receberá o link para criar sua senha.');
+      }
+    } catch {
+      notice('#first-access-notice','Falha de conexão. Verifique sua internet e tente novamente.');
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Cadastrar e enviar link →';
+    }
+  });
+  $('#password-setup-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    clearNotice('#password-setup-notice');
+    const password = $('#new-password').value;
+    const confirmation = $('#confirm-password').value;
+    if (password.length < 8) {
+      notice('#password-setup-notice', 'A senha precisa ter pelo menos 8 caracteres.');
+      return;
+    }
+    if (password !== confirmation) {
+      notice('#password-setup-notice', 'As senhas não coincidem. Confira e tente novamente.');
+      return;
+    }
+    const button = $('#save-password-button');
+    button.disabled = true;
+    button.textContent = 'Salvando senha...';
+    try {
+      const {data, error} = await db.auth.updateUser({password});
+      if (error || !data?.user) {
+        notice('#password-setup-notice', 'Não foi possível salvar a senha. O link pode ter expirado; solicite um novo primeiro acesso.');
+        return;
+      }
+      currentUser = data.user;
+      passwordSetupSession = false;
+      passwordWasSaved = true;
+      $('#new-password').value = '';
+      $('#confirm-password').value = '';
+      $('#password-setup-screen').classList.add('hidden');
+      showLogin();
+      notice('#login-notice', 'Senha criada. Entre com seu e-mail e a nova senha.');
+      history.replaceState(null, '', location.pathname + location.search);
+    } catch {
+      notice('#password-setup-notice', 'Falha de conexão. Verifique sua internet e tente novamente.');
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Salvar senha e continuar →';
+    }
+  });
+
+  function openProfileSetup(profile) {
+    $('#setup-phone').value = profile.phone || '';
+    $('#setup-rider-type').value = profile.rider_type === 'Garupa' ? 'Garupa' : 'Piloto';
+    $('#setup-motorcycle').value = profile.motorcycle || '';
+    $('#profile-setup-notice').textContent = '';
+    $('#profile-setup-notice').classList.remove('show');
+    $('#profile-setup-modal').classList.remove('hidden');
+    toggleSetupRiderFields();
+    loadSetupPilotOptions(profile.pilot_id);
+  }
+  function toggleSetupRiderFields() {
+    const pillion = $('#setup-rider-type').value === 'Garupa';
+    $('#setup-pilot-wrap').classList.toggle('hidden', !pillion);
+    $('#setup-motorcycle-wrap').classList.toggle('hidden', pillion);
+    $('#setup-motorcycle').required = !pillion;
+    $('#setup-pilot-id').required = pillion;
+  }
+  async function loadSetupPilotOptions(selectedId) {
+    const sel = $('#setup-pilot-id');
+    const {data,error} = await db.from('member_profiles').select('id,full_name,motorcycle').eq('active',true).eq('rider_type','Piloto').order('full_name');
+    if (error) { notice('#profile-setup-notice','Não foi possível carregar a lista de pilotos. Tente novamente.'); return; }
+    sel.innerHTML = '<option value="">Selecione o piloto</option>' + (data||[]).map(p => `<option value="${p.id}">${escapeHtml(p.full_name)} — ${escapeHtml(p.motorcycle||'Moto não informada')}</option>`).join('');
+    if (selectedId) sel.value = selectedId;
+  }
+  $('#profile-setup-form').addEventListener('submit',async (event) => {
+    event.preventDefault();
+    if (!currentUser || !currentProfile) return;
+    clearNotice('#profile-setup-notice');
+    const riderType = $('#setup-rider-type').value;
+    const phone = $('#setup-phone').value.trim();
+    const motorcycle = riderType === 'Piloto' ? $('#setup-motorcycle').value.trim() : null;
+    const pilotId = riderType === 'Garupa' ? ($('#setup-pilot-id').value || null) : null;
+    if (!phone) { notice('#profile-setup-notice','Informe seu telefone.'); return; }
+    if (riderType === 'Piloto' && !motorcycle) { notice('#profile-setup-notice','Informe a marca, o modelo e o ano da sua motocicleta.'); return; }
+    if (riderType === 'Garupa' && !pilotId) { notice('#profile-setup-notice','Selecione o piloto que acompanha você.'); return; }
+    const button = $('#save-profile-setup-button');
+    button.disabled = true;
+    button.textContent = 'Salvando...';
+    try {
+      const payload = {phone, motorcycle, pilot_id:pilotId};
+      const {error} = await db.from('member_profiles').update(payload).eq('id',currentUser.id);
+      if (error) { notice('#profile-setup-notice','Não foi possível salvar os dados. Tente novamente.'); return; }
+      currentProfile = {...currentProfile,...payload};
+      fillProfile(currentUser,currentProfile);
+      $('#profile-setup-modal').classList.add('hidden');
+      notice('#app-notice','Cadastro concluído. Bem-vindo aos Guardiões da 354!');
+    } catch {
+      notice('#profile-setup-notice','Falha de conexão. Verifique sua internet e tente novamente.');
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Salvar e continuar →';
+    }
+  });
+
+  async function logout() {
+    const {error} = await db.auth.signOut();
+    if (error) { notice('#app-notice','Não foi possível encerrar a sessão. Tente novamente.'); return; }
+    currentUser = null; currentProfile = null; $('#password').value = ''; clearNotice('#app-notice'); showLogin();
+  }
+  $('#header-logout').addEventListener('click',logout);
+  $('#mobile-menu-toggle').addEventListener('click',() => { const panel=$('#mobile-menu-panel'); const opening=panel.classList.contains('hidden'); panel.classList.toggle('hidden',!opening); $('#mobile-menu-toggle').setAttribute('aria-expanded',String(opening)); });
+  $('#mobile-menu-logout').addEventListener('click',() => { $('#mobile-menu-panel').classList.add('hidden'); $('#mobile-menu-toggle').setAttribute('aria-expanded','false'); logout(); });
+  $$('[data-mobile-page]').forEach(btn => btn.addEventListener('click',() => { go(btn.dataset.mobilePage); $('#mobile-menu-panel').classList.add('hidden'); $('#mobile-menu-toggle').setAttribute('aria-expanded','false'); }));
+  document.addEventListener('click',event => { const wrap=$('#mobile-menu-wrap'); if(wrap&&!wrap.contains(event.target)){ $('#mobile-menu-panel').classList.add('hidden'); $('#mobile-menu-toggle').setAttribute('aria-expanded','false'); } });
+  async function refreshNotificationDot(){
+    const dot=$('#notification-dot');if(!dot||!currentUser)return;
+    const {count,error}=await db.from('club_notifications').select('id',{count:'exact',head:true}).is('read_at',null);
+    if(error){console.warn('Não foi possível atualizar o indicador de notificações:',error);return;}
+    dot.classList.toggle('hidden',!count);
+    $('#header-notifications').setAttribute('aria-label',count?'Notificações novas':'Notificações');
+    $('#header-notifications').title=count?'Você tem notificações novas':'Notificações';
+  }
+  async function openNotifications(){
+    const overlay=$('#notifications-overlay'),box=$('#notifications-list');
+    overlay.classList.remove('hidden');overlay.style.display='flex';box.innerHTML='<div class="empty">Carregando notificações…</div>';
+    const {data,error}=await db.from('club_notifications').select('id,title,body,created_at,read_at,source_type,source_id').order('created_at',{ascending:false}).limit(50);
+    if(error){box.innerHTML='<div class="empty">Não foi possível carregar as notificações. Confira a configuração do Supabase.</div>';return;}
+    const rows=data||[],unread=rows.filter(n=>!n.read_at);
+    $('#notifications-unread-summary').textContent=unread.length?unread.length+' notificação(ões) não lida(s)':'Você está em dia! Nenhuma notificação não lida.';
+    box.innerHTML=rows.length?rows.map(n=>'<article class="notification-item '+(!n.read_at?'unread':'')+'" data-notification-open="'+n.id+'" role="button" tabindex="0" style="cursor:pointer"><strong>'+(n.read_at?'':'🔴 ')+escapeHtml(n.title)+'</strong><p>'+escapeHtml(n.body||'')+'</p><small>'+new Date(n.created_at).toLocaleString('pt-BR')+'</small><div class="form-actions" style="margin-top:10px"><button class="btn" type="button" data-notification-read="'+n.id+'">'+(n.read_at?'Lida ✓':'Marcar como lida')+'</button><span class="muted small">Abrir seção →</span></div></article>').join(''):'<div class="empty">Nenhuma notificação por enquanto.</div>';
+    const openTarget=async n=>{
+      if(!n)return;
+      if(!n.read_at){const {error}=await db.from('club_notifications').update({read_at:new Date().toISOString()}).eq('id',n.id);if(error){notice('#app-notice','Não foi possível marcar como lida.');return;}}
+      closeNotifications();const page=n.source_type==='vote'?'votes':'agenda';go(page);
+      if(n.source_type==='event')setTimeout(()=>{const el=document.querySelector('[data-agenda-details="'+n.source_id+'"]');if(el){el.click();el.scrollIntoView({behavior:'smooth',block:'center'});}},150);
+      else if(n.source_type==='announcement')setTimeout(()=>{const el=$('#announcements-list');el?.scrollIntoView({behavior:'smooth',block:'start'});},150);
+      else if(n.source_type==='vote')setTimeout(()=>{const el=document.querySelector('[data-vote-edit="'+n.source_id+'"]')||$('#votes-list');el?.scrollIntoView({behavior:'smooth',block:'center'});},150);
+      await refreshNotificationDot();
+    };
+    box.querySelectorAll('[data-notification-open]').forEach(card=>{const n=rows.find(x=>x.id===card.dataset.notificationOpen);card.addEventListener('click',e=>{if(e.target.closest('[data-notification-read]'))return;openTarget(n);});card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTarget(n);}});});
+    box.querySelectorAll('[data-notification-read]').forEach(btn=>btn.addEventListener('click',async()=>{
+      btn.disabled=true;
+      const {error:markError}=await db.from('club_notifications').update({read_at:new Date().toISOString()}).eq('id',btn.dataset.notificationRead);
+      if(markError){btn.disabled=false;notice('#app-notice','Não foi possível marcar como lida.');return;}
+      await openNotifications();await refreshNotificationDot();
+    }));
+  }
+  function closeNotifications(){const overlay=$('#notifications-overlay');overlay.classList.add('hidden');overlay.style.display='none';}
+  $('#header-notifications').addEventListener('click',openNotifications);
+  $('#notifications-close').addEventListener('click',closeNotifications);
+  $('#notifications-overlay').addEventListener('click',e=>{if(e.target.id==='notifications-overlay')closeNotifications();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeNotifications();});
+  setInterval(refreshNotificationDot,60000);
+  $$('[data-page]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.page)));
+  $$('[data-go]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.go)));
+  $('#install-button').classList.remove('hidden');
+  $('#install-button').addEventListener('click',async() => {
+    if (installPrompt) { await installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; }
+    else { $('#install-help-overlay').classList.remove('hidden'); $('#install-help-overlay').style.display='flex'; }
+  });
+  $('#install-help-close').addEventListener('click',()=>{ $('#install-help-overlay').classList.add('hidden'); $('#install-help-overlay').style.display='none'; });
+  $('#install-help-overlay').addEventListener('click',e=>{if(e.target.id==='install-help-overlay'){e.currentTarget.classList.add('hidden');e.currentTarget.style.display='none';}});
+  window.addEventListener('beforeinstallprompt',event => { event.preventDefault(); installPrompt = event; $('#install-button').classList.remove('hidden'); });
+
+  function urlBase64ToUint8Array(base64String) {
+    const padding='='.repeat((4-base64String.length%4)%4);
+    const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+    const raw=atob(base64);
+    return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
+  }
+  async function updatePushStatus(){
+    const buttons=[$('#enable-push-button'),$('#enable-push-home-button')].filter(Boolean);
+    const statuses=[$('#push-status'),$('#push-home-status')].filter(Boolean);
+    if(!buttons.length)return;
+    if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)){
+      statuses.forEach(el=>el.textContent='Este navegador não oferece push. No iPhone, instale o app na Tela de Início e abra por lá.');
+      buttons.forEach(btn=>btn.disabled=true);return;
+    }
+    if(Notification.permission==='denied'){statuses.forEach(el=>el.textContent='Notificações bloqueadas nas configurações do navegador/celular.');return;}
+    try{
+      const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();
+      statuses.forEach(el=>el.textContent=sub?'Notificações ativadas neste aparelho.':'Ainda não ativadas neste aparelho.');
+      buttons.forEach(btn=>btn.textContent=sub?'Atualizar notificações deste aparelho':'Ativar notificações neste aparelho');
+      document.querySelectorAll('.push-setup-card').forEach(card=>{card.hidden=!!sub;});
+    }catch(e){statuses.forEach(el=>el.textContent='Não foi possível verificar o suporte neste aparelho.');}
+  }
+  async function enablePushFromButton(btn){
+    const status=btn.id==='enable-push-home-button'?$('#push-home-status'):$('#push-status');
+    const setStatus=(message)=>{if(status)status.textContent=message;};
+    const withTimeout=(promise,ms,label)=>Promise.race([
+      promise,
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+' demorou demais. Feche e reabra o app; se persistir, atualize a página.')),ms))
+    ]);
+    btn.disabled=true;setStatus('Verificando conta e suporte…');
+    try{
+      if(!currentUser)throw new Error('Entre no aplicativo antes de ativar as notificações.');
+      if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window))throw new Error('Este navegador não oferece push. Abra o app pelo Chrome atualizado ou instale-o na Tela de Início.');
+      setStatus('Solicitando permissão…');
+      const permission=await Notification.requestPermission();
+      if(permission!=='granted')throw new Error('Permissão não concedida. Ative notificações nas configurações do Chrome/Android.');
+      setStatus('Registrando Service Worker…');
+      let reg;
+      try{
+        reg=await withTimeout(navigator.serviceWorker.register(new URL('./sw.js',location.href).href),15000,'O registro do Service Worker');
+      }catch(swError){
+        throw new Error('Falha ao registrar Service Worker: '+(swError?.message||swError));
+      }
+      if(!reg)throw new Error('O navegador não retornou o registro do Service Worker.');
+      setStatus('Conferindo Service Worker…');
+      reg=await withTimeout(navigator.serviceWorker.ready,12000,'A ativação do Service Worker');
+      setStatus('Registrando este aparelho…');
+      let sub=await withTimeout(reg.pushManager.getSubscription(),12000,'A consulta de inscrição push');
+      if(!sub){
+        sub=await withTimeout(reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(PUSH_VAPID_PUBLIC_KEY)}),20000,'A inscrição push');
+      }
+      const json=sub.toJSON();
+      if(!json.endpoint)throw new Error('O navegador não retornou um endpoint de push. Atualize o Chrome e tente novamente.');
+      setStatus('Salvando no Supabase…');
+      const result=await withTimeout(db.from('push_subscriptions').upsert({user_id:currentUser.id,endpoint:json.endpoint,subscription:json,updated_at:new Date().toISOString()},{onConflict:'endpoint'}),15000,'O salvamento no Supabase');
+      if(result.error)throw new Error('Supabase: '+result.error.message+(result.error.code?' ('+result.error.code+')':''));
+      setStatus('Notificações ativadas neste aparelho!');
+      document.querySelectorAll('#enable-push-button, #enable-push-home-button').forEach(b=>b.textContent='Atualizar notificações deste aparelho');
+      document.querySelectorAll('.push-setup-card').forEach(card=>{card.hidden=true;});
+    }catch(e){
+      console.error('Falha ao ativar push:',e);
+      setStatus(e?.message||'Não foi possível ativar as notificações. Confira o console do navegador.');
+    }finally{btn.disabled=false;}
+  }
+  $('#enable-push-button')?.addEventListener('click',e=>enablePushFromButton(e.currentTarget));
+  $('#enable-push-home-button')?.addEventListener('click',e=>enablePushFromButton(e.currentTarget));
+  navigator.serviceWorker?.addEventListener('message',event=>{
+    if(event.data?.type==='PUSH_NOTIFICATION_CLICK')go(event.data.page==='votes'?'votes':'agenda');
+  });
+  updatePushStatus();
+  async function loadAdminDashboard() {
+    const list = $('#admin-attention-list');
+    if (!list || currentProfile?.role !== 'admin') return;
+    list.textContent = 'Atualizando indicadores…';
+    const [membersRes, eventsRes, docsRes, announcementsRes, votesRes] = await Promise.all([
+      db.from('member_directory').select('full_name,member_status,rider_type,club_position').order('full_name',{ascending:true}),
+      db.from('club_events').select('id,title,status,starts_at').order('starts_at',{ascending:true}),
+      db.from('club_documents').select('id,title,created_at').order('created_at',{ascending:false}),
+      db.from('club_announcements').select('id,title,created_at').order('created_at',{ascending:false}),
+      db.from('club_votes').select('id,title,closes_at,created_at').order('created_at',{ascending:false})
+    ]);
+    const members = membersRes.error ? [] : (membersRes.data || []);
+    const events = eventsRes.error ? [] : (eventsRes.data || []);
+    const docs = docsRes.error ? [] : (docsRes.data || []);
+    const announcements = announcementsRes.error ? [] : (announcementsRes.data || []);
+    const votes = votesRes.error ? [] : (votesRes.data || []);
+    const pendingEvents = events.filter(e => e.status && e.status !== 'published' && new Date(e.starts_at).getTime() >= Date.now());
+    const prospects = members.filter(m => String(m.member_status||'').toLocaleLowerCase('pt-BR') === 'prospect');
+    const openVotes = votes.filter(v => !v.closes_at || new Date(v.closes_at).getTime() > Date.now());
+    const set = (id,value) => { const el = $(id); if (el) el.textContent = String(value); };
+    set('#admin-count-members', membersRes.error ? '—' : members.length);
+    set('#admin-count-prospects', membersRes.error ? '—' : prospects.length);
+    set('#admin-count-pending-events', eventsRes.error ? '—' : pendingEvents.length);
+    set('#admin-count-documents', docsRes.error ? '—' : docs.length);
+    set('#admin-count-announcements', announcementsRes.error ? '—' : announcements.length);
+    set('#admin-count-votes', votesRes.error ? '—' : openVotes.length);
+    set('#admin-updated-at','Atualizado às ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
+    const attention = [];
+    if (membersRes.error) attention.push('Não foi possível consultar o diretório de integrantes.');
+    if (eventsRes.error) attention.push('Não foi possível consultar a agenda.');
+    if (docsRes.error) attention.push('Não foi possível consultar a biblioteca de documentos.');
+    if (announcementsRes.error) attention.push('Não foi possível consultar os comunicados.');
+    if (votesRes.error) attention.push('Não foi possível consultar as votações.');
+    if (!membersRes.error && prospects.length) attention.push(prospects.length + ' prospect(s) no diretório — revisar acompanhamento.');
+    if (!eventsRes.error && pendingEvents.length) attention.push(pendingEvents.length + ' atividade(s) aguardando decisão.');
+    if (!votesRes.error && openVotes.length) attention.push(openVotes.length + ' votação(ões) aberta(s).');
+    if (!attention.length) {
+      list.innerHTML = '<div class="empty">Tudo em dia! Nenhuma pendência identificada pelos indicadores disponíveis.</div>';
+    } else {
+      list.innerHTML = '<ul style="margin:0;padding-left:22px;display:grid;gap:10px">' + attention.map(item => '<li>' + escapeHtml(item) + '</li>').join('') + '</ul>';
+    }
+  }
+  $('#admin-refresh')?.addEventListener('click',loadAdminDashboard);
+  $$('[data-admin-go]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.adminGo)));
+
+  async function loadMembers() {
+    const box = $('#members-list'); if (!box) return;
+    box.textContent = 'Carregando integrantes…';
+
+    const {data: directory, error: directoryError} = await db
+      .from('member_directory')
+      .select('full_name, club_position, member_status, rider_type, app_role, is_founder')
+      .order('full_name', {ascending:true});
+
+    if (directoryError) {
+      console.error('Falha ao carregar member_directory:', directoryError);
+      box.textContent = 'Não foi possível carregar o diretório oficial. Verifique as permissões de leitura de member_directory no Supabase.';
+      return;
+    }
+    if (!directory?.length) {
+      box.className = 'empty';
+      box.textContent = 'Nenhum integrante cadastrado no diretório oficial.';
+      return;
+    }
+
+    const {data: profiles, error: profilesError} = await db
+      .from('member_profiles')
+      .select('id, full_name, club_position, member_status, rider_type, phone, motorcycle, pilot_id, active');
+    if (profilesError) console.warn('Perfis pessoais não puderam complementar o diretório:', profilesError);
+
+    const normalize = value => String(value || '').trim().toLocaleLowerCase('pt-BR');
+    const profileByName = new Map((profiles || []).map(p => [normalize(p.full_name), p]));
+    const profileById = new Map((profiles || []).map(p => [p.id, p]));
+
+    // Ordem solicitada pela diretoria. Casais em que ambos são pilotos ficam juntos.
+    const hierarchy = [
+      {name:'Welton Santana Silva', position:'Presidente · Fundador', type:'Piloto', status:'Ativo'},
+      {name:'Gabriela Aparecida Elias', position:'Garupa do Presidente', type:'Garupa', status:'Ativo'},
+      {name:'Guilherme Henrique Lopes', position:'Vice-Presidente · Fundador', type:'Piloto', status:'Ativo'},
+      {name:'Bruna Silva Camargos', position:'Garupa do Vice-Presidente', type:'Garupa', status:'Ativo'},
+      {name:'Anilton Alan Nunes', position:'Diretor Geral', type:'Piloto', status:'Ativo'},
+      {name:'Jéssica Guilherme', position:'Membro Ativo', type:'Piloto', status:'Ativo'},
+      {name:'Edson Tiago Ferreira de Almeida', position:'Diretor Social', type:'Piloto', status:'Ativo'},
+      {name:'Flavia Rodrigues Ribeiro', position:'Membro Ativo', type:'Piloto', status:'Ativo'},
+      {name:'Alan José de Sousa', position:'Membro Ativo', type:'Piloto', status:'Ativo'},
+      {name:'Gabrielle Alves da Silva', position:'Garupa de Alan José de Sousa', type:'Garupa', status:'Ativo'},
+      {name:'Luciano Carlos dos Santos', position:'Membro Ativo', type:'Piloto', status:'Ativo'},
+      {name:'Lucilene Souza Viana', position:'Garupa de Luciano Carlos dos Santos', type:'Garupa', status:'Ativo'},
+      {name:'Danilo Rodrigues de Oliveira', position:'Membro Ativo', type:'Piloto', status:'Ativo'},
+      {name:'Samuel José de Paulo', position:'Membro Ativo', type:'Piloto', status:'Ativo'},
+      {name:'Wallace Herculano de Oliveira Ferraz', position:'Prospect', type:'Piloto', status:'Prospect'},
+      {name:'Samira de Sá Souza Ferraz', position:'Garupa de Wallace Herculano de Oliveira Ferraz', type:'Garupa', status:'Prospect'},
+      {name:'Matheus Felipe Amâncio Lopes', position:'Prospect', type:'Piloto', status:'Prospect'},
+      {name:'Guilherme Lopes de Oliveira Dias', position:'Prospect', type:'Piloto', status:'Prospect'},
+      {name:'Amanda Cristina Ferreira', position:'Garupa de Guilherme Lopes de Oliveira Dias', type:'Garupa', status:'Prospect'}
+    ];
+    const rosterByName = new Map(hierarchy.map((item,index) => [normalize(item.name), {...item, order:index}]));
+    const members = directory.map(m => {
+      const p = profileByName.get(normalize(m.full_name)) || {};
+      const roster = rosterByName.get(normalize(m.full_name));
+      const position = roster?.position || p.club_position || m.club_position || (m.is_founder ? 'Fundador' : 'Integrante');
+      const motorcycle = p.motorcycle || '';
+      const status = m.member_status || p.member_status || roster?.status || 'Ativo';
+      const riderType = m.rider_type || p.rider_type || roster?.type || 'Piloto';
+      const linkedPilot = p.pilot_id ? profileById.get(p.pilot_id)?.full_name : '';
+      return {name:m.full_name, position, motorcycle, phone:p.phone||'', status, riderType, linkedPilot, order:roster?.order ?? 9999};
+    }).sort((a,b) => a.order-b.order || a.name.localeCompare(b.name,'pt-BR'));
+
+    box.className = '';
+    box.innerHTML = members.map(m => `<div class="list-row member-row" data-member-name="${escapeHtml(m.name)}" data-member-position="${escapeHtml(m.position)}" data-member-status="${escapeHtml(m.status)}" data-member-type="${escapeHtml(m.riderType)}" role="button" tabindex="0" aria-expanded="false"><div class="member-summary"><div class="list-icon">♟</div><div class="list-main"><strong>${escapeHtml(m.name||'Integrante')}</strong><small>${escapeHtml(m.position)}</small></div><span class="badge">${escapeHtml(m.status)} · ${escapeHtml(m.riderType)}</span><span class="member-chevron">＋</span>${currentProfile?.role==='admin' ? '<button class="btn member-edit-btn" type="button" style="flex-shrink:0">Editar</button>' : ''}</div><div class="member-details"><div><strong>Categoria:</strong> ${escapeHtml(m.riderType)}</div><div><strong>Situação:</strong> ${escapeHtml(m.status)}</div><div><strong>Telefone:</strong> ${m.phone ? escapeHtml(m.phone) : 'Não informado'}</div>${m.riderType==='Piloto' ? `<div><strong>Motocicleta:</strong> ${m.motorcycle ? escapeHtml(m.motorcycle) : 'Não informada'}</div>` : `<div><strong>Piloto vinculado:</strong> ${m.linkedPilot ? escapeHtml(m.linkedPilot) : 'Não informado'}</div>`}</div></div>`).join('');
+    const openMemberEditor = row => {
+      if (currentProfile?.role !== 'admin') return;
+      $('#member-edit-name').value = row.dataset.memberName;
+      $('#member-edit-title').textContent = 'Editar: ' + row.dataset.memberName;
+      $('#member-edit-position').value = ['Presidente','Vice-Presidente','Diretor Geral','Diretor Social','Fundador','Membro Ativo','Membro','Prospect','Garupa'].includes(row.dataset.memberPosition) ? row.dataset.memberPosition : 'Membro';
+      $('#member-edit-status').value = ['Ativo','Prospect','Inativo'].includes(row.dataset.memberStatus) ? row.dataset.memberStatus : 'Ativo';
+      $('#member-edit-type').value = row.dataset.memberType === 'Garupa' ? 'Garupa' : 'Piloto';
+      $('#member-edit-notice').classList.remove('show');
+      $('#member-edit-modal').classList.remove('hidden');
+    };
+    box.querySelectorAll('.member-row').forEach(row => {
+      const button = row.querySelector('.member-edit-btn');
+      const toggleDetails = () => {
+        const expanded = row.classList.toggle('member-expanded');
+        row.setAttribute('aria-expanded', String(expanded));
+        const chevron = row.querySelector('.member-chevron');
+        if (chevron) chevron.textContent = expanded ? '−' : '＋';
+      };
+      row.addEventListener('click', event => {
+        if (event.target.closest('.member-edit-btn')) return;
+        toggleDetails();
+      });
+      row.addEventListener('keydown', event => {
+        if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('button')) { event.preventDefault(); toggleDetails(); }
+      });
+      if (button) button.addEventListener('click', event => { event.stopPropagation(); openMemberEditor(row); });
+    });
+  }
+  function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+  async function loadPilotOptions() {
+    const sel = $('#edit-pilot-id'); if (!sel) return;
+    const {data} = await db.from('member_profiles').select('id,full_name,motorcycle').eq('active',true).eq('rider_type','Piloto').order('full_name');
+    sel.innerHTML = '<option value="">Selecione o piloto</option>' + (data||[]).map(p => `<option value="${p.id}">${escapeHtml(p.full_name)} — ${escapeHtml(p.motorcycle||'Moto não informada')}</option>`).join('');
+    if (currentProfile?.pilot_id) sel.value = currentProfile.pilot_id;
+  }
+  async function loadDocuments() {
+    const box = $('#documents-list'); if (!box) return;
+    box.textContent = 'Carregando documentos…';
+    const {data,error} = await db.from('club_documents').select('id,title,file_path,created_at').order('created_at',{ascending:false});
+    if (error) { console.error('Erro ao carregar documentos:', error); box.textContent='Não foi possível carregar os documentos. Verifique as permissões de leitura no Supabase.'; return; }
+    const canEdit = canManageDocuments();
+    box.innerHTML = data?.length ? data.map(d=>`<div class="list-row"><div class="list-icon">▧</div><div class="list-main"><strong>${escapeHtml(d.title)}</strong><small>${new Date(d.created_at).toLocaleDateString('pt-BR')}</small></div><button class="btn" data-download="${escapeHtml(d.file_path)}">Baixar</button>${canEdit?`<button class="btn" data-document-edit="${escapeHtml(d.id)}">Renomear</button><button class="btn" data-document-delete="${escapeHtml(d.id)}">Excluir</button>`:''}</div>`).join('') : '<div class="empty">Nenhum documento publicado.</div>';
+    box.querySelectorAll('[data-download]').forEach(b=>b.addEventListener('click',async()=>{const {data,error}=await db.storage.from('club-documents').createSignedUrl(b.dataset.download,120);if(error){notice('#app-notice','Não foi possível gerar o link do documento.');return;}window.open(data.signedUrl,'_blank','noopener');}));
+    if(canEdit){
+      box.querySelectorAll('[data-document-edit]').forEach(b=>b.addEventListener('click',async()=>{const item=(data||[]).find(d=>String(d.id)===b.dataset.documentEdit);if(!item)return;const title=prompt('Novo nome do documento:',item.title);if(title===null)return;if(!title.trim()){notice('#app-notice','Informe um nome para o documento.');return;}const {error}=await db.from('club_documents').update({title:title.trim()}).eq('id',item.id);if(error){notice('#app-notice','Não foi possível renomear. Verifique as permissões no Supabase.');return;}notice('#app-notice','Documento atualizado.');await loadDocuments();}));
+      box.querySelectorAll('[data-document-delete]').forEach(b=>b.addEventListener('click',async()=>{const item=(data||[]).find(d=>String(d.id)===b.dataset.documentDelete);if(!item||!confirm('Excluir o documento “'+item.title+'”?'))return;const {error}=await db.from('club_documents').delete().eq('id',item.id);if(error){notice('#app-notice','Não foi possível excluir. Verifique as permissões no Supabase.');return;}const removed=await db.storage.from('club-documents').remove([item.file_path]);if(removed.error)console.warn('Registro removido, mas arquivo não removido do Storage:',removed.error);notice('#app-notice','Documento excluído.');await loadDocuments();}));
+    }
+  }
+  function canManageDocuments() {
+    const p = currentProfile;
+    return !!p && p.active === true && (p.role === 'admin' || ['Fundador','Fundador/Vice-Presidente','Presidente','Vice-Presidente','Diretor Geral','Diretor Social'].includes(p.club_position));
+  }
+  function canManageAgenda() {
+    const p = currentProfile;
+    return !!p && p.active === true && (p.role === 'admin' || ['Fundador','Fundador/Vice-Presidente','Presidente','Vice-Presidente','Diretor Geral','Diretor Social'].includes(p.club_position));
+  }
+  function resetAgendaForm() {
+    $('#agenda-form')?.reset();
+    $('#agenda-event-id').value = '';
+    $('#agenda-form-title').textContent = 'Sugerir atividade';
+    $('#agenda-submit').textContent = canManageAgenda() ? 'Publicar atividade' : 'Enviar sugestão';
+    $('#agenda-cancel-edit').textContent = 'Cancelar';
+    $('#agenda-cancel-edit').classList.remove('hidden');
+    $('#agenda-form-card').classList.add('hidden');
+    $('#agenda-suggest-toggle').classList.remove('hidden');
+    clearNotice('#agenda-form-notice');
+  }
+  function formatAgendaDate(value, withTime=true) {
+    if (!value) return 'Data a definir';
+    return new Date(value).toLocaleString('pt-BR', withTime ? {dateStyle:'short',timeStyle:'short'} : {dateStyle:'short'});
+  }
+  function daysUntil(value) {
+    const eventDate = new Date(value);
+    const today = new Date();
+    const eventDay = new Date(eventDate.getFullYear(),eventDate.getMonth(),eventDate.getDate());
+    const todayDay = new Date(today.getFullYear(),today.getMonth(),today.getDate());
+    const days = Math.round((eventDay-todayDay)/86400000);
+    if (days < 0) return 'Já aconteceu';
+    if (days === 0) return 'É hoje!';
+    if (days === 1) return 'Amanhã';
+    return 'Faltam ' + days + ' dias';
+  }
+  async function saveAgendaResponse(eventId, response, justification='') {
+    const payload = {event_id:eventId,user_id:currentUser.id,member_name:currentProfile.full_name,response,justification:justification.trim()||null};
+    const {error} = await db.from('club_event_responses').upsert(payload,{onConflict:'event_id,user_id'});
+    if (error) {
+      console.error('Falha ao salvar participação:',error);
+      notice('#app-notice','Não foi possível salvar sua resposta. Confira se o SQL de confirmações da agenda foi executado.');
+      return false;
+    }
+    notice('#app-notice',response==='justified'?'Justificativa enviada.':response==='confirmed'?'Presença confirmada!':'Participação registrada!');
+    await loadAgenda();
+    return true;
+  }
+  async function loadPastAgenda() {
+    const box=$('#agenda-history-list');if(!box)return;
+    box.className='empty';box.textContent='Carregando histórico…';
+    const {data,error}=await db.from('club_events').select('id,title,event_type,starts_at,location,status').eq('status','published').lt('starts_at',new Date().toISOString()).order('starts_at',{ascending:false}).limit(20);
+    if(error){console.warn('Histórico da agenda não carregado:',error);box.textContent='Não foi possível carregar o histórico. Tente atualizar.';return;}
+    const rows=data||[];if(!rows.length){box.className='empty';box.textContent='Ainda não há atividades anteriores publicadas.';return;}
+    box.className='';box.innerHTML=rows.map(e=>'<div class="past-event-row"><strong>'+escapeHtml(e.title)+'</strong><p class="muted small" style="margin:5px 0">'+escapeHtml(e.event_type||'Atividade')+' · '+escapeHtml(formatAgendaDate(e.starts_at))+(e.location?' · '+escapeHtml(e.location):'')+'</p>'+(e.location?'<a class="btn" style="display:inline-block;text-decoration:none;margin-top:5px" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(e.location)+'">Ver local no mapa ↗</a>':'')+'</div>').join('');
+  }
+  async function loadAgenda() {
+    const box = $('#agenda-list'); if (!box) return;
+    box.textContent = 'Carregando agenda…';
+    const {data,error} = await db.from('club_events')
+      .select('id,title,event_type,starts_at,location,description,status,created_by,creator_name,created_at')
+      .order('starts_at',{ascending:true});
+    if (error) {
+      console.error('Falha ao carregar agenda:',error);
+      box.innerHTML = '<div class="empty">Não foi possível carregar a agenda. Confira a conexão com o banco e toque em Atualizar.</div>';
+      return;
+    }
+    const now = Date.now();
+    const events = (data || []).filter(e => new Date(e.starts_at).getTime() >= now);
+    const upcoming = events.filter(e => e.status === 'published' || e.created_by === currentUser?.id || canManageAgenda());
+    const published = upcoming.filter(e => e.status === 'published');
+    const homeAgenda=$('#home-agenda-list');
+    if(homeAgenda)homeAgenda.innerHTML=published.length?published.slice(0,3).map(e=>'<div style="padding:10px 0;border-bottom:1px solid #ffffff12"><strong>'+escapeHtml(e.title)+'</strong><p class="muted small" style="margin:5px 0">'+escapeHtml(formatAgendaDate(e.starts_at))+(e.location?' · '+escapeHtml(e.location):'')+'</p><span class="announcement-tag">'+escapeHtml(e.event_type||'Atividade')+'</span></div>').join('')+'<button class="btn" type="button" data-home-open-agenda style="margin-top:10px">Ver agenda completa</button>':'<div class="empty">Nenhuma atividade futura publicada.</div>';
+    homeAgenda?.querySelector('[data-home-open-agenda]')?.addEventListener('click',()=>go('agenda'));
+    $('#agenda-next').textContent = published[0] ? daysUntil(published[0].starts_at) : 'Nenhuma atividade';
+    const ids = published.map(e=>e.id);
+    let responseByEvent = new Map();
+    let responsesByEvent = new Map();
+    if (ids.length) {
+      const {data: personalResponses, error: personalError} = await db.from('club_event_responses')
+        .select('event_id,response,justification').eq('user_id',currentUser.id).in('event_id',ids);
+      if (personalError) console.warn('Resposta pessoal da agenda não pôde ser carregada:',personalError);
+      responseByEvent = new Map((personalResponses||[]).map(r=>[r.event_id,r]));
+      if (canManageAgenda()) {
+        const {data: allResponses, error: allError} = await db.from('club_event_responses')
+          .select('event_id,user_id,member_name,response,justification,updated_at')
+          .in('event_id',ids).order('member_name',{ascending:true});
+        if (allError) console.warn('Respostas da diretoria não puderam ser carregadas:',allError);
+        (allResponses||[]).forEach(r=>{
+          if(!responsesByEvent.has(r.event_id)) responsesByEvent.set(r.event_id,[]);
+          responsesByEvent.get(r.event_id).push(r);
+        });
+      }
+    }
+    if (!upcoming.length) {
+      box.className = 'empty'; box.textContent = 'Nenhuma atividade futura publicada. Toque em “Sugerir atividade” para enviar uma ideia à diretoria.'; return;
+    }
+    box.className = '';
+    box.innerHTML = upcoming.map(e => {
+      const pending = e.status !== 'published';
+      const response = responseByEvent.get(e.id);
+      const isMeeting = e.event_type === 'Reunião';
+      const date = formatAgendaDate(e.starts_at);
+      const detailsId = 'agenda-details-' + e.id;
+      const actions = pending ? '' : (isMeeting
+        ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn btn-primary" type="button" data-agenda-response="confirmed" data-event-id="'+e.id+'">'+(response?.response==='confirmed'?'Presença confirmada ✓':'Confirmar presença')+'</button><button class="btn" type="button" data-agenda-justify="'+e.id+'">'+(response?.response==='justified'?'Justificativa enviada ✓':'Justificar ausência')+'</button></div><div id="agenda-justification-'+e.id+'" class="hidden" style="margin-top:10px"><label for="agenda-justification-text-'+e.id+'">Motivo da ausência</label><textarea id="agenda-justification-text-'+e.id+'" maxlength="1500" placeholder="Explique por que não poderá comparecer">'+(response?.response==='justified'?escapeHtml(response.justification||''):'')+'</textarea><button class="btn btn-primary" type="button" data-agenda-submit-justification="'+e.id+'" style="margin-top:8px">Enviar justificativa</button></div>'
+        : '<div style="margin-top:12px"><button class="btn btn-primary" type="button" data-agenda-response="participating" data-event-id="'+e.id+'">'+(response?.response==='participating'?'Vou participar ✓':'Vou participar')+'</button></div>');
+      const currentStatus = response ? (response.response==='participating'?'Você marcou que vai participar.':response.response==='confirmed'?'Sua presença está confirmada.':response.response==='justified'?'Você justificou sua ausência.':'') : '';
+      const eventResponses = responsesByEvent.get(e.id)||[];
+      const responsesPanel = canManageAgenda() ? '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #ffffff18"><strong>Respostas dos integrantes ('+eventResponses.length+')</strong>'+(eventResponses.length?'<div style="display:grid;gap:9px;margin-top:10px">'+eventResponses.map(r=>'<div style="padding:10px;border-radius:8px;background:#ffffff08"><strong>'+escapeHtml(r.member_name)+'</strong><p style="margin:4px 0;font-size:.83rem">'+(r.response==='participating'?'🏍️ Vai participar':r.response==='confirmed'?'✅ Presença confirmada':'📝 Justificou ausência')+'</p>'+(r.justification?'<p style="margin:4px 0;font-size:.83rem;white-space:pre-wrap"><strong>Justificativa:</strong> '+escapeHtml(r.justification)+'</p>':'')+'<small class="muted">'+(r.updated_at?'Atualizado em '+escapeHtml(formatAgendaDate(r.updated_at)):'')+'</small></div>').join('')+'</div>':'<p class="muted small" style="margin-top:8px">Ninguém respondeu ainda.</p>')+'</div>' : '';
+      return '<article class="list-row" style="align-items:flex-start;flex-wrap:wrap"><div class="list-icon">'+(e.event_type==='Passeio'?'🏍️':isMeeting?'📋':'📅')+'</div><div class="list-main"><strong>'+escapeHtml(e.title)+'</strong><small>'+escapeHtml(e.event_type)+' · '+escapeHtml(date)+'</small>'+(pending?'<p style="margin:8px 0 0;color:#d9c08b;font-size:.75rem">Aguardando aprovação da diretoria</p>':'<p style="margin:8px 0 0;font-size:.8rem;color:#c8c9ce">'+escapeHtml(daysUntil(e.starts_at))+'</p>')+'</div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><button class="btn" type="button" data-agenda-details="'+e.id+'"> '+(pending?'Ver sugestão':'Ver detalhes')+' </button>'+(canManageAgenda()?'<div style="display:flex;gap:5px;flex-wrap:wrap">'+(pending?'<button class="btn" type="button" data-agenda-approve="'+e.id+'">Aprovar</button>':'')+'<button class="btn" type="button" data-agenda-edit="'+e.id+'">Editar</button><button class="btn" type="button" data-agenda-delete="'+e.id+'">Excluir</button></div>':'')+'</div><div id="'+detailsId+'" class="hidden" style="flex:1 0 100%;padding:12px;margin-top:4px;border-top:1px solid #ffffff18"><p style="margin:0 0 8px;font-size:.85rem;color:#d0d1d5">📅 '+escapeHtml(date)+'</p>'+(e.location?'<p style="margin:6px 0;font-size:.85rem">📍 '+escapeHtml(e.location)+'</p><a class="btn" style="display:inline-block;text-decoration:none;margin:4px 0 8px" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(e.location)+'">Abrir ponto no mapa ↗</a>':'')+(e.description?'<p style="white-space:pre-wrap;margin:8px 0;font-size:.85rem;line-height:1.5">'+escapeHtml(e.description)+'</p>':'')+(pending?'':'<p id="agenda-response-status-'+e.id+'" class="muted small">'+escapeHtml(currentStatus)+'</p>'+actions+responsesPanel)+'</div></article>';
+    }).join('');
+    box.querySelectorAll('[data-agenda-details]').forEach(b=>b.addEventListener('click',()=>{
+      const panel=$('#agenda-details-'+b.dataset.agendaDetails);
+      panel?.classList.toggle('hidden');
+      b.textContent=panel?.classList.contains('hidden')?'Ver detalhes':'Ocultar detalhes';
+    }));
+    box.querySelectorAll('[data-agenda-response]').forEach(b=>b.addEventListener('click',async()=>{
+      b.disabled=true;
+      await saveAgendaResponse(b.dataset.eventId,b.dataset.agendaResponse);
+      b.disabled=false;
+    }));
+    box.querySelectorAll('[data-agenda-justify]').forEach(b=>b.addEventListener('click',()=>{
+      $('#agenda-justification-'+b.dataset.agendaJustify)?.classList.toggle('hidden');
+    }));
+    box.querySelectorAll('[data-agenda-submit-justification]').forEach(b=>b.addEventListener('click',async()=>{
+      const id=b.dataset.agendaSubmitJustification;
+      const value=$('#agenda-justification-text-'+id).value.trim();
+      if(!value){notice('#app-notice','Escreva o motivo da ausência antes de enviar.');return;}
+      b.disabled=true;
+      await saveAgendaResponse(id,'justified',value);
+      b.disabled=false;
+    }));
+    box.querySelectorAll('[data-agenda-approve]').forEach(b=>b.addEventListener('click',async()=>{
+      b.disabled=true;
+      const {error}=await db.from('club_events').update({status:'published'}).eq('id',b.dataset.agendaApprove);
+      if(error){notice('#app-notice','Não foi possível aprovar. Confira as permissões da agenda no Supabase.');b.disabled=false;return;}
+      await loadAgenda();
+    }));
+    box.querySelectorAll('[data-agenda-edit]').forEach(b=>b.addEventListener('click',()=>{
+      const e=(data||[]).find(item=>item.id===b.dataset.agendaEdit); if(!e)return;
+      $('#agenda-event-id').value=e.id; $('#agenda-title').value=e.title; $('#agenda-type').value=e.event_type;
+      const d=new Date(e.starts_at); $('#agenda-start').value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+      $('#agenda-location').value=e.location||''; $('#agenda-description').value=e.description||'';
+      $('#agenda-form-title').textContent='Editar atividade'; $('#agenda-submit').textContent='Salvar alterações';
+      $('#agenda-form-card').classList.remove('hidden'); $('#agenda-suggest-toggle').classList.add('hidden');
+      $('#agenda-cancel-edit').classList.remove('hidden'); clearNotice('#agenda-form-notice');
+      $('#agenda-form-card').scrollIntoView({behavior:'smooth',block:'start'});
+    }));
+    box.querySelectorAll('[data-agenda-delete]').forEach(b=>b.addEventListener('click',async()=>{
+      if(!confirm('Excluir esta atividade da agenda?'))return;
+      b.disabled=true; const {error}=await db.from('club_events').delete().eq('id',b.dataset.agendaDelete);
+      if(error){notice('#app-notice','Não foi possível excluir a atividade. Confira as permissões no Supabase.');b.disabled=false;return;}
+      await loadAgenda();
+    }));
+  }
+  $('#agenda-suggest-toggle').addEventListener('click',()=>{
+    $('#agenda-form-card').classList.toggle('hidden');
+    $('#agenda-suggest-toggle').classList.toggle('hidden',!$('#agenda-form-card').classList.contains('hidden'));
+    if(!$('#agenda-form-card').classList.contains('hidden')) $('#agenda-form-card').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  $('#agenda-form').addEventListener('submit',async event=>{
+    event.preventDefault(); clearNotice('#agenda-form-notice');
+    const id=$('#agenda-event-id').value;
+    const startsAt=new Date($('#agenda-start').value);
+    if(Number.isNaN(startsAt.getTime())){notice('#agenda-form-notice','Informe uma data e horário válidos.');return;}
+    const selected = id => Array.from($(id).selectedOptions).map(o=>o.value);
+    const visibleGroups=canManageAgenda()?selected('#agenda-visible-groups'):['all'];
+    const notifyGroups=canManageAgenda()?selected('#agenda-notify-groups'):['all'];
+    if(canManageAgenda()&&(!visibleGroups.length||!notifyGroups.length)){notice('#agenda-form-notice','Escolha ao menos um grupo para visualização e para notificação.');return;}
+    const payload={title:$('#agenda-title').value.trim(),event_type:$('#agenda-type').value,starts_at:startsAt.toISOString(),location:$('#agenda-location').value.trim()||null,description:$('#agenda-description').value.trim()||null,visible_to_groups:visibleGroups,notify_to_groups:notifyGroups,visible_to_emails:canManageAgenda()?selected('#agenda-visible-members'):[],notify_to_emails:canManageAgenda()?selected('#agenda-notify-members'):[]};
+    const button=$('#agenda-submit');button.disabled=true;
+    try {
+      let result;
+      if(id) result=await db.from('club_events').update(payload).eq('id',id);
+      else result=await db.from('club_events').insert({...payload,created_by:currentUser.id,creator_name:currentProfile.full_name,status:canManageAgenda()?'published':'pending'});
+      if(result.error){console.error('Falha ao salvar atividade:',result.error);notice('#agenda-form-notice','Não foi possível salvar. Confira se o SQL da agenda foi executado no Supabase do aplicativo.');return;}
+      notice('#agenda-form-notice',id?'Alterações salvas.':'Atividade cadastrada com sucesso.');
+      resetAgendaForm(); await loadAgenda();
+    } catch(err){console.error(err);notice('#agenda-form-notice','Falha de conexão ao salvar a atividade.');}
+    finally{button.disabled=false;}
+  });
+  $('#agenda-cancel-edit').addEventListener('click',resetAgendaForm);
+  $('#agenda-refresh').addEventListener('click',loadAgenda);
+  $('#agenda-history-toggle')?.addEventListener('click',()=>{const wrap=$('#agenda-history-wrap');const open=wrap.classList.contains('hidden');wrap.classList.toggle('hidden',!open);$('#agenda-history-toggle').setAttribute('aria-expanded',String(open));$('#agenda-history-toggle').textContent=open?'Ocultar histórico':'Passeios anteriores';if(open)loadPastAgenda();});
+  $('#member-card-print')?.addEventListener('click',()=>{const card=$('#member-digital-card');if(!card)return;const w=window.open('','_blank','width=720,height=600');if(!w){notice('#app-notice','Permita pop-ups para imprimir ou salvar a carteirinha.');return;}w.document.write('<html><head><title>Carteirinha Guardiões da 354</title><style>body{font-family:Arial;padding:24px}.member-pass{border:2px solid #b9152b;border-radius:16px;padding:24px}.member-pass-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.member-pass-field{border:1px solid #ddd;padding:10px}.member-pass-sub{color:#b9152b}.member-pass-logo{width:60px;height:60px}</style></head><body>'+card.outerHTML+'</body></html>');w.document.close();w.focus();w.print();});
+  async function loadAnnouncements() {
+    const box=$('#announcements-list'); if(!box)return;
+    const {data,error}=await db.from('club_announcements').select('id,title,body,created_at').order('created_at',{ascending:false});
+    if(error){box.textContent='Comunicados ainda não conectados. Aplique a configuração de banco indicada junto com este arquivo.';return;}
+    const board=canManageAgenda();
+    box.innerHTML=data?.length?data.map(a=>`<article class="announcement-card"><div class="announcement-icon">▤</div><div class="announcement-content"><h4>${escapeHtml(a.title)}</h4><p>${escapeHtml(a.body)}</p><div class="announcement-meta"><span>◷ ${new Date(a.created_at).toLocaleString('pt-BR')}</span><span class="announcement-tag">Comunicado oficial</span></div>${board?'<div class="form-actions"><button class="btn" type="button" data-announcement-edit="'+a.id+'">Editar</button><button class="btn" type="button" data-announcement-delete="'+a.id+'">Excluir</button></div>':''}</div></article>`).join(''):'<div class="empty">📭<br><strong>Nenhum comunicado por enquanto</strong><p class="muted">Quando a diretoria publicar um aviso, ele aparecerá aqui.</p></div>';
+    const homeAnnouncements=$('#home-announcements-list');
+    if(homeAnnouncements)homeAnnouncements.innerHTML=data?.length?(data||[]).slice(0,3).map(a=>'<div style="padding:10px 0;border-bottom:1px solid #ffffff12"><strong>'+escapeHtml(a.title)+'</strong><p class="muted small" style="margin:5px 0">'+escapeHtml((a.body||'').slice(0,150))+'</p><small class="muted">'+new Date(a.created_at).toLocaleDateString('pt-BR')+'</small></div>').join('')+'<button class="btn" type="button" data-home-open-announcements style="margin-top:10px">Ver todos os comunicados</button>':'<div class="empty">Nenhum comunicado publicado.</div>';
+    homeAnnouncements?.querySelector('[data-home-open-announcements]')?.addEventListener('click',()=>go('agenda'));
+    if(board){
+      box.querySelectorAll('[data-announcement-edit]').forEach(btn=>btn.addEventListener('click',async()=>{
+        const item=(data||[]).find(a=>String(a.id)===btn.dataset.announcementEdit);if(!item)return;
+        const title=prompt('Editar título do comunicado:',item.title);if(title===null)return;
+        const body=prompt('Editar texto do comunicado:',item.body||'');if(body===null)return;
+        if(!title.trim()||!body.trim()){notice('#app-notice','Título e texto não podem ficar vazios.');return;}
+        const {error}=await db.from('club_announcements').update({title:title.trim(),body:body.trim()}).eq('id',item.id);
+        if(error){console.error(error);notice('#app-notice','Não foi possível editar o comunicado: '+error.message);return;}
+        await loadAnnouncements();notice('#app-notice','Comunicado atualizado.');
+      }));
+      box.querySelectorAll('[data-announcement-delete]').forEach(btn=>btn.addEventListener('click',async()=>{
+        const item=(data||[]).find(a=>String(a.id)===btn.dataset.announcementDelete);if(!item||!confirm('Excluir o comunicado “'+item.title+'”?'))return;
+        const {error}=await db.from('club_announcements').delete().eq('id',item.id);
+        if(error){console.error(error);notice('#app-notice','Não foi possível excluir o comunicado: '+error.message);return;}
+        await loadAnnouncements();notice('#app-notice','Comunicado excluído.');
+      }));
+    }
+  }
+  async function loadVoteMemberChoices(){
+    const sel=$('#vote-target-members');if(!sel)return;
+    const {data,error}=await db.from('member_directory').select('full_name,email,member_status,rider_type,club_position').order('full_name',{ascending:true});
+    if(error){console.warn('Lista de integrantes das votações não carregada:',error);return;}
+    sel.innerHTML=(data||[]).filter(m=>m.email&&m.member_status!=='Inativo').map(m=>'<option value="'+escapeHtml(m.email)+'">'+escapeHtml(m.full_name)+' ('+escapeHtml(m.club_position||m.rider_type||'Integrante')+')</option>').join('');
+  }
+  $('#vote-type')?.addEventListener('change',()=>{const approval=$('#vote-type').value==='approval';$('#vote-options-wrap').classList.toggle('hidden',approval);$('#vote-options').required=!approval;});
+  $('#votes-refresh')?.addEventListener('click',loadVotes);
+  async function loadVotes(){
+    const box=$('#votes-list');if(!box)return;
+    const {data,error}=await db.from('club_votes').select('id,title,description,options,closes_at,created_at,vote_type,visible_to_groups,visible_to_emails').order('created_at',{ascending:false});
+    if(error){box.textContent='Não foi possível carregar as votações. Confira a migração SQL.';return;}
+    const rows=data||[], ids=rows.map(v=>v.id);
+    let ballots=[],myBallots=[],countsData=[];
+    const board=canManageAgenda();
+    if(ids.length){
+      const {data:mine,error:mineError}=await db.from('club_vote_ballots').select('id,vote_id,user_id,voter_name,option_selected,created_at').eq('user_id',currentUser.id).in('vote_id',ids);
+      if(!mineError)myBallots=mine||[];
+      if(board){
+        const {data:bs,error:be}=await db.from('club_vote_ballots').select('id,vote_id,user_id,voter_name,option_selected,created_at').in('vote_id',ids);
+        if(!be)ballots=bs||[];else console.warn('Relatório identificado indisponível:',be);
+      }
+      const {data:counts,error:countsError}=await db.rpc('get_club_vote_counts',{vote_ids:ids});
+      if(!countsError)countsData=counts||[];else console.warn('Resultados parciais indisponíveis:',countsError);
+    }
+    const now=Date.now();
+    box.innerHTML=rows.length?rows.map(v=>{
+      const allowedGroups=v.visible_to_groups||['all'];
+      const expired=v.closes_at&&new Date(v.closes_at).getTime()<=now;
+      const myVote=myBallots.find(b=>b.vote_id===v.id);
+      const opts=v.vote_type==='approval'?['Sim','Não','Abstenção']:(v.options||[]);
+      const vs=ballots.filter(b=>b.vote_id===v.id);
+      const counts=opts.map(opt=>({opt,count:Number((countsData.find(c=>c.vote_id===v.id&&c.option_selected===opt)||{}).vote_count||0)}));
+      const total=counts.reduce((sum,c)=>sum+c.count,0);
+      return '<article class="vote-card announcement-card"><div class="announcement-icon">✓</div><div class="announcement-content"><div class="announcement-meta"><span class="announcement-tag">'+(v.vote_type==='approval'?'Aprovação':'Votação')+'</span><span>'+(expired?'Encerrada': 'Aberta')+'</span>'+(v.closes_at?'<span>Até '+new Date(v.closes_at).toLocaleString('pt-BR')+'</span>':'')+'</div><h4 style="margin-top:9px">'+escapeHtml(v.title)+'</h4><p>'+escapeHtml(v.description||'')+'</p>'+(board?'<div class="form-actions"><button class="btn" type="button" data-vote-edit="'+v.id+'">Editar</button><button class="btn" type="button" data-vote-delete="'+v.id+'">Excluir</button></div>':'')+'<div class="vote-options">'+opts.map(opt=>'<button class="btn" data-vote="'+v.id+'" data-option="'+escapeHtml(opt)+'" '+(myVote||expired?'disabled':'')+'>'+escapeHtml(opt)+(myVote&&myVote.option_selected===opt?' ✓':'')+'</button>').join(' ')+'</div><div class="vote-partials"><strong>Parcial ('+total+' voto(s))</strong>'+counts.map(c=>'<div class="vote-count"><span>'+escapeHtml(c.opt)+'</span><strong>'+c.count+'</strong></div>').join('')+'</div>'+(myVote?'<small class="muted">Seu voto: '+escapeHtml(myVote.option_selected)+'</small>':expired?'<small class="muted">Esta votação foi encerrada.</small>':'')+'</div></article>';
+    }).join(''):'<div class="empty">🗳️<br><strong>Nenhuma votação disponível</strong><p class="muted">Quando a diretoria publicar uma votação, ela aparecerá aqui.</p></div>';
+    if(board){
+      box.querySelectorAll('[data-vote-edit]').forEach(btn=>btn.addEventListener('click',async()=>{
+        const item=rows.find(v=>String(v.id)===btn.dataset.voteEdit);if(!item)return;
+        if(ballots.some(b=>b.vote_id===item.id)&&!confirm('Esta votação já tem votos registrados. Alterar as opções pode afetar o relatório. Deseja continuar?'))return;
+        const title=prompt('Editar título da votação:',item.title);if(title===null)return;
+        const description=prompt('Editar descrição:',item.description||'');if(description===null)return;
+        let options=item.options||[];
+        if(item.vote_type!=='approval'){
+          const value=prompt('Editar opções (uma por linha):',options.join('\n'));if(value===null)return;
+          options=value.split('\n').map(x=>x.trim()).filter(Boolean);
+          if(options.length<2){notice('#app-notice','Informe pelo menos duas opções.');return;}
+        }
+        if(!title.trim()){notice('#app-notice','O título não pode ficar vazio.');return;}
+        const {error}=await db.from('club_votes').update({title:title.trim(),description:description.trim()||null,options}).eq('id',item.id);
+        if(error){console.error(error);notice('#app-notice','Não foi possível editar a votação: '+error.message);return;}
+        await loadVotes();notice('#app-notice','Votação atualizada.');
+      }));
+      box.querySelectorAll('[data-vote-delete]').forEach(btn=>btn.addEventListener('click',async()=>{
+        const item=rows.find(v=>String(v.id)===btn.dataset.voteDelete);if(!item||!confirm('Excluir a votação “'+item.title+'” e seus registros, se o banco permitir?'))return;
+        const {error:ballotError}=await db.from('club_vote_ballots').delete().eq('vote_id',item.id);
+        if(ballotError){console.error(ballotError);notice('#app-notice','Não foi possível remover os votos vinculados: '+ballotError.message);return;}
+        const {error}=await db.from('club_votes').delete().eq('id',item.id);
+        if(error){console.error(error);notice('#app-notice','Não foi possível excluir a votação: '+error.message);return;}
+        await loadVotes();notice('#app-notice','Votação e registros vinculados excluídos.');
+      }));
+    }
+    box.querySelectorAll('[data-vote]').forEach(btn=>btn.addEventListener('click',async()=>{
+      btn.disabled=true;
+      const {error:voteError}=await db.from('club_vote_ballots').insert({vote_id:btn.dataset.vote,user_id:currentUser.id,voter_name:currentProfile.full_name,option_selected:btn.dataset.option});
+      notice('#app-notice',voteError?'Não foi possível registrar o voto. Talvez você já tenha votado ou a votação esteja encerrada.':'Voto registrado.');
+      await loadVotes();
+    }));
+    const report=$('#vote-results');
+    if(report){
+      if(!board){report.innerHTML='<div class="empty">Relatório restrito à diretoria e aos fundadores.</div>';}
+      else report.innerHTML=rows.length?rows.map(v=>'<div class="audience-box"><h4>'+escapeHtml(v.title)+'</h4>'+ballots.filter(b=>b.vote_id===v.id).map(b=>'<div class="announcement-meta"><strong>'+escapeHtml(b.voter_name||'Integrante')+'</strong><span>Votou: '+escapeHtml(b.option_selected)+'</span><span>'+new Date(b.created_at).toLocaleString('pt-BR')+'</span></div>').join('')+'</div>').join(''):'<div class="empty">Nenhuma votação criada.</div>';
+    }
+  }
+  $('#member-edit-cancel')?.addEventListener('click', () => $('#member-edit-modal').classList.add('hidden'));
+  $('#member-edit-form')?.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (currentProfile?.role !== 'admin') { notice('#member-edit-notice','Somente a diretoria autorizada pode alterar o cadastro.'); return; }
+    const name = $('#member-edit-name').value;
+    const position = $('#member-edit-position').value;
+    const status = $('#member-edit-status').value;
+    const riderType = $('#member-edit-type').value;
+    const button = event.submitter || event.target.querySelector('button[type="submit"]');
+    button.disabled = true; button.textContent = 'Salvando…';
+    try {
+      const {error} = await db.from('member_directory').update({club_position:position,member_status:status,rider_type:riderType}).eq('full_name',name);
+      if (error) {
+        console.error('Falha ao editar integrante:', error);
+        notice('#member-edit-notice', status === 'Inativo' ? 'O banco ainda não aceita a situação Inativo. Aplique o SQL de configuração e tente novamente.' : 'Não foi possível salvar. Confira as permissões de edição da tabela member_directory no Supabase.');
+        return;
+      }
+      $('#member-edit-modal').classList.add('hidden');
+      notice('#app-notice','Cadastro de ' + name + ' atualizado.');
+      await loadMembers();
+    } catch (error) {
+      console.error(error); notice('#member-edit-notice','Falha de conexão ao salvar as alterações.');
+    } finally { button.disabled = false; button.textContent = 'Salvar alterações'; }
+  });
+  $('#members-refresh')?.addEventListener('click',loadMembers);
+  $('#profile-edit-form')?.addEventListener('submit',async e=>{
+    e.preventDefault(); if(!currentUser || !currentProfile)return;
+    const riderType=currentProfile.rider_type==='Garupa'?'Garupa':'Piloto';
+    const payload={
+      phone:$('#edit-phone').value.trim()||null,
+      motorcycle:riderType==='Piloto'?($('#edit-motorcycle').value.trim()||null):null,
+      pilot_id:riderType==='Garupa'?($('#edit-pilot-id').value||null):null
+    };
+    if(riderType==='Piloto' && !payload.motorcycle){notice('#app-notice','Informe a marca, o modelo e o ano da sua motocicleta.');return;}
+    if(riderType==='Garupa' && !payload.pilot_id){notice('#app-notice','Selecione o piloto responsável.');return;}
+    const {error}=await db.from('member_profiles').update(payload).eq('id',currentUser.id);
+    if(error){notice('#app-notice','Não foi possível salvar seus dados. Confira as permissões de atualização no banco.');return;}
+    currentProfile={...currentProfile,...payload};fillProfile(currentUser,currentProfile);notice('#app-notice','Seus dados foram atualizados.');
+  });
+  $('#document-form')?.addEventListener('submit',async e=>{
+    e.preventDefault();
+    if(!canManageDocuments()){notice('#app-notice','Seu cargo não tem permissão para enviar documentos.');return;}
+    const file=$('#document-file').files[0];
+    const title=$('#document-title').value.trim();
+    if(!file||!title)return;
+    const path=Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    const up=await db.storage.from('club-documents').upload(path,file,{upsert:false});
+    if(up.error){notice('#app-notice','Falha no envio do arquivo. Verifique as permissões do Storage.');return;}
+    const {error}=await db.from('club_documents').insert({title:title,file_path:path,uploaded_by:currentUser.id});
+    if(error){await db.storage.from('club-documents').remove([path]);notice('#app-notice','O arquivo foi enviado, mas não foi possível registrar o documento. Verifique as permissões da tabela.');return;}
+    notice('#app-notice','Documento publicado para os membros.');$('#document-form').reset();await loadDocuments();
+  });
+  async function loadAnnouncementMemberChoices(){
+    const selectors=[$('#announcement-visible-members'),$('#announcement-notify-members'),$('#agenda-visible-members'),$('#agenda-notify-members')].filter(Boolean);
+    if(!selectors.length)return;
+    const {data,error}=await db.from('member_directory').select('full_name,email,member_status,rider_type').order('full_name',{ascending:true});
+    if(error){console.warn('Lista de integrantes para público do comunicado não carregada:',error);return;}
+    const members=(data||[]).filter(m=>m.email && m.member_status!=='Inativo');
+    selectors.forEach(sel=>{sel.innerHTML=members.map(m=>'<option value="'+escapeHtml(m.email)+'">'+escapeHtml(m.full_name)+' ('+escapeHtml(m.rider_type||'Integrante')+')</option>').join('');});
+  }
+  $('#announcement-form')?.addEventListener('submit',async e=>{
+    e.preventDefault();if(!canManageAgenda()){notice('#app-notice','Apenas a diretoria e os fundadores podem publicar comunicados.');return;}
+    const selected = id => Array.from($(id).selectedOptions).map(o=>o.value);
+    const visibleGroups=selected('#announcement-visible-groups');
+    const notifyGroups=selected('#announcement-notify-groups');
+    if(!visibleGroups.length && !selected('#announcement-visible-members').length){notice('#app-notice','Escolha quem poderá ver: selecione um grupo ou pelo menos uma pessoa.');return;} if(!notifyGroups.length && !selected('#announcement-notify-members').length){notice('#app-notice','Escolha quem receberá a notificação: selecione um grupo ou pelo menos uma pessoa.');return;}
+    const payload={title:$('#announcement-title').value.trim(),body:$('#announcement-body').value.trim(),target_group:visibleGroups.includes('all')?'all':visibleGroups[0],created_by:currentUser.id,visible_to_groups:visibleGroups,notify_to_groups:notifyGroups,visible_to_emails:selected('#announcement-visible-members'),notify_to_emails:selected('#announcement-notify-members')};
+    const {error}=await db.from('club_announcements').insert(payload);
+    notice('#app-notice',error?'Não foi possível publicar. Execute a migração SQL de Agenda e Comunicados no Supabase do aplicativo.':'Comunicado publicado.');if(!error){e.target.reset();loadAnnouncements();}
+  });
+  $('#vote-form')?.addEventListener('submit',async e=>{
+    e.preventDefault();if(!canManageAgenda()){notice('#vote-form-notice','Apenas a diretoria e os fundadores podem criar votações.');return;}
+    const selected=id=>Array.from($(id).selectedOptions).map(o=>o.value);
+    const groups=selected('#vote-target-groups'),emails=selected('#vote-target-members');
+    if(!groups.length&&!emails.length){notice('#vote-form-notice','Escolha grupos ou integrantes específicos para votar.');return;}
+    const type=$('#vote-type').value;
+    const options=type==='approval'?['Sim','Não','Abstenção']:$('#vote-options').value.split('\n').map(x=>x.trim()).filter(Boolean);
+    if(type==='simple'&&options.length<2){notice('#vote-form-notice','Informe pelo menos duas opções, uma por linha.');return;}
+    const closes=$('#vote-closes-at').value;
+    const payload={title:$('#vote-title').value.trim(),description:$('#vote-description').value.trim()||null,options,target_group:'all',created_by:currentUser.id,vote_type:type,visible_to_groups:groups,visible_to_emails:emails,closes_at:closes?new Date(closes).toISOString():null};
+    clearNotice('#vote-form-notice');
+    const {error}=await db.from('club_votes').insert(payload);
+    if(error){console.error('Falha ao criar votação no Supabase:',error);notice('#vote-form-notice','Erro ao criar votação: '+(error.message||'erro desconhecido')+(error.code?' ('+error.code+')':''));}
+    else {notice('#vote-form-notice','Votação publicada.');e.target.reset();$('#vote-type').value='simple';$('#vote-options-wrap').classList.remove('hidden');$('#vote-options').required=true;await loadVotes();}
+  });
+  async function restoreSession() {
+    try {
+      const {data,error} = await db.auth.getSession();
+      if (error) {
+        console.error('Falha ao restaurar sessão Supabase:', error);
+        notice('#login-notice','Não foi possível restaurar sua sessão. Confira a conexão e atualize novamente.');
+        return;
+      }
+      if (data.session?.user && (passwordSetupSession || initialAuthLinkType === 'invite' || initialAuthLinkType === 'recovery')) {
+        currentUser = data.session.user;
+        passwordSetupSession = true;
+        showPasswordSetup();
+        return;
+      }
+      if (data.session?.user) {
+        await loadProfile(data.session.user);
+      }
+    } catch (error) {
+      console.error('Erro ao restaurar sessão:', error);
+      notice('#login-notice','Erro ao recuperar seu acesso. Atualize a página e tente novamente.');
+    }
+  }
+  restoreSession();
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load',() => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  }
+})();
+</script>
+</body>
+</html>
