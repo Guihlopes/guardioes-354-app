@@ -70,3 +70,33 @@ using (
 );
 
 -- A votação é identificada: a diretoria pode consultar eleitor e opção.
+
+-- Inclui o grupo Diretoria e fundadores no resolvedor de público.
+create or replace function public.club_target_matches(
+  p_user_id uuid,
+  p_groups text[],
+  p_emails text[]
+) returns boolean
+language sql stable security definer
+set search_path = public, auth
+as $$
+  select
+    exists (
+      select 1 from public.member_profiles p
+      where p.id = p_user_id and p.active = true
+        and (
+          coalesce(p_groups, array['all']::text[]) @> array['all']::text[]
+          or (coalesce(p_groups, array[]::text[]) @> array['pilots']::text[] and p.rider_type = 'Piloto')
+          or (coalesce(p_groups, array[]::text[]) @> array['pillion']::text[] and p.rider_type = 'Garupa')
+          or (coalesce(p_groups, array[]::text[]) @> array['prospects']::text[] and p.member_status = 'Prospect')
+          or (coalesce(p_groups, array[]::text[]) @> array['board']::text[] and
+            (p.role='admin' or p.club_position in ('Fundador','Fundador/Vice-Presidente','Presidente','Vice-Presidente','Diretor Geral','Diretor Social')))
+        )
+    )
+    or exists (
+      select 1 from public.member_profiles p
+      join auth.users u on u.id = p.id
+      where p.id = p_user_id and p.active = true
+        and lower(u.email) = any(coalesce(p_emails, array[]::text[]))
+    );
+$$;
