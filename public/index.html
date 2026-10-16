@@ -305,14 +305,30 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     </section>
 
     <section id="page-admin" class="app-page hidden-page">
-      <div class="page-heading"><div><h1>Administração</h1><p>Área reservada a administradores autorizados.</p></div><span class="badge">Admin</span></div>
-      <div class="callout">A interface administrativa está em preparação. Antes de habilitar ações reais, vamos implementar as operações no servidor e as políticas de acesso no banco; esconder esta tela não substitui essas proteções.</div>
-      <div class="grid">
-        <div class="card"><div class="muted small">Gestão de membros</div><div class="status-value">Preparada</div><p class="muted small">Cadastro e permissões serão conectados com segurança.</p></div>
-        <div class="card"><div class="muted small">Eventos e agenda</div><div class="status-value">Preparada</div><p class="muted small">Criação e edição de atividades.</p></div>
-        <div class="card"><div class="muted small">Comunicados</div><div class="status-value">Preparada</div><p class="muted small">Publicação de avisos oficiais.</p></div>
-        <div class="card"><div class="muted small">Configurações</div><div class="status-value">Preparada</div><p class="muted small">Preferências e ferramentas de gestão.</p></div>
+      <div class="page-heading"><div><h1>Central da Diretoria</h1><p>Visão geral e atalhos administrativos dos Guardiões da 354.</p></div><span class="badge">Administração</span></div>
+      <div class="form-actions" style="margin:0 0 16px">
+        <button class="btn btn-primary" id="admin-refresh" type="button">↻ Atualizar painel</button>
+        <span class="muted small" id="admin-updated-at">Os indicadores são carregados do banco.</span>
       </div>
+      <div class="grid" id="admin-stats-grid">
+        <div class="card"><div class="muted small">Integrantes</div><div class="status-value" id="admin-count-members">—</div><p class="muted small">Diretório oficial</p></div>
+        <div class="card"><div class="muted small">Prospects</div><div class="status-value" id="admin-count-prospects">—</div><p class="muted small">Em acompanhamento</p></div>
+        <div class="card"><div class="muted small">Atividades pendentes</div><div class="status-value" id="admin-count-pending-events">—</div><p class="muted small">Aguardando decisão</p></div>
+        <div class="card"><div class="muted small">Documentos</div><div class="status-value" id="admin-count-documents">—</div><p class="muted small">Biblioteca oficial</p></div>
+        <div class="card"><div class="muted small">Comunicados</div><div class="status-value" id="admin-count-announcements">—</div><p class="muted small">Avisos publicados</p></div>
+        <div class="card"><div class="muted small">Votações abertas</div><div class="status-value" id="admin-count-votes">—</div><p class="muted small">Ainda dentro do prazo</p></div>
+      </div>
+      <div class="section-title"><div><h2>Acesso rápido</h2><p>Abra as áreas existentes para realizar as operações.</p></div></div>
+      <div class="grid">
+        <div class="card"><div class="muted small">01 · Integrantes</div><h3>Gestão de membros</h3><p class="muted small">Consulte cadastros, cargos, categoria e situação. Edite integrantes autorizados.</p><button class="btn btn-primary" type="button" data-admin-go="members">Abrir membros →</button></div>
+        <div class="card"><div class="muted small">02 · Agenda</div><h3>Eventos e passeios</h3><p class="muted small">Revise sugestões, gerencie atividades e acompanhe confirmações.</p><button class="btn btn-primary" type="button" data-admin-go="agenda">Abrir agenda →</button></div>
+        <div class="card"><div class="muted small">03 · Comunicação</div><h3>Comunicados oficiais</h3><p class="muted small">Publique, edite e exclua avisos conforme as permissões da diretoria.</p><button class="btn btn-primary" type="button" data-admin-go="agenda">Abrir comunicados →</button></div>
+        <div class="card"><div class="muted small">04 · Arquivos</div><h3>Documentos oficiais</h3><p class="muted small">Envie arquivos, renomeie documentos e gerencie a biblioteca.</p><button class="btn btn-primary" type="button" data-admin-go="documents">Abrir documentos →</button></div>
+        <div class="card"><div class="muted small">05 · Deliberações</div><h3>Votações</h3><p class="muted small">Crie votações, acompanhe resultados e consulte decisões em andamento.</p><button class="btn btn-primary" type="button" data-admin-go="votes">Abrir votações →</button></div>
+        <div class="card"><div class="muted small">06 · Segurança</div><h3>Permissões e boas práticas</h3><p class="muted small">A interface respeita os cargos do perfil; o Supabase continua responsável por autorizar cada operação no banco.</p><span class="badge">Proteção no banco ativa</span></div>
+      </div>
+      <div class="section-title"><div><h2>Precisa de atenção</h2><p>Resumo dos itens que podem precisar de uma decisão da diretoria.</p></div></div>
+      <div class="card"><div id="admin-attention-list" class="empty">Carregando pendências…</div></div>
     </section>
   </main>
 
@@ -370,6 +386,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     $('#page-' + page)?.classList.remove('hidden-page');
     $$('[data-page]').forEach(el => el.classList.toggle('active', el.dataset.page === page));
     window.scrollTo({top:0,behavior:'smooth'});
+    if (page === 'admin' && currentProfile?.role === 'admin') loadAdminDashboard();
   }
   function fillProfile(user, p) {
     const firstName = (p.full_name || 'Integrante').trim().split(/\s+/)[0];
@@ -676,6 +693,51 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     if(event.data?.type==='PUSH_NOTIFICATION_CLICK')go(event.data.page==='votes'?'votes':'agenda');
   });
   updatePushStatus();
+  async function loadAdminDashboard() {
+    const list = $('#admin-attention-list');
+    if (!list || currentProfile?.role !== 'admin') return;
+    list.textContent = 'Atualizando indicadores…';
+    const [membersRes, eventsRes, docsRes, announcementsRes, votesRes] = await Promise.all([
+      db.from('member_directory').select('full_name,member_status,rider_type,club_position').order('full_name',{ascending:true}),
+      db.from('club_events').select('id,title,status,starts_at').order('starts_at',{ascending:true}),
+      db.from('club_documents').select('id,title,created_at').order('created_at',{ascending:false}),
+      db.from('club_announcements').select('id,title,created_at').order('created_at',{ascending:false}),
+      db.from('club_votes').select('id,title,closes_at,created_at').order('created_at',{ascending:false})
+    ]);
+    const members = membersRes.error ? [] : (membersRes.data || []);
+    const events = eventsRes.error ? [] : (eventsRes.data || []);
+    const docs = docsRes.error ? [] : (docsRes.data || []);
+    const announcements = announcementsRes.error ? [] : (announcementsRes.data || []);
+    const votes = votesRes.error ? [] : (votesRes.data || []);
+    const pendingEvents = events.filter(e => e.status && e.status !== 'published' && new Date(e.starts_at).getTime() >= Date.now());
+    const prospects = members.filter(m => String(m.member_status||'').toLocaleLowerCase('pt-BR') === 'prospect');
+    const openVotes = votes.filter(v => !v.closes_at || new Date(v.closes_at).getTime() > Date.now());
+    const set = (id,value) => { const el = $(id); if (el) el.textContent = String(value); };
+    set('#admin-count-members', membersRes.error ? '—' : members.length);
+    set('#admin-count-prospects', membersRes.error ? '—' : prospects.length);
+    set('#admin-count-pending-events', eventsRes.error ? '—' : pendingEvents.length);
+    set('#admin-count-documents', docsRes.error ? '—' : docs.length);
+    set('#admin-count-announcements', announcementsRes.error ? '—' : announcements.length);
+    set('#admin-count-votes', votesRes.error ? '—' : openVotes.length);
+    set('#admin-updated-at','Atualizado às ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
+    const attention = [];
+    if (membersRes.error) attention.push('Não foi possível consultar o diretório de integrantes.');
+    if (eventsRes.error) attention.push('Não foi possível consultar a agenda.');
+    if (docsRes.error) attention.push('Não foi possível consultar a biblioteca de documentos.');
+    if (announcementsRes.error) attention.push('Não foi possível consultar os comunicados.');
+    if (votesRes.error) attention.push('Não foi possível consultar as votações.');
+    if (!membersRes.error && prospects.length) attention.push(prospects.length + ' prospect(s) no diretório — revisar acompanhamento.');
+    if (!eventsRes.error && pendingEvents.length) attention.push(pendingEvents.length + ' atividade(s) aguardando decisão.');
+    if (!votesRes.error && openVotes.length) attention.push(openVotes.length + ' votação(ões) aberta(s).');
+    if (!attention.length) {
+      list.innerHTML = '<div class="empty">Tudo em dia! Nenhuma pendência identificada pelos indicadores disponíveis.</div>';
+    } else {
+      list.innerHTML = '<ul style="margin:0;padding-left:22px;display:grid;gap:10px">' + attention.map(item => '<li>' + escapeHtml(item) + '</li>').join('') + '</ul>';
+    }
+  }
+  $('#admin-refresh')?.addEventListener('click',loadAdminDashboard);
+  $('[data-admin-go]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.adminGo)));
+
   async function loadMembers() {
     const box = $('#members-list'); if (!box) return;
     box.textContent = 'Carregando integrantes…';
