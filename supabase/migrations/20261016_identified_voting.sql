@@ -2,6 +2,7 @@
 -- Execute no SQL Editor do projeto Supabase do aplicativo.
 
 alter table public.club_votes
+  add column if not exists closes_at timestamptz,
   add column if not exists vote_type text not null default 'simple',
   add column if not exists visible_to_groups text[] not null default array['all']::text[],
   add column if not exists visible_to_emails text[] not null default array[]::text[];
