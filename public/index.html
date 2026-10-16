@@ -386,10 +386,21 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const button = $('#login-button'); button.disabled = true; button.textContent = 'Entrando...';
     try {
       const email = $('#email').value.trim(); const password = $('#password').value;
+      if (!window.supabase || !db?.auth) throw new Error('Biblioteca de autenticação não carregou. Feche o app e abra novamente com internet.');
       const {data,error} = await db.auth.signInWithPassword({email,password});
-      if (error) notice('#login-notice','Não foi possível entrar. Confira o e-mail e a senha ou verifique se o acesso foi liberado.');
-      else if (data.user) await loadProfile(data.user);
-    } catch { notice('#login-notice','Falha de conexão. Verifique sua internet e tente novamente.'); }
+      if (error) {
+        console.error('Falha de autenticação Supabase:', error);
+        notice('#login-notice', error.message?.toLowerCase().includes('fetch') || error.message?.toLowerCase().includes('network')
+          ? 'O celular não conseguiu alcançar o serviço de autenticação. Teste trocar Wi-Fi por dados móveis e tente novamente.'
+          : 'Não foi possível entrar: ' + (error.message || 'confira e-mail, senha e autorização da conta.'));
+      } else if (data.user) await loadProfile(data.user);
+    } catch (err) {
+      console.error('Exceção ao entrar no aplicativo:', err);
+      const detail = String(err?.message || '');
+      notice('#login-notice', detail.includes('Failed to fetch') || detail.includes('NetworkError')
+        ? 'Falha ao conectar ao Supabase. Teste alternar entre Wi-Fi e dados móveis. Se persistir, envie a mensagem técnica: ' + detail
+        : 'O aplicativo encontrou um erro ao iniciar o login: ' + (detail || 'erro desconhecido') + '. Atualize a página e tente novamente.');
+    }
     finally { button.disabled = false; button.textContent = 'Entrar no aplicativo →'; }
   });
   $('#first-access-button').addEventListener('click', () => {
