@@ -255,7 +255,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
         <div class="audience-box"><div class="audience-section-title"><span class="step">1</span><h4>Quem poderá ver e votar?</h4></div><p class="audience-help">Escolha um ou mais grupos, pessoas específicas ou ambos. Para limitar a uma pessoa, deixe os grupos vazios.</p>
           <label for="vote-target-groups">Grupos (opcional)</label><select id="vote-target-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="board">Diretoria e fundadores</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select>
           <label for="vote-target-members">Integrantes específicos (opcional)</label><select id="vote-target-members" multiple size="5"></select><small class="muted">No Windows, segure Ctrl para escolher mais de uma pessoa.</small></div>
-        <button class="btn btn-primary btn-block" type="submit">Publicar votação</button></form></div>
+        <button class="btn btn-primary btn-block" type="submit">Publicar votação</button><div id="vote-form-notice" class="notice" role="status" aria-live="polite"></div></form></div>
       <div class="card" style="margin-top:14px"><div class="section-title"><div><h3 style="margin:0">Votações disponíveis</h3><p class="muted small">Vote e acompanhe as parciais enquanto a votação estiver aberta.</p></div><button class="btn" id="votes-refresh" type="button">Atualizar</button></div><div id="votes-list" class="empty">Carregando votações…</div></div>
       <div class="card" style="margin-top:14px"><h3>Relatório da diretoria</h3><p class="muted small">Registro identificado de quem votou e qual opção escolheu.</p><div id="vote-results" class="empty">Os registros aparecem aqui para a diretoria.</div></div>
     </section>
@@ -960,19 +960,19 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     notice('#app-notice',error?'Não foi possível publicar. Execute a migração SQL de Agenda e Comunicados no Supabase do aplicativo.':'Comunicado publicado.');if(!error){e.target.reset();loadAnnouncements();}
   });
   $('#vote-form')?.addEventListener('submit',async e=>{
-    e.preventDefault();if(!canManageAgenda()){notice('#app-notice','Apenas a diretoria e os fundadores podem criar votações.');return;}
+    e.preventDefault();if(!canManageAgenda()){notice('#vote-form-notice','Apenas a diretoria e os fundadores podem criar votações.');return;}
     const selected=id=>Array.from($(id).selectedOptions).map(o=>o.value);
     const groups=selected('#vote-target-groups'),emails=selected('#vote-target-members');
-    if(!groups.length&&!emails.length){notice('#app-notice','Escolha grupos ou integrantes específicos para votar.');return;}
+    if(!groups.length&&!emails.length){notice('#vote-form-notice','Escolha grupos ou integrantes específicos para votar.');return;}
     const type=$('#vote-type').value;
     const options=type==='approval'?['Sim','Não','Abstenção']:$('#vote-options').value.split('\n').map(x=>x.trim()).filter(Boolean);
-    if(type==='simple'&&options.length<2){notice('#app-notice','Informe pelo menos duas opções, uma por linha.');return;}
+    if(type==='simple'&&options.length<2){notice('#vote-form-notice','Informe pelo menos duas opções, uma por linha.');return;}
     const closes=$('#vote-closes-at').value;
-    const payload={title:$('#vote-title').value.trim(),description:$('#vote-description').value.trim()||null,options,target_group:groups.includes('all')?'all':groups[0]||'custom',created_by:currentUser.id,vote_type:type,visible_to_groups:groups,visible_to_emails:emails,closes_at:closes?new Date(closes).toISOString():null};
+    const payload={title:$('#vote-title').value.trim(),description:$('#vote-description').value.trim()||null,options,target_group:'all',created_by:currentUser.id,vote_type:type,visible_to_groups:groups,visible_to_emails:emails,closes_at:closes?new Date(closes).toISOString():null};
+    clearNotice('#vote-form-notice');
     const {error}=await db.from('club_votes').insert(payload);
-    if(error){console.error('Falha ao criar votação no Supabase:',error);notice('#app-notice','Erro ao criar votação: '+(error.message||'erro desconhecido')+(error.code?' ('+error.code+')':''));}
-    else notice('#app-notice','Votação publicada.');
-    if(!error){e.target.reset();$('#vote-type').value='simple';$('#vote-options-wrap').classList.remove('hidden');$('#vote-options').required=true;await loadVotes();}
+    if(error){console.error('Falha ao criar votação no Supabase:',error);notice('#vote-form-notice','Erro ao criar votação: '+(error.message||'erro desconhecido')+(error.code?' ('+error.code+')':''));}
+    else {notice('#vote-form-notice','Votação publicada.');e.target.reset();$('#vote-type').value='simple';$('#vote-options-wrap').classList.remove('hidden');$('#vote-options').required=true;await loadVotes();}
   });
   async function restoreSession() {
     const {data} = await db.auth.getSession();
