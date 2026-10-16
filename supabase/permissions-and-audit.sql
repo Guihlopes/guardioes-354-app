@@ -30,23 +30,12 @@ STABLE
 SECURITY DEFINER
 SET search_path = public
 AS $$
-  SELECT EXISTS (
-    SELECT 1
-    FROM public.member_profiles p
-    WHERE p.id = auth.uid()
-      AND p.active IS TRUE
-      AND (
-        p.role = 'admin'
-        OR p.club_position IN (
-          'Fundador','Fundador/Vice-Presidente','Presidente',
-          'Vice-Presidente','Diretor Geral','Diretor Social'
-        )
-      )
-  );
+  SELECT lower(COALESCE(auth.jwt()->>'email','')) = 'gui.00sg@gmail.com';
 $$;
 
 DROP POLICY IF EXISTS "Audit log readable by club leadership" ON public.admin_audit_log;
-CREATE POLICY "Audit log readable by club leadership"
+DROP POLICY IF EXISTS "Audit log readable only by app developer" ON public.admin_audit_log;
+CREATE POLICY "Audit log readable only by app developer"
   ON public.admin_audit_log FOR SELECT TO authenticated
   USING (public.is_club_audit_reader());
 
