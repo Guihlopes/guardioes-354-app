@@ -556,7 +556,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     }).sort((a,b) => a.order-b.order || a.name.localeCompare(b.name,'pt-BR'));
 
     box.className = '';
-    box.innerHTML = members.map(m => `<div class="list-row member-row" ${currentProfile?.role==='admin' ? 'role="button" tabindex="0" title="Clique para editar integrante"' : ''} data-member-name="${escapeHtml(m.name)}" data-member-position="${escapeHtml(m.position)}" data-member-status="${escapeHtml(m.status)}" data-member-type="${escapeHtml(m.riderType)}"><div class="list-icon">♟</div><div class="list-main"><strong>${escapeHtml(m.name||'Integrante')}</strong><small>${escapeHtml(m.position)} · ${escapeHtml(m.motorcycle)}</small></div><span class="badge">${escapeHtml(m.status)} · ${escapeHtml(m.riderType)}</span></div>`).join('');
+    box.innerHTML = members.map(m => `<div class="list-row member-row" data-member-name="${escapeHtml(m.name)}" data-member-position="${escapeHtml(m.position)}" data-member-status="${escapeHtml(m.status)}" data-member-type="${escapeHtml(m.riderType)}"><div class="list-icon">♟</div><div class="list-main"><strong>${escapeHtml(m.name||'Integrante')}</strong><small>${escapeHtml(m.position)} · ${escapeHtml(m.motorcycle)}</small></div><span class="badge">${escapeHtml(m.status)} · ${escapeHtml(m.riderType)}</span>${currentProfile?.role==='admin' ? '<button class="btn member-edit-btn" type="button" style="flex-shrink:0">Editar</button>' : ''}</div>`).join('');
     const openMemberEditor = row => {
       if (currentProfile?.role !== 'admin') return;
       $('#member-edit-name').value = row.dataset.memberName;
@@ -567,12 +567,19 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       $('#member-edit-notice').classList.remove('show');
       $('#member-edit-modal').classList.remove('hidden');
     };
-    box.querySelectorAll('.member-row[role="button"]').forEach(row => {
-      row.style.cursor = 'pointer';
-      row.addEventListener('click', () => openMemberEditor(row));
-      row.addEventListener('keydown', event => {
-        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openMemberEditor(row); }
-      });
+    box.querySelectorAll('.member-row').forEach(row => {
+      const button = row.querySelector('.member-edit-btn');
+      if (currentProfile?.role === 'admin') {
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', event => {
+          if (event.target.closest('button')) { openMemberEditor(row); return; }
+          openMemberEditor(row);
+        });
+        row.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openMemberEditor(row); }
+        });
+        if (button) button.addEventListener('click', event => { event.stopPropagation(); openMemberEditor(row); });
+      }
     });
   }
   function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
