@@ -96,6 +96,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   </div>
 </div>
 
+<div id="install-help-overlay" class="notification-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="install-help-title" style="display:none"><section class="notification-panel"><div class="notification-head"><h2 id="install-help-title">📲 Instalar aplicativo</h2><button id="install-help-close" class="btn" type="button">Fechar ✕</button></div><div class="audience-box"><h4>Android · Chrome</h4><p>1. Abra este site no Chrome.<br>2. Toque nos três pontinhos (⋮).<br>3. Escolha <strong>Instalar aplicativo</strong> ou <strong>Adicionar à tela inicial</strong>.</p></div><div class="audience-box"><h4>iPhone · Safari</h4><p>1. Abra este site no Safari.<br>2. Toque em <strong>Compartilhar</strong> (quadrado com seta).<br>3. Escolha <strong>Adicionar à Tela de Início</strong> e confirme em Adicionar.</p></div><p class="muted small">Se a opção não aparecer, confira se abriu o endereço no navegador indicado, e não dentro de outro aplicativo.</p></section></div>
 <div id="first-access-screen" class="app-shell hidden">
   <div class="login-wrap">
     <div class="brand-login"><div class="eyebrow">Guardiões da 354 · Primeiro acesso</div></div>
@@ -566,7 +567,17 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     if(error){box.innerHTML='<div class="empty">Não foi possível carregar as notificações. Confira a configuração do Supabase.</div>';return;}
     const rows=data||[],unread=rows.filter(n=>!n.read_at);
     $('#notifications-unread-summary').textContent=unread.length?unread.length+' notificação(ões) não lida(s)':'Você está em dia! Nenhuma notificação não lida.';
-    box.innerHTML=rows.length?rows.map(n=>'<article class="notification-item '+(!n.read_at?'unread':'')+'"><strong>'+(n.read_at?'':'🔴 ')+escapeHtml(n.title)+'</strong><p>'+escapeHtml(n.body||'')+'</p><small>'+new Date(n.created_at).toLocaleString('pt-BR')+'</small>'+(n.read_at?'':' <button class="btn" style="margin-top:10px" data-notification-read="'+n.id+'">Marcar como lida</button>')+'</article>').join(''):'<div class="empty">Nenhuma notificação por enquanto.</div>';
+    box.innerHTML=rows.length?rows.map(n=>'<article class="notification-item '+(!n.read_at?'unread':'')+'" data-notification-open="'+n.id+'" role="button" tabindex="0" style="cursor:pointer"><strong>'+(n.read_at?'':'🔴 ')+escapeHtml(n.title)+'</strong><p>'+escapeHtml(n.body||'')+'</p><small>'+new Date(n.created_at).toLocaleString('pt-BR')+'</small><div class="form-actions" style="margin-top:10px"><button class="btn" type="button" data-notification-read="'+n.id+'">'+(n.read_at?'Lida ✓':'Marcar como lida')+'</button><span class="muted small">Abrir seção →</span></div></article>').join(''):'<div class="empty">Nenhuma notificação por enquanto.</div>';
+    const openTarget=async n=>{
+      if(!n)return;
+      if(!n.read_at){const {error}=await db.from('club_notifications').update({read_at:new Date().toISOString()}).eq('id',n.id);if(error){notice('#app-notice','Não foi possível marcar como lida.');return;}}
+      closeNotifications();const page=n.source_type==='vote'?'votes':'agenda';go(page);
+      if(n.source_type==='event')setTimeout(()=>{const el=document.querySelector('[data-agenda-details="'+n.source_id+'"]');if(el){el.click();el.scrollIntoView({behavior:'smooth',block:'center'});}},150);
+      else if(n.source_type==='announcement')setTimeout(()=>{const el=$('#announcements-list');el?.scrollIntoView({behavior:'smooth',block:'start'});},150);
+      else if(n.source_type==='vote')setTimeout(()=>{const el=document.querySelector('[data-vote-edit="'+n.source_id+'"]')||$('#votes-list');el?.scrollIntoView({behavior:'smooth',block:'center'});},150);
+      await refreshNotificationDot();
+    };
+    box.querySelectorAll('[data-notification-open]').forEach(card=>{const n=rows.find(x=>x.id===card.dataset.notificationOpen);card.addEventListener('click',e=>{if(e.target.closest('[data-notification-read]'))return;openTarget(n);});card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTarget(n);}});});
     box.querySelectorAll('[data-notification-read]').forEach(btn=>btn.addEventListener('click',async()=>{
       btn.disabled=true;
       const {error:markError}=await db.from('club_notifications').update({read_at:new Date().toISOString()}).eq('id',btn.dataset.notificationRead);
@@ -582,10 +593,13 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   setInterval(refreshNotificationDot,60000);
   $$('[data-page]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.page)));
   $$('[data-go]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.go)));
+  $('#install-button').classList.remove('hidden');
   $('#install-button').addEventListener('click',async() => {
-    if (!installPrompt) { notice('#login-notice','Para instalar, use o menu do navegador e escolha “Instalar aplicativo” ou “Adicionar à tela inicial”.'); return; }
-    await installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; $('#install-button').classList.add('hidden');
+    if (installPrompt) { await installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; }
+    else { $('#install-help-overlay').classList.remove('hidden'); $('#install-help-overlay').style.display='flex'; }
   });
+  $('#install-help-close').addEventListener('click',()=>{ $('#install-help-overlay').classList.add('hidden'); $('#install-help-overlay').style.display='none'; });
+  $('#install-help-overlay').addEventListener('click',e=>{if(e.target.id==='install-help-overlay'){e.currentTarget.classList.add('hidden');e.currentTarget.style.display='none';}});
   window.addEventListener('beforeinstallprompt',event => { event.preventDefault(); installPrompt = event; $('#install-button').classList.remove('hidden'); });
 
   async function loadMembers() {
