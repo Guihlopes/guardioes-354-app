@@ -1,4 +1,4 @@
-const CACHE_NAME = 'guardioes-354-pwa-v3';
+const CACHE_NAME = 'guardioes-354-pwa-v4';
 const APP_FILES = ['./', './index.html', './manifest.json', './icons/icon.svg'];
 
 self.addEventListener('install', (event) => {
@@ -17,6 +17,33 @@ self.addEventListener('activate', (event) => {
     )
   );
   self.clients.claim();
+});
+
+self.addEventListener('push', (event) => {
+  let payload = {};
+  try { payload = event.data ? event.data.json() : {}; } catch (_) { payload = { body: event.data?.text() || '' }; }
+  const title = payload.title || 'Guardiões da 354';
+  const options = {
+    body: payload.body || 'Você tem uma nova atualização no aplicativo.',
+    icon: './icons/guardioes-logo.png',
+    badge: './icons/favicon-32.png',
+    data: { url: payload.url || './' },
+    tag: payload.tag || 'guardioes-' + (payload.source_id || Date.now()),
+    renotify: false
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const target = new URL(event.notification.data?.url || './', self.location.origin).href;
+  event.waitUntil((async () => {
+    const clientsList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of clientsList) {
+      if (client.url.startsWith(self.location.origin) && 'focus' in client) { await client.focus(); client.postMessage({ type: 'PUSH_NOTIFICATION_CLICK', url: target }); return; }
+    }
+    if (self.clients.openWindow) await self.clients.openWindow(target);
+  })());
 });
 
 self.addEventListener('fetch', (event) => {
