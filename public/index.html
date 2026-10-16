@@ -377,7 +377,14 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   const SUPABASE_URL = 'https://nlaywsguzsiwvexwnakp.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_eIzAaMENq8u1smn5gVR3Lg_cj9bABxk';
   const PUSH_VAPID_PUBLIC_KEY = 'BMHesRKdUbVl0jFSwy84ELM62KTh7Uu9UYOO-863vnZ_ou-pqGyJhzc5d94ZFP4CtrpjXAwudCedlOZW-fBAc1o';
-  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: window.localStorage
+    }
+  });
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
   let currentUser = null;
@@ -1247,14 +1254,26 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     else {notice('#vote-form-notice','Votação publicada.');e.target.reset();$('#vote-type').value='simple';$('#vote-options-wrap').classList.remove('hidden');$('#vote-options').required=true;await loadVotes();}
   });
   async function restoreSession() {
-    const {data} = await db.auth.getSession();
-    if (data.session?.user && (passwordSetupSession || initialAuthLinkType === 'invite' || initialAuthLinkType === 'recovery')) {
-      currentUser = data.session.user;
-      passwordSetupSession = true;
-      showPasswordSetup();
-      return;
+    try {
+      const {data,error} = await db.auth.getSession();
+      if (error) {
+        console.error('Falha ao restaurar sessão Supabase:', error);
+        notice('#login-notice','Não foi possível restaurar sua sessão. Confira a conexão e atualize novamente.');
+        return;
+      }
+      if (data.session?.user && (passwordSetupSession || initialAuthLinkType === 'invite' || initialAuthLinkType === 'recovery')) {
+        currentUser = data.session.user;
+        passwordSetupSession = true;
+        showPasswordSetup();
+        return;
+      }
+      if (data.session?.user) {
+        await loadProfile(data.session.user);
+      }
+    } catch (error) {
+      console.error('Erro ao restaurar sessão:', error);
+      notice('#login-notice','Erro ao recuperar seu acesso. Atualize a página e tente novamente.');
     }
-    if (data.session?.user) await loadProfile(data.session.user);
   }
   restoreSession();
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
