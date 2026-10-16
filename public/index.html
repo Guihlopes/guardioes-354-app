@@ -49,6 +49,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   #login-screen .login-copy,#first-access-screen .login-copy,#password-setup-screen .login-copy{margin:5px 0 8px}
   #login-screen .login-footer{margin-top:5px}
 }
+#header-notifications{position:relative}#notification-dot{position:absolute;top:5px;right:5px;width:10px;height:10px;border-radius:50%;background:#ef3340;border:2px solid var(--panel);box-shadow:0 0 0 1px #ef334055}#notification-dot.hidden{display:none!important}
 </style>
 </head>
 <body>
@@ -143,7 +144,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       <img src="/icons/guardioes-logo.png?v=2" alt="Guardiões da 354" onerror="this.style.display='none'">
       <div><div class="brand-title">GUARDIÕES DA 354</div><div class="brand-sub">Área exclusiva dos integrantes</div></div>
     </div>
-    <div class="header-actions"><button class="icon-btn" id="header-notifications" title="Notificações" aria-label="Notificações">♧</button><button class="btn" id="header-logout" type="button">Sair <span class="logout-text">da conta</span></button></div>
+    <div class="header-actions"><button class="icon-btn" id="header-notifications" title="Notificações" aria-label="Notificações">♧<span id="notification-dot" class="hidden" aria-hidden="true"></span></button><button class="btn" id="header-logout" type="button">Sair <span class="logout-text">da conta</span></button></div>
   </header>
   <nav class="mobile-nav" aria-label="Navegação móvel">
     <button class="active" data-page="home"><span>⌂</span>Início</button><button data-page="members"><span>♟</span>Membros</button><button data-page="agenda"><span>▦</span>Agenda e avisos</button><button data-page="documents"><span>▧</span>Docs</button><button data-page="votes"><span>✓</span>Votos</button><button data-page="profile"><span>♙</span>Perfil</button>
@@ -359,7 +360,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       notice('#login-notice','Sua conta ainda não está autorizada a entrar no aplicativo.');
       return false;
     }
-    currentUser = user; currentProfile = data; fillProfile(user,data); showApp(); await Promise.all([loadMembers(),loadPilotOptions(),loadDocuments(),loadAnnouncements(),loadVotes(),loadAgenda(),loadAnnouncementMemberChoices()]); resetAgendaForm(); go('home'); if (!data.phone || (data.rider_type === 'Piloto' && !data.motorcycle) || (data.rider_type === 'Garupa' && !data.pilot_id)) { openProfileSetup(data); } return true;
+    currentUser = user; currentProfile = data; fillProfile(user,data); showApp(); await Promise.all([loadMembers(),loadPilotOptions(),loadDocuments(),loadAnnouncements(),loadVotes(),loadAgenda(),loadAnnouncementMemberChoices()]); await refreshNotificationDot(); resetAgendaForm(); go('home'); if (!data.phone || (data.rider_type === 'Piloto' && !data.motorcycle) || (data.rider_type === 'Garupa' && !data.pilot_id)) { openProfileSetup(data); } return true;
   }
   $('#login-form').addEventListener('submit', async (event) => {
     event.preventDefault(); clearNotice('#login-notice');
@@ -503,13 +504,23 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     currentUser = null; currentProfile = null; $('#password').value = ''; clearNotice('#app-notice'); showLogin();
   }
   $('#header-logout').addEventListener('click',logout);
+  async function refreshNotificationDot(){
+    const dot=$('#notification-dot');if(!dot||!currentUser)return;
+    const {count,error}=await db.from('club_notifications').select('id',{count:'exact',head:true}).is('read_at',null);
+    if(error){console.warn('Não foi possível atualizar o indicador de notificações:',error);return;}
+    dot.classList.toggle('hidden',!count);
+    $('#header-notifications').setAttribute('aria-label',count?'Notificações novas':'Notificações');
+    $('#header-notifications').title=count?'Você tem notificações novas':'Notificações';
+  }
   $('#header-notifications').addEventListener('click',async() => {
     const {data,error}=await db.from('club_notifications').select('id,title,body,created_at,read_at,source_type,source_id').order('created_at',{ascending:false}).limit(30);
     if(error){notice('#app-notice','Notificações ainda precisam da migração SQL.');return;}
     const unread=(data||[]).filter(n=>!n.read_at);
     const lines=(data||[]).map(n=>(n.read_at?'':'🔔 ')+n.title+' — '+n.body+' ('+new Date(n.created_at).toLocaleString('pt-BR')+')').join('\n');
     notice('#app-notice',lines?('Notificações ('+unread.length+' não lidas): '+lines):'Você não tem notificações.');
+    await refreshNotificationDot();
   });
+  setInterval(refreshNotificationDot,60000);
   $$('[data-page]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.page)));
   $$('[data-go]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.go)));
   $('#install-button').addEventListener('click',async() => {
