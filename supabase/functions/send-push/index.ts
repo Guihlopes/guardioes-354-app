@@ -50,6 +50,7 @@ Deno.serve(async (req) => {
       body: row.body || "Você tem uma nova notificação do motoclube.",
       source_type: row.source_type || "",
       source_id: row.source_id || "",
+      page: row.source_type === "vote" ? "votes" : "agenda",
       url,
       tag: "club-notification-" + row.id,
     });
