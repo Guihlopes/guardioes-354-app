@@ -362,9 +362,32 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
           <div class="muted small">06 · SEGURANÇA</div><h3>Permissões e histórico</h3>
           <p>Área para acompanhar a segurança e a responsabilidade administrativa.</p>
           <ul class="small muted" style="padding-left:20px"><li>Restringir ações conforme o cargo.</li><li>Manter os Fundadores na hierarquia definida pelo motoclube.</li><li>Planejar um histórico de quem alterou cada informação.</li></ul>
-          <span class="badge">Próxima melhoria sugerida</span>
+          <button class="btn btn-primary" type="button" id="open-audit-log">Abrir histórico de alterações →</button>
         </div>
       </div>
+      <section id="admin-security-panel" class="hidden" style="margin:20px 0">
+        <div class="section-title"><div><h2>Permissões e histórico</h2><p>Registro das alterações administrativas feitas no aplicativo.</p></div><button class="btn" type="button" id="close-audit-log">Fechar</button></div>
+        <div class="card" style="margin-bottom:14px">
+          <h3 style="margin-top:0">Regras de acesso</h3>
+          <div class="grid">
+            <div class="card"><strong>Fundadores</strong><p class="muted small">Guilherme Henrique Lopes e Welton Santana Silva: prioridade hierárquica conforme o estatuto. Acesso técnico segue as permissões concedidas na conta.</p></div>
+            <div class="card"><strong>Presidente e Vice-Presidente</strong><p class="muted small">Gestão administrativa de membros, conforme as regras atuais do aplicativo.</p></div>
+            <div class="card"><strong>Diretores</strong><p class="muted small">Acesso às ferramentas de agenda, documentos e atividades autorizadas para a diretoria.</p></div>
+            <div class="card"><strong>Membros e prospects</strong><p class="muted small">Acesso às áreas de consulta e edição apenas dos dados pessoais permitidos.</p></div>
+          </div>
+          <p class="muted small">Importante: as permissões efetivas também dependem das políticas RLS do Supabase. Aplique o arquivo <code>supabase/permissions-and-audit.sql</code> antes de usar o histórico.</p>
+        </div>
+        <div class="card">
+          <div class="form-grid" style="margin-bottom:14px">
+            <div><label for="audit-search">Pesquisar</label><input id="audit-search" placeholder="Nome, tabela ou responsável"></div>
+            <div><label for="audit-action-filter">Tipo de ação</label><select id="audit-action-filter"><option value="">Todas as ações</option><option value="INSERT">Inclusões</option><option value="UPDATE">Alterações</option><option value="DELETE">Exclusões</option></select></div>
+            <div><label for="audit-table-filter">Área</label><select id="audit-table-filter"><option value="">Todas as áreas</option><option value="member_profiles">Perfis</option><option value="member_directory">Diretório de membros</option><option value="club_events">Passeios e eventos</option><option value="club_documents">Documentos</option><option value="club_announcements">Comunicados</option><option value="club_votes">Votações</option></select></div>
+            <div style="display:flex;align-items:end"><button class="btn btn-primary" type="button" id="audit-apply-filters">Aplicar filtros</button></div>
+          </div>
+          <div id="audit-log-list" class="empty">Clique em “Atualizar histórico” para consultar os registros.</div>
+          <div class="form-actions"><button class="btn" type="button" id="audit-refresh">↻ Atualizar histórico</button><span class="muted small" id="audit-log-status"></span></div>
+        </div>
+      </section>
       <div class="section-title"><div><h2>Pendências e alertas</h2><p>Confira esta lista antes de encerrar as tarefas administrativas.</p></div></div>
       <div class="card"><div id="admin-attention-list" class="empty">Carregando pendências…</div></div>
     </section>
@@ -790,6 +813,35 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       list.innerHTML = '<ul style="margin:0;padding-left:22px;display:grid;gap:10px">' + attention.map(item => '<li>' + escapeHtml(item) + '</li>').join('') + '</ul>';
     }
   }
+  async function loadAuditLog() {
+    const box=$('#audit-log-list'); const status=$('#audit-log-status'); if(!box)return;
+    box.textContent='Carregando histórico…'; if(status)status.textContent='';
+    let query=db.from('admin_audit_log').select('id,actor_name,action,table_name,record_id,record_label,old_data,new_data,created_at').order('created_at',{ascending:false}).limit(100);
+    const action=$('#audit-action-filter')?.value||'';
+    const table=$('#audit-table-filter')?.value||'';
+    const search=($('#audit-search')?.value||'').trim();
+    if(action)query=query.eq('action',action);
+    if(table)query=query.eq('table_name',table);
+    if(search)query=query.or('actor_name.ilike.%'+search+'%,record_label.ilike.%'+search+'%,table_name.ilike.%'+search+'%');
+    const {data,error}=await query;
+    if(error){box.className='empty';box.textContent='Não foi possível carregar o histórico. Aplique supabase/permissions-and-audit.sql no SQL Editor do Supabase e confira se sua conta tem cargo autorizado. Detalhe: '+(error.message||'erro desconhecido');if(status)status.textContent='Falha ao consultar';return;}
+    if(!data?.length){box.className='empty';box.textContent='Nenhuma alteração encontrada para estes filtros.';if(status)status.textContent='0 registros';return;}
+    box.className='';box.innerHTML='<div style="display:grid;gap:10px">'+data.map(row=>{
+      const labels={member_profiles:'Perfil',member_directory:'Diretório de membros',club_events:'Passeios/eventos',club_documents:'Documentos',club_announcements:'Comunicados',club_votes:'Votações'};
+      const actions={INSERT:'Inclusão',UPDATE:'Alteração',DELETE:'Exclusão'};
+      const stamp=row.created_at?new Date(row.created_at).toLocaleString('pt-BR'):'Data desconhecida';
+      const changed=[];
+      const before=row.old_data||{}; const after=row.new_data||{};
+      const keys=[...new Set([...Object.keys(before),...Object.keys(after)])].filter(k=>!['updated_at','created_at','id'].includes(k));
+      for(const k of keys){if(JSON.stringify(before[k])!==JSON.stringify(after[k]))changed.push('<li><strong>'+escapeHtml(k)+'</strong>: '+escapeHtml(before[k]===undefined?'—':JSON.stringify(before[k]))+' → '+escapeHtml(after[k]===undefined?'—':JSON.stringify(after[k]))+'</li>');}
+      return '<details class="card"><summary style="cursor:pointer"><strong>'+escapeHtml(actions[row.action]||row.action)+'</strong> · '+escapeHtml(row.record_label||row.record_id||'Registro')+'<div class="muted small">'+escapeHtml(labels[row.table_name]||row.table_name)+' · '+escapeHtml(row.actor_name||'Responsável desconhecido')+' · '+escapeHtml(stamp)+'</div></summary><div style="margin-top:12px">'+(changed.length?'<ul style="padding-left:20px;overflow-wrap:anywhere">'+changed.join('')+'</ul>':'<p class="muted small">Registro criado ou removido. Os dados completos estão guardados no histórico.</p>')+'</div></details>';
+    }).join('')+'</div>';
+    if(status)status.textContent=data.length+' registro(s) recentes';
+  }
+  $('#open-audit-log')?.addEventListener('click',()=>{const panel=$('#admin-security-panel');panel?.classList.remove('hidden');loadAuditLog();panel?.scrollIntoView({behavior:'smooth',block:'start'});});
+  $('#close-audit-log')?.addEventListener('click',()=>$('#admin-security-panel')?.classList.add('hidden'));
+  $('#audit-refresh')?.addEventListener('click',loadAuditLog);
+  $('#audit-apply-filters')?.addEventListener('click',loadAuditLog);
   $('#admin-refresh')?.addEventListener('click',loadAdminDashboard);
   $$('[data-admin-go]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.adminGo)));
 
