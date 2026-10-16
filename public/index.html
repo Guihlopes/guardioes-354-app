@@ -246,7 +246,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     </section>
     <section id="page-votes" class="app-page hidden-page">
       <div class="page-heading"><div><h1>Votações</h1><p>Deliberações com acesso definido pela diretoria.</p></div><span class="badge">Restrito</span></div>
-      <div class="card admin-only hidden" id="vote-create-card" style="margin-bottom:16px"><h3>＋ Criar votação</h3><p class="muted small">Defina o formato, o público e as opções. Os resultados parciais ficam visíveis durante a votação.</p><form id="vote-form">
+      <div class="card hidden" id="vote-create-card" style="margin-bottom:16px"><h3>＋ Criar votação</h3><p class="muted small">Defina o formato, o público e as opções. Os resultados parciais ficam visíveis durante a votação.</p><form id="vote-form">
         <label for="vote-title">Título da votação</label><input id="vote-title" required maxlength="180" placeholder="Ex.: Escolha da data do próximo passeio">
         <label for="vote-description">Descrição / contexto</label><textarea id="vote-description" maxlength="5000" placeholder="Explique o assunto para os integrantes"></textarea>
         <label for="vote-type">Modalidade</label><select id="vote-type"><option value="simple">Escolher entre opções</option><option value="approval">Aprovação: Sim / Não / Abstenção</option></select>
@@ -364,7 +364,8 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     if ($('#edit-rider-type')) $('#edit-rider-type').value = p.rider_type || 'Piloto';
     if ($('#edit-motorcycle')) $('#edit-motorcycle').value = p.motorcycle || '';
     $('#profile-pillion-wrap')?.classList.toggle('hidden', p.rider_type !== 'Garupa');
-    $$('.admin-only').forEach(el => el.classList.toggle('hidden', p.role !== 'admin'));
+    $('.admin-only').forEach(el => el.classList.toggle('hidden', p.role !== 'admin'));
+    $('#vote-create-card')?.classList.toggle('hidden', !canManageAgenda());
     $$('.admin-only').forEach(el => el.classList.toggle('hidden', p.role !== 'admin'));
   }
   async function loadProfile(user) {
