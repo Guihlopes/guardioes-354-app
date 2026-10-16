@@ -92,8 +92,8 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     <form id="profile-setup-form">
       <label for="setup-phone">Telefone</label>
       <input id="setup-phone" type="tel" maxlength="30" placeholder="(34) 99999-9999" required>
-      <label for="setup-rider-type">Você é piloto ou garupa?</label>
-      <select id="setup-rider-type" required>
+      <label for="setup-rider-type">Categoria oficial (alterada somente pela diretoria)</label>
+      <select id="setup-rider-type" disabled>
         <option value="Piloto">Piloto</option>
         <option value="Garupa">Garupa</option>
       </select>
@@ -189,14 +189,14 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       <div class="card">
         <form id="profile-edit-form">
           <div class="form-grid">
-            <div><label for="edit-full-name">Nome completo</label><input id="edit-full-name" required maxlength="120"></div>
+            <div><label for="edit-full-name">Nome completo</label><input id="edit-full-name" required maxlength="120" readonly></div>
             <div><label for="edit-phone">Telefone</label><input id="edit-phone" type="tel" maxlength="30" placeholder="(34) 99999-9999"></div>
             <div><label for="edit-email">E-mail</label><input id="edit-email" type="email" disabled></div>
-            <div><label for="edit-rider-type">Categoria</label><select id="edit-rider-type" required><option value="Piloto">Piloto</option><option value="Garupa">Garupa</option><option value="Membro Ativo">Membro Ativo</option><option value="Prospect">Prospect</option></select></div>
+            <div><label for="edit-rider-type">Categoria oficial (somente diretoria altera)</label><select id="edit-rider-type" disabled><option value="Piloto">Piloto</option><option value="Garupa">Garupa</option></select></div>
             <div><label for="edit-motorcycle">Motocicleta</label><input id="edit-motorcycle" maxlength="100" placeholder="Marca / modelo / ano"></div>
             <div id="profile-pillion-wrap" class="hidden"><label for="edit-pilot-id">Piloto responsável</label><select id="edit-pilot-id"><option value="">Selecione o piloto</option></select></div>
           </div>
-          <div class="callout" style="margin-top:14px">Cargo e situação são controlados pela diretoria. Você pode editar somente seus dados pessoais. Alterações de categoria poderão exigir validação da diretoria.</div>
+          <div class="callout" style="margin-top:14px">Nome, categoria, situação (Ativo/Prospect), cargo e permissões são controlados pela diretoria. Você pode atualizar seu telefone e os dados de vínculo de piloto/garupa.</div>
           <div class="form-actions"><button class="btn btn-primary" type="submit">Salvar meus dados</button></div>
         </form>
         <div class="section-title"><div><h2>Vínculo no motoclube</h2><p>Informações oficiais do seu cadastro.</p></div></div>
@@ -411,7 +411,6 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     sel.innerHTML = '<option value="">Selecione o piloto</option>' + (data||[]).map(p => `<option value="${p.id}">${escapeHtml(p.full_name)} — ${escapeHtml(p.motorcycle||'Moto não informada')}</option>`).join('');
     if (selectedId) sel.value = selectedId;
   }
-  $('#setup-rider-type').addEventListener('change',toggleSetupRiderFields);
   $('#profile-setup-form').addEventListener('submit',async (event) => {
     event.preventDefault();
     if (!currentUser || !currentProfile) return;
@@ -427,7 +426,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     button.disabled = true;
     button.textContent = 'Salvando...';
     try {
-      const payload = {phone, rider_type:riderType, motorcycle, pilot_id:pilotId};
+      const payload = {phone, motorcycle, pilot_id:pilotId};
       const {error} = await db.from('member_profiles').update(payload).eq('id',currentUser.id);
       if (error) { notice('#profile-setup-notice','Não foi possível salvar os dados. Tente novamente.'); return; }
       currentProfile = {...currentProfile,...payload};
@@ -528,12 +527,18 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     box.querySelectorAll('[data-vote]').forEach(b=>b.addEventListener('click',async()=>{const {error}=await db.from('club_vote_ballots').insert({vote_id:b.dataset.vote,user_id:currentUser.id,option_selected:b.dataset.option});notice('#app-notice',error?'Não foi possível registrar o voto. Talvez você já tenha votado ou não tenha autorização.':'Voto registrado.');if(!error)loadVotes();}));
   }
   $('#members-refresh')?.addEventListener('click',loadMembers);
-  $('#edit-rider-type')?.addEventListener('change',()=>$('#profile-pillion-wrap').classList.toggle('hidden',$('#edit-rider-type').value!=='Garupa'));
   $('#profile-edit-form')?.addEventListener('submit',async e=>{
-    e.preventDefault(); if(!currentUser)return;
-    const payload={full_name:$('#edit-full-name').value.trim(),phone:$('#edit-phone').value.trim()||null,rider_type:$('#edit-rider-type').value,motorcycle:$('#edit-motorcycle').value.trim()||null,pilot_id:$('#edit-rider-type').value==='Garupa'?($('#edit-pilot-id').value||null):null};
+    e.preventDefault(); if(!currentUser || !currentProfile)return;
+    const riderType=currentProfile.rider_type==='Garupa'?'Garupa':'Piloto';
+    const payload={
+      phone:$('#edit-phone').value.trim()||null,
+      motorcycle:riderType==='Piloto'?($('#edit-motorcycle').value.trim()||null):null,
+      pilot_id:riderType==='Garupa'?($('#edit-pilot-id').value||null):null
+    };
+    if(riderType==='Piloto' && !payload.motorcycle){notice('#app-notice','Informe a marca, o modelo e o ano da sua motocicleta.');return;}
+    if(riderType==='Garupa' && !payload.pilot_id){notice('#app-notice','Selecione o piloto responsável.');return;}
     const {error}=await db.from('member_profiles').update(payload).eq('id',currentUser.id);
-    if(error){notice('#app-notice','Não foi possível salvar. O banco precisa permitir a edição apenas dos campos pessoais do próprio membro.');return;}
+    if(error){notice('#app-notice','Não foi possível salvar seus dados. Confira as permissões de atualização no banco.');return;}
     currentProfile={...currentProfile,...payload};fillProfile(currentUser,currentProfile);notice('#app-notice','Seus dados foram atualizados.');
   });
   $('#document-form')?.addEventListener('submit',async e=>{
