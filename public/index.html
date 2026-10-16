@@ -624,6 +624,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();
       statuses.forEach(el=>el.textContent=sub?'Notificações ativadas neste aparelho.':'Ainda não ativadas neste aparelho.');
       buttons.forEach(btn=>btn.textContent=sub?'Atualizar notificações deste aparelho':'Ativar notificações neste aparelho');
+      document.querySelectorAll('.push-setup-card').forEach(card=>{card.hidden=!!sub;});
     }catch(e){statuses.forEach(el=>el.textContent='Não foi possível verificar o suporte neste aparelho.');}
   }
   async function enablePushFromButton(btn){
@@ -662,6 +663,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       if(result.error)throw new Error('Supabase: '+result.error.message+(result.error.code?' ('+result.error.code+')':''));
       setStatus('Notificações ativadas neste aparelho!');
       document.querySelectorAll('#enable-push-button, #enable-push-home-button').forEach(b=>b.textContent='Atualizar notificações deste aparelho');
+      document.querySelectorAll('.push-setup-card').forEach(card=>{card.hidden=true;});
     }catch(e){
       console.error('Falha ao ativar push:',e);
       setStatus(e?.message||'Não foi possível ativar as notificações. Confira o console do navegador.');
