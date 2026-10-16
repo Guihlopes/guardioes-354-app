@@ -305,29 +305,64 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     </section>
 
     <section id="page-admin" class="app-page hidden-page">
-      <div class="page-heading"><div><h1>Central da Diretoria</h1><p>Visão geral e atalhos administrativos dos Guardiões da 354.</p></div><span class="badge">Administração</span></div>
-      <div class="form-actions" style="margin:0 0 16px">
-        <button class="btn btn-primary" id="admin-refresh" type="button">↻ Atualizar painel</button>
-        <span class="muted small" id="admin-updated-at">Os indicadores são carregados do banco.</span>
+      <div class="page-heading"><div><h1>Central da Diretoria</h1><p>Use esta página como ponto de partida para organizar o motoclube.</p></div><span class="badge">Área restrita</span></div>
+      <div class="card" style="margin-bottom:16px;border-color:#b9152b">
+        <h3 style="margin-top:0">Por onde começar?</h3>
+        <p class="muted small">1. Confira os números abaixo. 2. Veja se há pendências. 3. Escolha uma área e use o botão para abrir a ferramenta correspondente.</p>
+        <div class="form-actions" style="margin-bottom:0">
+          <button class="btn btn-primary" id="admin-refresh" type="button">↻ Atualizar informações</button>
+          <span class="muted small" id="admin-updated-at">Os indicadores são carregados do banco.</span>
+        </div>
       </div>
+      <div class="section-title"><div><h2>Resumo do motoclube</h2><p>Os números são consultados no banco e ajudam a identificar onde agir.</p></div></div>
       <div class="grid" id="admin-stats-grid">
-        <div class="card"><div class="muted small">Integrantes</div><div class="status-value" id="admin-count-members">—</div><p class="muted small">Diretório oficial</p></div>
-        <div class="card"><div class="muted small">Prospects</div><div class="status-value" id="admin-count-prospects">—</div><p class="muted small">Em acompanhamento</p></div>
-        <div class="card"><div class="muted small">Atividades pendentes</div><div class="status-value" id="admin-count-pending-events">—</div><p class="muted small">Aguardando decisão</p></div>
-        <div class="card"><div class="muted small">Documentos</div><div class="status-value" id="admin-count-documents">—</div><p class="muted small">Biblioteca oficial</p></div>
-        <div class="card"><div class="muted small">Comunicados</div><div class="status-value" id="admin-count-announcements">—</div><p class="muted small">Avisos publicados</p></div>
-        <div class="card"><div class="muted small">Votações abertas</div><div class="status-value" id="admin-count-votes">—</div><p class="muted small">Ainda dentro do prazo</p></div>
+        <div class="card"><div class="muted small">👥 Integrantes cadastrados</div><div class="status-value" id="admin-count-members">—</div><p class="muted small">Confira cargos e cadastros na Gestão de membros.</p><button class="btn" type="button" data-admin-go="members">Ver integrantes →</button></div>
+        <div class="card"><div class="muted small">🏍️ Prospects</div><div class="status-value" id="admin-count-prospects">—</div><p class="muted small">Acompanhe a situação dos integrantes em formação.</p><button class="btn" type="button" data-admin-go="members">Acompanhar →</button></div>
+        <div class="card"><div class="muted small">📅 Atividades pendentes</div><div class="status-value" id="admin-count-pending-events">—</div><p class="muted small">Veja sugestões de passeios que podem precisar de decisão.</p><button class="btn" type="button" data-admin-go="agenda">Revisar agenda →</button></div>
+        <div class="card"><div class="muted small">📁 Documentos oficiais</div><div class="status-value" id="admin-count-documents">—</div><p class="muted small">Estatuto, regulamentos, atas e arquivos do clube.</p><button class="btn" type="button" data-admin-go="documents">Abrir biblioteca →</button></div>
+        <div class="card"><div class="muted small">📣 Comunicados publicados</div><div class="status-value" id="admin-count-announcements">—</div><p class="muted small">Mantenha os membros informados sobre decisões e avisos.</p><button class="btn" type="button" data-admin-go="agenda">Ver comunicados →</button></div>
+        <div class="card"><div class="muted small">🗳️ Votações abertas</div><div class="status-value" id="admin-count-votes">—</div><p class="muted small">Acompanhe decisões que ainda estão recebendo votos.</p><button class="btn" type="button" data-admin-go="votes">Gerenciar votações →</button></div>
       </div>
-      <div class="section-title"><div><h2>Acesso rápido</h2><p>Abra as áreas existentes para realizar as operações.</p></div></div>
+      <div class="section-title"><div><h2>O que você pode fazer em cada área</h2><p>Escolha uma tarefa. Cada botão leva à tela onde ela é realizada.</p></div></div>
       <div class="grid">
-        <div class="card"><div class="muted small">01 · Integrantes</div><h3>Gestão de membros</h3><p class="muted small">Consulte cadastros, cargos, categoria e situação. Edite integrantes autorizados.</p><button class="btn btn-primary" type="button" data-admin-go="members">Abrir membros →</button></div>
-        <div class="card"><div class="muted small">02 · Agenda</div><h3>Eventos e passeios</h3><p class="muted small">Revise sugestões, gerencie atividades e acompanhe confirmações.</p><button class="btn btn-primary" type="button" data-admin-go="agenda">Abrir agenda →</button></div>
-        <div class="card"><div class="muted small">03 · Comunicação</div><h3>Comunicados oficiais</h3><p class="muted small">Publique, edite e exclua avisos conforme as permissões da diretoria.</p><button class="btn btn-primary" type="button" data-admin-go="agenda">Abrir comunicados →</button></div>
-        <div class="card"><div class="muted small">04 · Arquivos</div><h3>Documentos oficiais</h3><p class="muted small">Envie arquivos, renomeie documentos e gerencie a biblioteca.</p><button class="btn btn-primary" type="button" data-admin-go="documents">Abrir documentos →</button></div>
-        <div class="card"><div class="muted small">05 · Deliberações</div><h3>Votações</h3><p class="muted small">Crie votações, acompanhe resultados e consulte decisões em andamento.</p><button class="btn btn-primary" type="button" data-admin-go="votes">Abrir votações →</button></div>
-        <div class="card"><div class="muted small">06 · Segurança</div><h3>Permissões e boas práticas</h3><p class="muted small">A interface respeita os cargos do perfil; o Supabase continua responsável por autorizar cada operação no banco.</p><span class="badge">Proteção no banco ativa</span></div>
+        <div class="card">
+          <div class="muted small">01 · PESSOAS</div><h3>Gestão de membros</h3>
+          <p>Use quando entrar um novo integrante ou quando precisar corrigir um cadastro.</p>
+          <ul class="small muted" style="padding-left:20px"><li>Conferir nome, telefone e motocicleta.</li><li>Revisar categoria e situação.</li><li>Manter cargos alinhados à decisão oficial da diretoria.</li></ul>
+          <button class="btn btn-primary" type="button" data-admin-go="members">Abrir gestão de membros →</button>
+        </div>
+        <div class="card">
+          <div class="muted small">02 · PASSEIOS</div><h3>Eventos e agenda</h3>
+          <p>Use antes de um passeio e sempre que alguém sugerir uma atividade.</p>
+          <ul class="small muted" style="padding-left:20px"><li>Revisar sugestões recebidas.</li><li>Conferir data, destino e ponto de encontro.</li><li>Acompanhar confirmações de presença.</li></ul>
+          <button class="btn btn-primary" type="button" data-admin-go="agenda">Abrir agenda →</button>
+        </div>
+        <div class="card">
+          <div class="muted small">03 · AVISOS</div><h3>Comunicados oficiais</h3>
+          <p>Use para que decisões e avisos importantes não fiquem perdidos no WhatsApp.</p>
+          <ul class="small muted" style="padding-left:20px"><li>Publicar avisos para os integrantes.</li><li>Corrigir ou retirar comunicados antigos.</li><li>Usar mensagens claras com data e instruções.</li></ul>
+          <button class="btn btn-primary" type="button" data-admin-go="agenda">Abrir comunicados →</button>
+        </div>
+        <div class="card">
+          <div class="muted small">04 · ARQUIVOS</div><h3>Documentos oficiais</h3>
+          <p>Use como arquivo central dos documentos que os membros precisam consultar.</p>
+          <ul class="small muted" style="padding-left:20px"><li>Publicar estatuto, regulamentos e atas.</li><li>Usar nomes claros e datas nas versões.</li><li>Renomear ou excluir arquivos desatualizados.</li></ul>
+          <button class="btn btn-primary" type="button" data-admin-go="documents">Abrir documentos →</button>
+        </div>
+        <div class="card">
+          <div class="muted small">05 · DECISÕES</div><h3>Votações</h3>
+          <p>Use quando a irmandade precisar registrar uma decisão de forma organizada.</p>
+          <ul class="small muted" style="padding-left:20px"><li>Definir pergunta e prazo de encerramento.</li><li>Selecionar quem pode participar.</li><li>Conferir o resultado e registrar a decisão.</li></ul>
+          <button class="btn btn-primary" type="button" data-admin-go="votes">Abrir votações →</button>
+        </div>
+        <div class="card">
+          <div class="muted small">06 · SEGURANÇA</div><h3>Permissões e histórico</h3>
+          <p>Área para acompanhar a segurança e a responsabilidade administrativa.</p>
+          <ul class="small muted" style="padding-left:20px"><li>Restringir ações conforme o cargo.</li><li>Manter os Fundadores na hierarquia definida pelo motoclube.</li><li>Planejar um histórico de quem alterou cada informação.</li></ul>
+          <span class="badge">Próxima melhoria sugerida</span>
+        </div>
       </div>
-      <div class="section-title"><div><h2>Precisa de atenção</h2><p>Resumo dos itens que podem precisar de uma decisão da diretoria.</p></div></div>
+      <div class="section-title"><div><h2>Pendências e alertas</h2><p>Confira esta lista antes de encerrar as tarefas administrativas.</p></div></div>
       <div class="card"><div id="admin-attention-list" class="empty">Carregando pendências…</div></div>
     </section>
   </main>
