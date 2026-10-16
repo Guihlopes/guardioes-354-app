@@ -387,7 +387,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     if ($('#edit-motorcycle')) $('#edit-motorcycle').value = p.motorcycle || '';
     $('#profile-pillion-wrap')?.classList.toggle('hidden', p.rider_type !== 'Garupa');
     $('#vote-create-card')?.classList.toggle('hidden', !canManageAgenda());
-    $('.admin-only').forEach(el => el.classList.toggle('hidden', p.role !== 'admin'));
+    $$('.admin-only').forEach(el => el.classList.toggle('hidden', p.role !== 'admin'));
     $('#document-upload-card')?.classList.toggle('hidden', !canManageDocuments());
   }
   async function loadProfile(user) {
