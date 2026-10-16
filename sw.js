@@ -1,4 +1,4 @@
-const CACHE_NAME = 'guardioes-354-pwa-v9';
+const CACHE_NAME = 'guardioes-354-pwa-v10';
 const APP_FILES = ['./', './index.html', './manifest.json', './icons/icon.svg'];
 
 self.addEventListener('install', (event) => {
