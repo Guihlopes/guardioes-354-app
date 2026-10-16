@@ -387,7 +387,8 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     if ($('#edit-motorcycle')) $('#edit-motorcycle').value = p.motorcycle || '';
     $('#profile-pillion-wrap')?.classList.toggle('hidden', p.rider_type !== 'Garupa');
     $('#vote-create-card')?.classList.toggle('hidden', !canManageAgenda());
-    $$('.admin-only').forEach(el => el.classList.toggle('hidden', p.role !== 'admin'));
+    $('#document-upload-card')?.classList.toggle('hidden', !canManageDocuments());
+    $('.admin-only').forEach(el => el.classList.toggle('hidden', p.role !== 'admin'));
   }
   async function loadProfile(user) {
     clearNotice('#login-notice');
@@ -787,6 +788,10 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       box.querySelectorAll('[data-document-delete]').forEach(b=>b.addEventListener('click',async()=>{const item=(data||[]).find(d=>String(d.id)===b.dataset.documentDelete);if(!item||!confirm('Excluir o documento “'+item.title+'”?'))return;const {error}=await db.from('club_documents').delete().eq('id',item.id);if(error){notice('#app-notice','Não foi possível excluir. Verifique as permissões no Supabase.');return;}const removed=await db.storage.from('club-documents').remove([item.file_path]);if(removed.error)console.warn('Registro removido, mas arquivo não removido do Storage:',removed.error);notice('#app-notice','Documento excluído.');await loadDocuments();}));
     }
   }
+  function canManageDocuments() {
+    const p = currentProfile;
+    return !!p && p.active === true && (p.role === 'admin' || ['Fundador','Fundador/Vice-Presidente','Presidente','Vice-Presidente','Diretor Geral','Diretor Social'].includes(p.club_position));
+  }
   function canManageAgenda() {
     const p = currentProfile;
     return !!p && p.active === true && (p.role === 'admin' || ['Fundador','Fundador/Vice-Presidente','Presidente','Vice-Presidente','Diretor Geral','Diretor Social'].includes(p.club_position));
@@ -1098,13 +1103,17 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     currentProfile={...currentProfile,...payload};fillProfile(currentUser,currentProfile);notice('#app-notice','Seus dados foram atualizados.');
   });
   $('#document-form')?.addEventListener('submit',async e=>{
-    e.preventDefault();if(currentProfile?.role!=='admin'){notice('#app-notice','Apenas administradores podem enviar documentos.');return;}
-    const file=$('#document-file').files[0];if(!file)return;
-    const path=`${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+    e.preventDefault();
+    if(!canManageDocuments()){notice('#app-notice','Seu cargo não tem permissão para enviar documentos.');return;}
+    const file=$('#document-file').files[0];
+    const title=$('#document-title').value.trim();
+    if(!file||!title)return;
+    const path=Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
     const up=await db.storage.from('club-documents').upload(path,file,{upsert:false});
-    if(up.error){notice('#app-notice','Falha no upload. Verifique o bucket e as permissões.');return;}
-    const {error}=await db.from('club_documents').insert({title:$('#document-title').value.trim(),file_path:path,uploaded_by:currentUser.id});
-    notice('#app-notice',error?'Arquivo enviado, mas não foi possível registrar seus dados.':'Documento publicado para os membros.');$('#document-form').reset();loadDocuments();
+    if(up.error){notice('#app-notice','Falha no envio do arquivo. Verifique as permissões do Storage.');return;}
+    const {error}=await db.from('club_documents').insert({title:title,file_path:path,uploaded_by:currentUser.id});
+    if(error){await db.storage.from('club-documents').remove([path]);notice('#app-notice','O arquivo foi enviado, mas não foi possível registrar o documento. Verifique as permissões da tabela.');return;}
+    notice('#app-notice','Documento publicado para os membros.');$('#document-form').reset();await loadDocuments();
   });
   async function loadAnnouncementMemberChoices(){
     const selectors=[$('#announcement-visible-members'),$('#announcement-notify-members'),$('#agenda-visible-members'),$('#agenda-notify-members')].filter(Boolean);
