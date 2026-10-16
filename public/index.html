@@ -843,7 +843,25 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const box=$('#announcements-list'); if(!box)return;
     const {data,error}=await db.from('club_announcements').select('id,title,body,created_at').order('created_at',{ascending:false});
     if(error){box.textContent='Comunicados ainda não conectados. Aplique a configuração de banco indicada junto com este arquivo.';return;}
-    box.innerHTML=data?.length?data.map(a=>`<article class="announcement-card"><div class="announcement-icon">▤</div><div class="announcement-content"><h4>${escapeHtml(a.title)}</h4><p>${escapeHtml(a.body)}</p><div class="announcement-meta"><span>◷ ${new Date(a.created_at).toLocaleString('pt-BR')}</span><span class="announcement-tag">Comunicado oficial</span></div></div></article>`).join(''):'<div class="empty">📭<br><strong>Nenhum comunicado por enquanto</strong><p class="muted">Quando a diretoria publicar um aviso, ele aparecerá aqui.</p></div>';
+    const board=canManageAgenda();
+    box.innerHTML=data?.length?data.map(a=>`<article class="announcement-card"><div class="announcement-icon">▤</div><div class="announcement-content"><h4>${escapeHtml(a.title)}</h4><p>${escapeHtml(a.body)}</p><div class="announcement-meta"><span>◷ ${new Date(a.created_at).toLocaleString('pt-BR')}</span><span class="announcement-tag">Comunicado oficial</span></div>${board?'<div class="form-actions"><button class="btn" type="button" data-announcement-edit="'+a.id+'">Editar</button><button class="btn" type="button" data-announcement-delete="'+a.id+'">Excluir</button></div>':''}</div></article>`).join(''):'<div class="empty">📭<br><strong>Nenhum comunicado por enquanto</strong><p class="muted">Quando a diretoria publicar um aviso, ele aparecerá aqui.</p></div>';
+    if(board){
+      box.querySelectorAll('[data-announcement-edit]').forEach(btn=>btn.addEventListener('click',async()=>{
+        const item=(data||[]).find(a=>String(a.id)===btn.dataset.announcementEdit);if(!item)return;
+        const title=prompt('Editar título do comunicado:',item.title);if(title===null)return;
+        const body=prompt('Editar texto do comunicado:',item.body||'');if(body===null)return;
+        if(!title.trim()||!body.trim()){notice('#app-notice','Título e texto não podem ficar vazios.');return;}
+        const {error}=await db.from('club_announcements').update({title:title.trim(),body:body.trim()}).eq('id',item.id);
+        if(error){console.error(error);notice('#app-notice','Não foi possível editar o comunicado: '+error.message);return;}
+        await loadAnnouncements();notice('#app-notice','Comunicado atualizado.');
+      }));
+      box.querySelectorAll('[data-announcement-delete]').forEach(btn=>btn.addEventListener('click',async()=>{
+        const item=(data||[]).find(a=>String(a.id)===btn.dataset.announcementDelete);if(!item||!confirm('Excluir o comunicado “'+item.title+'”?'))return;
+        const {error}=await db.from('club_announcements').delete().eq('id',item.id);
+        if(error){console.error(error);notice('#app-notice','Não foi possível excluir o comunicado: '+error.message);return;}
+        await loadAnnouncements();notice('#app-notice','Comunicado excluído.');
+      }));
+    }
   }
   async function loadVoteMemberChoices(){
     const sel=$('#vote-target-members');if(!sel)return;
@@ -879,8 +897,32 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       const vs=ballots.filter(b=>b.vote_id===v.id);
       const counts=opts.map(opt=>({opt,count:Number((countsData.find(c=>c.vote_id===v.id&&c.option_selected===opt)||{}).vote_count||0)}));
       const total=counts.reduce((sum,c)=>sum+c.count,0);
-      return '<article class="vote-card announcement-card"><div class="announcement-icon">✓</div><div class="announcement-content"><div class="announcement-meta"><span class="announcement-tag">'+(v.vote_type==='approval'?'Aprovação':'Votação')+'</span><span>'+(expired?'Encerrada': 'Aberta')+'</span>'+(v.closes_at?'<span>Até '+new Date(v.closes_at).toLocaleString('pt-BR')+'</span>':'')+'</div><h4 style="margin-top:9px">'+escapeHtml(v.title)+'</h4><p>'+escapeHtml(v.description||'')+'</p><div class="vote-options">'+opts.map(opt=>'<button class="btn" data-vote="'+v.id+'" data-option="'+escapeHtml(opt)+'" '+(myVote||expired?'disabled':'')+'>'+escapeHtml(opt)+(myVote&&myVote.option_selected===opt?' ✓':'')+'</button>').join(' ')+'</div><div class="vote-partials"><strong>Parcial ('+total+' voto(s))</strong>'+counts.map(c=>'<div class="vote-count"><span>'+escapeHtml(c.opt)+'</span><strong>'+c.count+'</strong></div>').join('')+'</div>'+(myVote?'<small class="muted">Seu voto: '+escapeHtml(myVote.option_selected)+'</small>':expired?'<small class="muted">Esta votação foi encerrada.</small>':'')+'</div></article>';
+      return '<article class="vote-card announcement-card"><div class="announcement-icon">✓</div><div class="announcement-content"><div class="announcement-meta"><span class="announcement-tag">'+(v.vote_type==='approval'?'Aprovação':'Votação')+'</span><span>'+(expired?'Encerrada': 'Aberta')+'</span>'+(v.closes_at?'<span>Até '+new Date(v.closes_at).toLocaleString('pt-BR')+'</span>':'')+'</div><h4 style="margin-top:9px">'+escapeHtml(v.title)+'</h4><p>'+escapeHtml(v.description||'')+'</p>'+(board?'<div class="form-actions"><button class="btn" type="button" data-vote-edit="'+v.id+'">Editar</button><button class="btn" type="button" data-vote-delete="'+v.id+'">Excluir</button></div>':'')+'<div class="vote-options">'+opts.map(opt=>'<button class="btn" data-vote="'+v.id+'" data-option="'+escapeHtml(opt)+'" '+(myVote||expired?'disabled':'')+'>'+escapeHtml(opt)+(myVote&&myVote.option_selected===opt?' ✓':'')+'</button>').join(' ')+'</div><div class="vote-partials"><strong>Parcial ('+total+' voto(s))</strong>'+counts.map(c=>'<div class="vote-count"><span>'+escapeHtml(c.opt)+'</span><strong>'+c.count+'</strong></div>').join('')+'</div>'+(myVote?'<small class="muted">Seu voto: '+escapeHtml(myVote.option_selected)+'</small>':expired?'<small class="muted">Esta votação foi encerrada.</small>':'')+'</div></article>';
     }).join(''):'<div class="empty">🗳️<br><strong>Nenhuma votação disponível</strong><p class="muted">Quando a diretoria publicar uma votação, ela aparecerá aqui.</p></div>';
+    if(board){
+      box.querySelectorAll('[data-vote-edit]').forEach(btn=>btn.addEventListener('click',async()=>{
+        const item=rows.find(v=>String(v.id)===btn.dataset.voteEdit);if(!item)return;
+        if(ballots.some(b=>b.vote_id===item.id)&&!confirm('Esta votação já tem votos registrados. Alterar as opções pode afetar o relatório. Deseja continuar?'))return;
+        const title=prompt('Editar título da votação:',item.title);if(title===null)return;
+        const description=prompt('Editar descrição:',item.description||'');if(description===null)return;
+        let options=item.options||[];
+        if(item.vote_type!=='approval'){
+          const value=prompt('Editar opções (uma por linha):',options.join('\n'));if(value===null)return;
+          options=value.split('\n').map(x=>x.trim()).filter(Boolean);
+          if(options.length<2){notice('#app-notice','Informe pelo menos duas opções.');return;}
+        }
+        if(!title.trim()){notice('#app-notice','O título não pode ficar vazio.');return;}
+        const {error}=await db.from('club_votes').update({title:title.trim(),description:description.trim()||null,options}).eq('id',item.id);
+        if(error){console.error(error);notice('#app-notice','Não foi possível editar a votação: '+error.message);return;}
+        await loadVotes();notice('#app-notice','Votação atualizada.');
+      }));
+      box.querySelectorAll('[data-vote-delete]').forEach(btn=>btn.addEventListener('click',async()=>{
+        const item=rows.find(v=>String(v.id)===btn.dataset.voteDelete);if(!item||!confirm('Excluir a votação “'+item.title+'” e seus registros, se o banco permitir?'))return;
+        const {error}=await db.from('club_votes').delete().eq('id',item.id);
+        if(error){console.error(error);notice('#app-notice','Não foi possível excluir a votação: '+error.message+' (se houver votos registrados, a exclusão pode exigir remover os votos vinculados).');return;}
+        await loadVotes();notice('#app-notice','Votação excluída.');
+      }));
+    }
     box.querySelectorAll('[data-vote]').forEach(btn=>btn.addEventListener('click',async()=>{
       btn.disabled=true;
       const {error:voteError}=await db.from('club_vote_ballots').insert({vote_id:btn.dataset.vote,user_id:currentUser.id,voter_name:currentProfile.full_name,option_selected:btn.dataset.option});
