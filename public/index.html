@@ -970,7 +970,8 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const closes=$('#vote-closes-at').value;
     const payload={title:$('#vote-title').value.trim(),description:$('#vote-description').value.trim()||null,options,target_group:groups.includes('all')?'all':groups[0]||'custom',created_by:currentUser.id,vote_type:type,visible_to_groups:groups,visible_to_emails:emails,closes_at:closes?new Date(closes).toISOString():null};
     const {error}=await db.from('club_votes').insert(payload);
-    notice('#app-notice',error?'Não foi possível criar a votação. Execute a migração de votações no Supabase.':'Votação publicada.');
+    if(error){console.error('Falha ao criar votação no Supabase:',error);notice('#app-notice','Erro ao criar votação: '+(error.message||'erro desconhecido')+(error.code?' ('+error.code+')':''));}
+    else notice('#app-notice','Votação publicada.');
     if(!error){e.target.reset();$('#vote-type').value='simple';$('#vote-options-wrap').classList.remove('hidden');$('#vote-options').required=true;await loadVotes();}
   });
   async function restoreSession() {
