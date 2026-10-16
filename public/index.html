@@ -50,6 +50,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   #login-screen .login-footer{margin-top:5px}
 }
 #header-notifications{position:relative}#notification-dot{position:absolute;top:5px;right:5px;width:10px;height:10px;border-radius:50%;background:#ef3340;border:2px solid var(--panel);box-shadow:0 0 0 1px #ef334055}#notification-dot.hidden{display:none!important}
+.audience-box{border:1px solid var(--line);border-radius:14px;padding:15px;background:linear-gradient(145deg,#1b1d21,#111214);margin:12px 0}.audience-box h4{margin:0 0 5px;font-size:.98rem}.audience-box .audience-help{color:var(--muted);font-size:.8rem;line-height:1.45;margin:0 0 12px}.audience-box select[multiple]{width:100%;min-height:110px;padding:8px;border-radius:10px;background:#0e0f11;border:1px solid #393b42;color:var(--text)}.audience-section-title{display:flex;align-items:center;gap:8px;margin-bottom:8px}.audience-section-title .step{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:#df1e3124;color:#ff8b96;font-weight:700}.announcement-card{display:flex;gap:13px;padding:16px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(135deg,#1b1d21,#111214);margin:10px 0}.announcement-card .announcement-icon{flex:0 0 42px;width:42px;height:42px;border-radius:12px;background:#df1e311c;color:#f16b78;display:grid;place-items:center;font-size:1.15rem}.announcement-card .announcement-content{min-width:0;flex:1}.announcement-card h4{margin:0 0 6px;font-size:1rem}.announcement-card p{margin:0;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}.announcement-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font-size:.78rem;margin-top:10px}.notification-overlay{position:fixed;inset:0;background:#000b;z-index:1000;display:flex;justify-content:flex-end}.notification-panel{width:min(440px,100%);height:100%;overflow:auto;background:var(--panel);border-left:1px solid var(--line);padding:20px;box-shadow:-18px 0 50px #0008}.notification-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.notification-head h2{margin:0;font-size:1.25rem}.notification-item{padding:13px;border:1px solid var(--line);border-radius:12px;margin:9px 0;background:var(--panel2)}.notification-item.unread{border-color:#df1e31;background:linear-gradient(120deg,#df1e311c,var(--panel2))}.notification-item p{margin:6px 0;line-height:1.45}.notification-item small{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -146,6 +147,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     </div>
     <div class="header-actions"><button class="icon-btn" id="header-notifications" title="Notificações" aria-label="Notificações">♧<span id="notification-dot" class="hidden" aria-hidden="true"></span></button><button class="btn" id="header-logout" type="button">Sair <span class="logout-text">da conta</span></button></div>
   </header>
+  <div id="notifications-overlay" class="notification-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="notifications-title" style="display:none"><section class="notification-panel"><div class="notification-head"><h2 id="notifications-title">🔔 Notificações</h2><button id="notifications-close" class="btn" type="button">Fechar ✕</button></div><div id="notifications-unread-summary" class="muted small" style="margin-bottom:12px"></div><div id="notifications-list"></div></section></div>
   <nav class="mobile-nav" aria-label="Navegação móvel">
     <button class="active" data-page="home"><span>⌂</span>Início</button><button data-page="members"><span>♟</span>Membros</button><button data-page="agenda"><span>▦</span>Agenda e avisos</button><button data-page="documents"><span>▧</span>Docs</button><button data-page="votes"><span>✓</span>Votos</button><button data-page="profile"><span>♙</span>Perfil</button>
   </nav>
@@ -226,10 +228,12 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       <div class="card admin-only hidden" id="announcement-compose-card" style="margin-bottom:14px"><h3>Novo comunicado</h3>
         <form id="announcement-form"><label for="announcement-title">Título</label><input id="announcement-title" required maxlength="160">
         <label for="announcement-body">Comunicado</label><textarea id="announcement-body" required maxlength="10000"></textarea>
-        <div class="form-grid"><div><label for="announcement-visible-groups">Quem poderá ver na agenda</label><select id="announcement-visible-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select><small class="muted">Use Ctrl para selecionar mais de uma opção. “Todos” não deve ser combinado com outros grupos.</small></div>
-        <div><label for="announcement-notify-groups">Quem receberá notificação</label><select id="announcement-notify-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select><small class="muted">A notificação pode ter público diferente de quem vê a publicação.</small></div></div>
-        <label for="announcement-visible-members">Integrantes específicos que poderão ver (opcional)</label><select id="announcement-visible-members" multiple size="5"></select>
-        <label for="announcement-notify-members">Integrantes específicos que receberão notificação (opcional)</label><select id="announcement-notify-members" multiple size="5"></select>
+        <div class="audience-box"><div class="audience-section-title"><span class="step">1</span><h4>Quem poderá ver este comunicado?</h4></div><p class="audience-help">Escolha grupos, pessoas específicas ou combine as opções. Se quiser apenas uma pessoa, selecione somente ela na lista individual abaixo.</p>
+          <label for="announcement-visible-groups">Grupos (opcional)</label><select id="announcement-visible-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select>
+          <label for="announcement-visible-members">Pessoas específicas (opcional)</label><select id="announcement-visible-members" multiple size="5"></select><small class="muted">Dica: segure Ctrl (Windows) para escolher mais de uma pessoa.</small></div>
+        <div class="audience-box"><div class="audience-section-title"><span class="step">2</span><h4>Quem deve receber a notificação?</h4></div><p class="audience-help">Este público é independente de quem pode ver o comunicado. Para notificar apenas uma pessoa, deixe os grupos vazios e selecione somente ela.</p>
+          <label for="announcement-notify-groups">Grupos (opcional)</label><select id="announcement-notify-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select>
+          <label for="announcement-notify-members">Pessoas específicas (opcional)</label><select id="announcement-notify-members" multiple size="5"></select><small class="muted">Você pode escolher um grupo, pessoas específicas ou ambos.</small></div>
         <button class="btn btn-primary btn-block" type="submit">Publicar comunicado</button></form></div>
       <div class="card" style="margin-top:14px"><h3>Comunicados recentes</h3><div id="announcements-list" class="empty">Carregando comunicados…</div></div>
     </section>
@@ -516,19 +520,26 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     $('#header-notifications').setAttribute('aria-label',count?'Notificações novas':'Notificações');
     $('#header-notifications').title=count?'Você tem notificações novas':'Notificações';
   }
-  $('#header-notifications').addEventListener('click',async() => {
-    const {data,error}=await db.from('club_notifications').select('id,title,body,created_at,read_at,source_type,source_id').order('created_at',{ascending:false}).limit(30);
-    if(error){notice('#app-notice','Notificações ainda precisam da migração SQL.');return;}
-    const unread=(data||[]).filter(n=>!n.read_at);
-    const lines=(data||[]).map(n=>(n.read_at?'':'🔔 ')+n.title+' — '+n.body+' ('+new Date(n.created_at).toLocaleString('pt-BR')+')').join('\n');
-    notice('#app-notice',lines?('Notificações ('+unread.length+' não lidas): '+lines):'Você não tem notificações.');
-    if(unread.length){
-      const ids=unread.map(n=>n.id);
-      const {error:readError}=await db.from('club_notifications').update({read_at:new Date().toISOString()}).in('id',ids);
-      if(readError)console.warn('Não foi possível marcar notificações como lidas:',readError);
-    }
-    await refreshNotificationDot();
-  });
+  async function openNotifications(){
+    const overlay=$('#notifications-overlay'),box=$('#notifications-list');
+    overlay.classList.remove('hidden');overlay.style.display='flex';box.innerHTML='<div class="empty">Carregando notificações…</div>';
+    const {data,error}=await db.from('club_notifications').select('id,title,body,created_at,read_at,source_type,source_id').order('created_at',{ascending:false}).limit(50);
+    if(error){box.innerHTML='<div class="empty">Não foi possível carregar as notificações. Confira a configuração do Supabase.</div>';return;}
+    const rows=data||[],unread=rows.filter(n=>!n.read_at);
+    $('#notifications-unread-summary').textContent=unread.length?unread.length+' notificação(ões) não lida(s)':'Você está em dia! Nenhuma notificação não lida.';
+    box.innerHTML=rows.length?rows.map(n=>'<article class="notification-item '+(!n.read_at?'unread':'')+'"><strong>'+(n.read_at?'':'🔴 ')+escapeHtml(n.title)+'</strong><p>'+escapeHtml(n.body||'')+'</p><small>'+new Date(n.created_at).toLocaleString('pt-BR')+'</small>'+(n.read_at?'':' <button class="btn" style="margin-top:10px" data-notification-read="'+n.id+'">Marcar como lida</button>')+'</article>').join(''):'<div class="empty">Nenhuma notificação por enquanto.</div>';
+    box.querySelectorAll('[data-notification-read]').forEach(btn=>btn.addEventListener('click',async()=>{
+      btn.disabled=true;
+      const {error:markError}=await db.from('club_notifications').update({read_at:new Date().toISOString()}).eq('id',btn.dataset.notificationRead);
+      if(markError){btn.disabled=false;notice('#app-notice','Não foi possível marcar como lida.');return;}
+      await openNotifications();await refreshNotificationDot();
+    }));
+  }
+  function closeNotifications(){const overlay=$('#notifications-overlay');overlay.classList.add('hidden');overlay.style.display='none';}
+  $('#header-notifications').addEventListener('click',openNotifications);
+  $('#notifications-close').addEventListener('click',closeNotifications);
+  $('#notifications-overlay').addEventListener('click',e=>{if(e.target.id==='notifications-overlay')closeNotifications();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeNotifications();});
   setInterval(refreshNotificationDot,60000);
   $$('[data-page]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.page)));
   $$('[data-go]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.go)));
@@ -811,7 +822,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const box=$('#announcements-list'); if(!box)return;
     const {data,error}=await db.from('club_announcements').select('id,title,body,created_at').order('created_at',{ascending:false});
     if(error){box.textContent='Comunicados ainda não conectados. Aplique a configuração de banco indicada junto com este arquivo.';return;}
-    box.innerHTML=data?.length?data.map(a=>`<div class="list-row"><div class="list-icon">▤</div><div class="list-main"><strong>${escapeHtml(a.title)}</strong><small>${new Date(a.created_at).toLocaleString('pt-BR')}</small><p>${escapeHtml(a.body)}</p></div></div>`).join(''):'<div class="empty">Nenhum comunicado publicado.</div>';
+    box.innerHTML=data?.length?data.map(a=>`<article class="announcement-card"><div class="announcement-icon">▤</div><div class="announcement-content"><h4>${escapeHtml(a.title)}</h4><p>${escapeHtml(a.body)}</p><div class="announcement-meta"><span>◷ ${new Date(a.created_at).toLocaleString('pt-BR')}</span><span class="announcement-tag">Comunicado oficial</span></div></div></article>`).join(''):'<div class="empty">📭<br><strong>Nenhum comunicado por enquanto</strong><p class="muted">Quando a diretoria publicar um aviso, ele aparecerá aqui.</p></div>';
   }
   async function loadVotes() {
     const box=$('#votes-list');if(!box)return;
@@ -881,7 +892,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const selected = id => Array.from($(id).selectedOptions).map(o=>o.value);
     const visibleGroups=selected('#announcement-visible-groups');
     const notifyGroups=selected('#announcement-notify-groups');
-    if(!visibleGroups.length || !notifyGroups.length){notice('#app-notice','Escolha ao menos um grupo para visualização e para notificação.');return;}
+    if(!visibleGroups.length && !selected('#announcement-visible-members').length){notice('#app-notice','Escolha quem poderá ver: selecione um grupo ou pelo menos uma pessoa.');return;} if(!notifyGroups.length && !selected('#announcement-notify-members').length){notice('#app-notice','Escolha quem receberá a notificação: selecione um grupo ou pelo menos uma pessoa.');return;}
     const payload={title:$('#announcement-title').value.trim(),body:$('#announcement-body').value.trim(),target_group:visibleGroups.includes('all')?'all':visibleGroups[0],created_by:currentUser.id,visible_to_groups:visibleGroups,notify_to_groups:notifyGroups,visible_to_emails:selected('#announcement-visible-members'),notify_to_emails:selected('#announcement-notify-members')};
     const {error}=await db.from('club_announcements').insert(payload);
     notice('#app-notice',error?'Não foi possível publicar. Execute a migração SQL de Agenda e Comunicados no Supabase do aplicativo.':'Comunicado publicado.');if(!error){e.target.reset();loadAnnouncements();}
