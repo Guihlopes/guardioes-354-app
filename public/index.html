@@ -218,6 +218,14 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
         </form>
       </div>
       <div class="card"><div class="section-title" style="margin-top:0"><div><h3 style="margin:0">Atividades agendadas</h3><p>Toque em uma atividade para ver os detalhes e confirmar sua participação.</p></div></div><div id="agenda-list" class="empty">Carregando agenda…</div></div>
+      <div class="card admin-only hidden" id="announcement-compose-card" style="margin-bottom:14px"><h3>Novo comunicado</h3>
+        <form id="announcement-form"><label for="announcement-title">Título</label><input id="announcement-title" required maxlength="160">
+        <label for="announcement-body">Comunicado</label><textarea id="announcement-body" required maxlength="10000"></textarea>
+        <div class="form-grid"><div><label for="announcement-visible-groups">Quem poderá ver na agenda</label><select id="announcement-visible-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select><small class="muted">Use Ctrl para selecionar mais de uma opção. “Todos” não deve ser combinado com outros grupos.</small></div>
+        <div><label for="announcement-notify-groups">Quem receberá notificação</label><select id="announcement-notify-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select><small class="muted">A notificação pode ter público diferente de quem vê a publicação.</small></div></div>
+        <label for="announcement-visible-members">Integrantes específicos que poderão ver (opcional)</label><select id="announcement-visible-members" multiple size="5"></select>
+        <label for="announcement-notify-members">Integrantes específicos que receberão notificação (opcional)</label><select id="announcement-notify-members" multiple size="5"></select>
+        <button class="btn btn-primary btn-block" type="submit">Publicar comunicado</button></form></div>
       <div class="card" style="margin-top:14px"><h3>Comunicados recentes</h3><div id="announcements-list" class="empty">Carregando comunicados…</div></div>
     </section>
 
@@ -830,10 +838,23 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const {error}=await db.from('club_documents').insert({title:$('#document-title').value.trim(),file_path:path,uploaded_by:currentUser.id});
     notice('#app-notice',error?'Arquivo enviado, mas não foi possível registrar seus dados.':'Documento publicado para os membros.');$('#document-form').reset();loadDocuments();
   });
+  async function loadAnnouncementMemberChoices(){
+    const selectors=[$('#announcement-visible-members'),$('#announcement-notify-members')].filter(Boolean);
+    if(!selectors.length)return;
+    const {data,error}=await db.from('member_directory').select('full_name,email,member_status,rider_type').order('full_name',{ascending:true});
+    if(error){console.warn('Lista de integrantes para público do comunicado não carregada:',error);return;}
+    const members=(data||[]).filter(m=>m.email && m.member_status!=='Inativo');
+    selectors.forEach(sel=>{sel.innerHTML=members.map(m=>'<option value="'+escapeHtml(m.email)+'">'+escapeHtml(m.full_name)+' ('+escapeHtml(m.rider_type||'Integrante')+')</option>').join('');});
+  }
   $('#announcement-form')?.addEventListener('submit',async e=>{
-    e.preventDefault();if(currentProfile?.role!=='admin'){notice('#app-notice','Apenas administradores podem publicar comunicados.');return;}
-    const {error}=await db.from('club_announcements').insert({title:$('#announcement-title').value.trim(),body:$('#announcement-body').value.trim(),target_group:$('#announcement-targets').value,created_by:currentUser.id});
-    notice('#app-notice',error?'Não foi possível publicar. Verifique as tabelas e permissões do Supabase.':'Comunicado publicado.');if(!error){e.target.reset();loadAnnouncements();}
+    e.preventDefault();if(!canManageAgenda()){notice('#app-notice','Apenas a diretoria e os fundadores podem publicar comunicados.');return;}
+    const selected = id => Array.from($(id).selectedOptions).map(o=>o.value);
+    const visibleGroups=selected('#announcement-visible-groups');
+    const notifyGroups=selected('#announcement-notify-groups');
+    if(!visibleGroups.length || !notifyGroups.length){notice('#app-notice','Escolha ao menos um grupo para visualização e para notificação.');return;}
+    const payload={title:$('#announcement-title').value.trim(),body:$('#announcement-body').value.trim(),target_group:visibleGroups.includes('all')?'all':visibleGroups[0],created_by:currentUser.id,visible_to_groups:visibleGroups,notify_to_groups:notifyGroups,visible_to_emails:selected('#announcement-visible-members'),notify_to_emails:selected('#announcement-notify-members')};
+    const {error}=await db.from('club_announcements').insert(payload);
+    notice('#app-notice',error?'Não foi possível publicar. Execute a migração SQL de Agenda e Comunicados no Supabase do aplicativo.':'Comunicado publicado.');if(!error){e.target.reset();loadAnnouncements();}
   });
   $('#vote-form')?.addEventListener('submit',async e=>{
     e.preventDefault();if(currentProfile?.role!=='admin'){notice('#app-notice','Apenas administradores podem criar votações.');return;}
