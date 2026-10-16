@@ -124,3 +124,33 @@ drop trigger if exists club_announcements_notify_on_insert on public.club_announ
 create trigger club_announcements_notify_on_insert
 after insert on public.club_announcements
 for each row execute function public.club_create_notifications();
+
+-- Restringe a leitura conforme o público escolhido. Políticas RESTRICTIVE
+-- são aplicadas junto das políticas de acesso já existentes.
+drop policy if exists "Agenda visível conforme público" on public.club_events;
+create policy "Agenda visível conforme público"
+on public.club_events as restrictive for select to authenticated
+using (
+  (status = 'published' and public.club_target_matches(auth.uid(), visible_to_groups, visible_to_emails))
+  or created_by = auth.uid()
+  or exists (
+    select 1 from public.member_profiles p
+    where p.id = auth.uid() and p.active = true
+      and (p.role = 'admin' or p.club_position in
+        ('Fundador','Fundador/Vice-Presidente','Presidente','Vice-Presidente','Diretor Geral','Diretor Social'))
+  )
+);
+
+drop policy if exists "Comunicados visíveis conforme público" on public.club_announcements;
+create policy "Comunicados visíveis conforme público"
+on public.club_announcements as restrictive for select to authenticated
+using (
+  public.club_target_matches(auth.uid(), visible_to_groups, visible_to_emails)
+  or created_by = auth.uid()
+  or exists (
+    select 1 from public.member_profiles p
+    where p.id = auth.uid() and p.active = true
+      and (p.role = 'admin' or p.club_position in
+        ('Fundador','Fundador/Vice-Presidente','Presidente','Vice-Presidente','Diretor Geral','Diretor Social'))
+  )
+);
