@@ -100,3 +100,21 @@ as $$
         and lower(u.email) = any(coalesce(p_emails, array[]::text[]))
     );
 $$;
+
+-- Permite que cada integrante veja somente totais agregados; nomes/opções individuais
+-- permanecem restritos à diretoria pela política da tabela de votos.
+create or replace function public.get_club_vote_counts(vote_ids uuid[])
+returns table(vote_id uuid, option_selected text, vote_count bigint)
+language sql stable security definer
+set search_path = public
+as $$
+  select b.vote_id, b.option_selected, count(*)::bigint
+  from public.club_vote_ballots b
+  join public.club_votes v on v.id = b.vote_id
+  where b.vote_id = any(vote_ids)
+    and public.club_target_matches(auth.uid(), v.visible_to_groups, v.visible_to_emails)
+  group by b.vote_id, b.option_selected;
+$$;
+
+revoke all on function public.get_club_vote_counts(uuid[]) from public;
+grant execute on function public.get_club_vote_counts(uuid[]) to authenticated;
