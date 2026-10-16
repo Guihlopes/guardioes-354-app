@@ -761,6 +761,9 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const events = (data || []).filter(e => new Date(e.starts_at).getTime() >= now);
     const upcoming = events.filter(e => e.status === 'published' || e.created_by === currentUser?.id || canManageAgenda());
     const published = upcoming.filter(e => e.status === 'published');
+    const homeAgenda=$('#home-agenda-list');
+    if(homeAgenda)homeAgenda.innerHTML=published.length?published.slice(0,3).map(e=>'<div style="padding:10px 0;border-bottom:1px solid #ffffff12"><strong>'+escapeHtml(e.title)+'</strong><p class="muted small" style="margin:5px 0">'+escapeHtml(formatAgendaDate(e.starts_at))+(e.location?' · '+escapeHtml(e.location):'')+'</p><span class="announcement-tag">'+escapeHtml(e.event_type||'Atividade')+'</span></div>').join('')+'<button class="btn" type="button" data-home-open-agenda style="margin-top:10px">Ver agenda completa</button>':'<div class="empty">Nenhuma atividade futura publicada.</div>';
+    homeAgenda?.querySelector('[data-home-open-agenda]')?.addEventListener('click',()=>go('agenda'));
     $('#agenda-next').textContent = published[0] ? daysUntil(published[0].starts_at) : 'Nenhuma atividade';
     const ids = published.map(e=>e.id);
     let responseByEvent = new Map();
@@ -877,6 +880,9 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     if(error){box.textContent='Comunicados ainda não conectados. Aplique a configuração de banco indicada junto com este arquivo.';return;}
     const board=canManageAgenda();
     box.innerHTML=data?.length?data.map(a=>`<article class="announcement-card"><div class="announcement-icon">▤</div><div class="announcement-content"><h4>${escapeHtml(a.title)}</h4><p>${escapeHtml(a.body)}</p><div class="announcement-meta"><span>◷ ${new Date(a.created_at).toLocaleString('pt-BR')}</span><span class="announcement-tag">Comunicado oficial</span></div>${board?'<div class="form-actions"><button class="btn" type="button" data-announcement-edit="'+a.id+'">Editar</button><button class="btn" type="button" data-announcement-delete="'+a.id+'">Excluir</button></div>':''}</div></article>`).join(''):'<div class="empty">📭<br><strong>Nenhum comunicado por enquanto</strong><p class="muted">Quando a diretoria publicar um aviso, ele aparecerá aqui.</p></div>';
+    const homeAnnouncements=$('#home-announcements-list');
+    if(homeAnnouncements)homeAnnouncements.innerHTML=data?.length?(data||[]).slice(0,3).map(a=>'<div style="padding:10px 0;border-bottom:1px solid #ffffff12"><strong>'+escapeHtml(a.title)+'</strong><p class="muted small" style="margin:5px 0">'+escapeHtml((a.body||'').slice(0,150))+'</p><small class="muted">'+new Date(a.created_at).toLocaleDateString('pt-BR')+'</small></div>').join('')+'<button class="btn" type="button" data-home-open-announcements style="margin-top:10px">Ver todos os comunicados</button>':'<div class="empty">Nenhum comunicado publicado.</div>';
+    homeAnnouncements?.querySelector('[data-home-open-announcements]')?.addEventListener('click',()=>go('agenda'));
     if(board){
       box.querySelectorAll('[data-announcement-edit]').forEach(btn=>btn.addEventListener('click',async()=>{
         const item=(data||[]).find(a=>String(a.id)===btn.dataset.announcementEdit);if(!item)return;
