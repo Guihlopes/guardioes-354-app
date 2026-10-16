@@ -194,11 +194,29 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     </section>
 
     <section id="page-agenda" class="app-page hidden-page">
-      <div class="page-heading"><div><h1>Agenda</h1><p>Reuniões, eventos, encontros e passeios.</p></div><span class="badge">Calendário</span></div>
+      <div class="page-heading"><div><h1>Agenda</h1><p>Reuniões, eventos, encontros e passeios dos Guardiões da 354.</p></div><span class="badge">Programação oficial</span></div>
       <div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:15px">
-        <div class="card"><div class="muted small">Eventos</div><div class="status-value">—</div></div><div class="card"><div class="muted small">Próxima reunião</div><div class="status-value">—</div></div><div class="card"><div class="muted small">Passeios</div><div class="status-value">—</div></div>
+        <div class="card"><div class="muted small">Próximos eventos</div><div id="agenda-count" class="status-value">—</div></div>
+        <div class="card"><div class="muted small">Próxima atividade</div><div id="agenda-next" class="status-value" style="font-size:1rem">—</div></div>
+        <div class="card"><div class="muted small">Passeios publicados</div><div id="agenda-rides-count" class="status-value">—</div></div>
       </div>
-      <div class="card"><h3>Programação do motoclube</h3><div class="empty">A agenda visual está preparada, mas ainda precisa de uma tabela no banco de dados para salvar e compartilhar eventos reais.</div></div>
+      <div class="card" style="margin-bottom:14px">
+        <h3 id="agenda-form-title">Sugerir atividade</h3>
+        <p class="muted small" style="line-height:1.5;margin-top:-5px">Integrantes podem sugerir atividades. As sugestões aguardam aprovação da diretoria; eventos cadastrados pela diretoria são publicados automaticamente.</p>
+        <form id="agenda-form">
+          <input id="agenda-event-id" type="hidden">
+          <label for="agenda-title">Nome da atividade</label><input id="agenda-title" required maxlength="160" placeholder="Ex.: Passeio até Serra do Salitre">
+          <div class="form-grid">
+            <div><label for="agenda-type">Tipo</label><select id="agenda-type" required><option value="Passeio">Passeio</option><option value="Reunião">Reunião</option><option value="Encontro">Encontro</option><option value="Evento">Evento</option><option value="Ação social">Ação social</option></select></div>
+            <div><label for="agenda-start">Data e horário</label><input id="agenda-start" type="datetime-local" required></div>
+          </div>
+          <label for="agenda-location">Local / ponto de encontro</label><input id="agenda-location" maxlength="240" placeholder="Ex.: Posto de combustível, São Gotardo">
+          <label for="agenda-description">Detalhes</label><textarea id="agenda-description" maxlength="5000" placeholder="Roteiro, horário de saída, orientações e outras informações"></textarea>
+          <div class="form-actions"><button id="agenda-submit" class="btn btn-primary" type="submit">Enviar sugestão</button><button id="agenda-cancel-edit" class="btn hidden" type="button">Cancelar edição</button></div>
+          <div id="agenda-form-notice" class="notice" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+      <div class="card"><div class="section-title" style="margin-top:0"><div><h3 style="margin:0">Próximas atividades</h3><p>Eventos publicados e sugestões aguardando análise, quando disponíveis.</p></div><button id="agenda-refresh" class="btn" type="button">Atualizar</button></div><div id="agenda-list" class="empty">Carregando agenda…</div></div>
     </section>
 
     <section id="page-announcements" class="app-page hidden-page">
@@ -341,7 +359,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       notice('#login-notice','Sua conta ainda não está autorizada a entrar no aplicativo.');
       return false;
     }
-    currentUser = user; currentProfile = data; fillProfile(user,data); showApp(); await Promise.all([loadMembers(),loadPilotOptions(),loadDocuments(),loadAnnouncements(),loadVotes()]); go('home'); if (!data.phone || (data.rider_type === 'Piloto' && !data.motorcycle) || (data.rider_type === 'Garupa' && !data.pilot_id)) { openProfileSetup(data); } return true;
+    currentUser = user; currentProfile = data; fillProfile(user,data); showApp(); await Promise.all([loadMembers(),loadPilotOptions(),loadDocuments(),loadAnnouncements(),loadVotes(),loadAgenda()]); resetAgendaForm(); go('home'); if (!data.phone || (data.rider_type === 'Piloto' && !data.motorcycle) || (data.rider_type === 'Garupa' && !data.pilot_id)) { openProfileSetup(data); } return true;
   }
   $('#login-form').addEventListener('submit', async (event) => {
     event.preventDefault(); clearNotice('#login-notice');
@@ -596,6 +614,91 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     box.innerHTML = data?.length ? data.map(d=>`<div class="list-row"><div class="list-icon">▧</div><div class="list-main"><strong>${escapeHtml(d.title)}</strong><small>${new Date(d.created_at).toLocaleDateString('pt-BR')}</small></div><button class="btn" data-download="${escapeHtml(d.file_path)}">Baixar</button></div>`).join('') : '<div class="empty">Nenhum documento publicado.</div>';
     box.querySelectorAll('[data-download]').forEach(b=>b.addEventListener('click',async()=>{const {data,error}=await db.storage.from('club-documents').createSignedUrl(b.dataset.download,120);if(error){notice('#app-notice','Não foi possível gerar o link do documento.');return;}window.open(data.signedUrl,'_blank','noopener');}));
   }
+  function canManageAgenda() {
+    const p = currentProfile;
+    return !!p && p.active === true && (p.role === 'admin' || ['Fundador','Fundador/Vice-Presidente','Presidente','Vice-Presidente','Diretor Geral','Diretor Social'].includes(p.club_position));
+  }
+  function resetAgendaForm() {
+    $('#agenda-form')?.reset();
+    $('#agenda-event-id').value = '';
+    $('#agenda-form-title').textContent = 'Sugerir atividade';
+    $('#agenda-submit').textContent = canManageAgenda() ? 'Publicar atividade' : 'Enviar sugestão';
+    $('#agenda-cancel-edit').classList.add('hidden');
+    clearNotice('#agenda-form-notice');
+  }
+  function formatAgendaDate(value, withTime=true) {
+    if (!value) return 'Data a definir';
+    return new Date(value).toLocaleString('pt-BR', withTime ? {dateStyle:'short',timeStyle:'short'} : {dateStyle:'short'});
+  }
+  async function loadAgenda() {
+    const box = $('#agenda-list'); if (!box) return;
+    box.textContent = 'Carregando agenda…';
+    const {data,error} = await db.from('club_events')
+      .select('id,title,event_type,starts_at,location,description,status,created_by,creator_name,created_at')
+      .order('starts_at',{ascending:true});
+    if (error) {
+      console.error('Falha ao carregar agenda:',error);
+      box.innerHTML = '<div class="empty">A agenda precisa ser conectada ao banco. Execute o SQL de configuração enviado para o projeto Supabase do aplicativo e toque em Atualizar.</div>';
+      return;
+    }
+    const events = data || [];
+    const now = Date.now();
+    const upcoming = events.filter(e => new Date(e.starts_at).getTime() >= now && (e.status === 'published' || e.created_by === currentUser?.id || canManageAgenda()));
+    const published = upcoming.filter(e => e.status === 'published');
+    const rides = published.filter(e => e.event_type === 'Passeio');
+    $('#agenda-count').textContent = String(published.length);
+    $('#agenda-rides-count').textContent = String(rides.length);
+    $('#agenda-next').textContent = published[0] ? formatAgendaDate(published[0].starts_at,false) : 'Nenhuma';
+    if (!upcoming.length) {
+      box.className = 'empty'; box.textContent = 'Nenhuma atividade futura cadastrada. Use o formulário acima para sugerir um passeio, reunião ou evento.'; return;
+    }
+    box.className = '';
+    box.innerHTML = upcoming.map(e => {
+      const pending = e.status !== 'published';
+      const date = formatAgendaDate(e.starts_at);
+      return '<article class="list-row" style="align-items:flex-start"><div class="list-icon">'+(e.event_type==='Passeio'?'🏍️':e.event_type==='Reunião'?'📋':'📅')+'</div><div class="list-main"><strong>'+escapeHtml(e.title)+'</strong><small>'+escapeHtml(e.event_type)+' · '+escapeHtml(date)+'</small>'+(e.location?'<p style="margin:8px 0 0;font-size:.84rem">📍 '+escapeHtml(e.location)+'</p>':'')+(e.description?'<p style="white-space:pre-wrap;margin:7px 0 0;font-size:.84rem;line-height:1.5">'+escapeHtml(e.description)+'</p>':'')+(pending?'<p style="margin:8px 0 0;color:#d9c08b;font-size:.75rem">Aguardando aprovação da diretoria</p>':'')+'</div>'+(canManageAgenda()?'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'+(pending?'<button class="btn" type="button" data-agenda-approve="'+e.id+'">Aprovar</button>':'')+'<button class="btn" type="button" data-agenda-edit="'+e.id+'">Editar</button><button class="btn" type="button" data-agenda-delete="'+e.id+'">Excluir</button></div>':'')+'</article>';
+    }).join('');
+    box.querySelectorAll('[data-agenda-approve]').forEach(b=>b.addEventListener('click',async()=>{
+      b.disabled=true;
+      const {error}=await db.from('club_events').update({status:'published'}).eq('id',b.dataset.agendaApprove);
+      if(error){notice('#app-notice','Não foi possível aprovar. Confira as permissões da agenda no Supabase.');b.disabled=false;return;}
+      await loadAgenda();
+    }));
+    box.querySelectorAll('[data-agenda-edit]').forEach(b=>b.addEventListener('click',()=>{
+      const e=events.find(item=>item.id===b.dataset.agendaEdit); if(!e)return;
+      $('#agenda-event-id').value=e.id; $('#agenda-title').value=e.title; $('#agenda-type').value=e.event_type;
+      const d=new Date(e.starts_at); $('#agenda-start').value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+      $('#agenda-location').value=e.location||''; $('#agenda-description').value=e.description||'';
+      $('#agenda-form-title').textContent='Editar atividade'; $('#agenda-submit').textContent='Salvar alterações';
+      $('#agenda-cancel-edit').classList.remove('hidden'); clearNotice('#agenda-form-notice');
+      $('#agenda-form-title').scrollIntoView({behavior:'smooth',block:'start'});
+    }));
+    box.querySelectorAll('[data-agenda-delete]').forEach(b=>b.addEventListener('click',async()=>{
+      if(!confirm('Excluir esta atividade da agenda?'))return;
+      b.disabled=true; const {error}=await db.from('club_events').delete().eq('id',b.dataset.agendaDelete);
+      if(error){notice('#app-notice','Não foi possível excluir a atividade. Confira as permissões no Supabase.');b.disabled=false;return;}
+      await loadAgenda();
+    }));
+  }
+  $('#agenda-form').addEventListener('submit',async event=>{
+    event.preventDefault(); clearNotice('#agenda-form-notice');
+    const id=$('#agenda-event-id').value;
+    const startsAt=new Date($('#agenda-start').value);
+    if(Number.isNaN(startsAt.getTime())){notice('#agenda-form-notice','Informe uma data e horário válidos.');return;}
+    const payload={title:$('#agenda-title').value.trim(),event_type:$('#agenda-type').value,starts_at:startsAt.toISOString(),location:$('#agenda-location').value.trim()||null,description:$('#agenda-description').value.trim()||null};
+    const button=$('#agenda-submit');button.disabled=true;
+    try {
+      let result;
+      if(id) result=await db.from('club_events').update(payload).eq('id',id);
+      else result=await db.from('club_events').insert({...payload,created_by:currentUser.id,creator_name:currentProfile.full_name,status:canManageAgenda()?'published':'pending'});
+      if(result.error){console.error('Falha ao salvar atividade:',result.error);notice('#agenda-form-notice','Não foi possível salvar. Confira se o SQL da agenda foi executado no Supabase do aplicativo.');return;}
+      notice('#agenda-form-notice',id?'Alterações salvas.':'Atividade cadastrada com sucesso.');
+      resetAgendaForm(); await loadAgenda();
+    } catch(err){console.error(err);notice('#agenda-form-notice','Falha de conexão ao salvar a atividade.');}
+    finally{button.disabled=false;}
+  });
+  $('#agenda-cancel-edit').addEventListener('click',resetAgendaForm);
+  $('#agenda-refresh').addEventListener('click',loadAgenda);
   async function loadAnnouncements() {
     const box=$('#announcements-list'); if(!box)return;
     const {data,error}=await db.from('club_announcements').select('id,title,body,created_at').order('created_at',{ascending:false});
