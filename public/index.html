@@ -439,6 +439,12 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     $('#profile-status').textContent = p.member_status || 'Ativo';
     $('#profile-role').textContent = p.role === 'admin' ? 'Administrador' : 'Membro';
     $('#profile-role-badge').textContent = p.role === 'admin' ? 'Administrador' : 'Membro';
+    $('#member-card-name').textContent = p.full_name || 'Integrante';
+    $('#member-card-position').textContent = p.club_position || (p.member_status === 'Prospect' ? 'Prospect' : 'Membro Ativo');
+    $('#member-card-rider').textContent = p.rider_type || 'Não informado';
+    $('#member-card-status').textContent = p.member_status || 'Ativo';
+    $('#member-card-bike').textContent = p.rider_type === 'Garupa' ? 'Garupa' : (p.motorcycle || 'Não informada');
+    $('#member-card-id').textContent = p.role === 'admin' ? 'Diretoria autorizada' : (p.member_status === 'Prospect' ? 'Prospect' : 'Integrante');
     if ($('#edit-full-name')) $('#edit-full-name').value = p.full_name || '';
     if ($('#edit-phone')) $('#edit-phone').value = p.phone || '';
     if ($('#edit-email')) $('#edit-email').value = user.email || '';
@@ -943,6 +949,14 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     await loadAgenda();
     return true;
   }
+  async function loadPastAgenda() {
+    const box=$('#agenda-history-list');if(!box)return;
+    box.className='empty';box.textContent='Carregando histórico…';
+    const {data,error}=await db.from('club_events').select('id,title,event_type,starts_at,location,status').eq('status','published').lt('starts_at',new Date().toISOString()).order('starts_at',{ascending:false}).limit(20);
+    if(error){console.warn('Histórico da agenda não carregado:',error);box.textContent='Não foi possível carregar o histórico. Tente atualizar.';return;}
+    const rows=data||[];if(!rows.length){box.className='empty';box.textContent='Ainda não há atividades anteriores publicadas.';return;}
+    box.className='';box.innerHTML=rows.map(e=>'<div class="past-event-row"><strong>'+escapeHtml(e.title)+'</strong><p class="muted small" style="margin:5px 0">'+escapeHtml(e.event_type||'Atividade')+' · '+escapeHtml(formatAgendaDate(e.starts_at))+(e.location?' · '+escapeHtml(e.location):'')+'</p>'+(e.location?'<a class="btn" style="display:inline-block;text-decoration:none;margin-top:5px" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(e.location)+'">Ver local no mapa ↗</a>':'')+'</div>').join('');
+  }
   async function loadAgenda() {
     const box = $('#agenda-list'); if (!box) return;
     box.textContent = 'Carregando agenda…';
@@ -1071,6 +1085,8 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   });
   $('#agenda-cancel-edit').addEventListener('click',resetAgendaForm);
   $('#agenda-refresh').addEventListener('click',loadAgenda);
+  $('#agenda-history-toggle')?.addEventListener('click',()=>{const wrap=$('#agenda-history-wrap');const open=wrap.classList.contains('hidden');wrap.classList.toggle('hidden',!open);$('#agenda-history-toggle').setAttribute('aria-expanded',String(open));$('#agenda-history-toggle').textContent=open?'Ocultar histórico':'Passeios anteriores';if(open)loadPastAgenda();});
+  $('#member-card-print')?.addEventListener('click',()=>{const card=$('#member-digital-card');if(!card)return;const w=window.open('','_blank','width=720,height=600');if(!w){notice('#app-notice','Permita pop-ups para imprimir ou salvar a carteirinha.');return;}w.document.write('<html><head><title>Carteirinha Guardiões da 354</title><style>body{font-family:Arial;padding:24px}.member-pass{border:2px solid #b9152b;border-radius:16px;padding:24px}.member-pass-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.member-pass-field{border:1px solid #ddd;padding:10px}.member-pass-sub{color:#b9152b}.member-pass-logo{width:60px;height:60px}</style></head><body>'+card.outerHTML+'</body></html>');w.document.close();w.focus();w.print();});
   async function loadAnnouncements() {
     const box=$('#announcements-list'); if(!box)return;
     const {data,error}=await db.from('club_announcements').select('id,title,body,created_at').order('created_at',{ascending:false});
