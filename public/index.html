@@ -457,6 +457,9 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     if (page === 'admin' && currentProfile?.role === 'admin') loadAdminDashboard();
   }
   function fillProfile(user, p) {
+    const developerEmail = String(user?.email || currentUser?.email || '').trim().toLowerCase();
+    const auditButton = $('#open-audit-log');
+    if (auditButton) auditButton.classList.toggle('hidden', developerEmail !== 'gui.00sg@gmail.com');
     const firstName = (p.full_name || 'Integrante').trim().split(/\s+/)[0];
     $('#home-first-name').textContent = firstName;
     $('#home-position').textContent = p.club_position || (p.full_name === 'Guilherme Henrique Lopes' ? 'Fundador/Vice-Presidente' : (p.rider_type === 'Garupa' ? 'Garupa' : 'Membro Ativo'));
