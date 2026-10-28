@@ -1,0 +1,17 @@
+# Deploy with: supabase functions deploy passkey-register-options
+# supabase functions deploy passkey-register-verify
+# supabase functions deploy passkey-auth-options
+# supabase functions deploy passkey-auth-verify
+# Authentication options are intentionally callable without a Supabase JWT;
+# verification endpoints enforce WebAuthn challenge/origin/RP ID on the server.
+[functions.passkey-register-options]
+verify_jwt = true
+
+[functions.passkey-register-verify]
+verify_jwt = true
+
+[functions.passkey-auth-options]
+verify_jwt = false
+
+[functions.passkey-auth-verify]
+verify_jwt = false
