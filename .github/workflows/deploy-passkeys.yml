@@ -13,6 +13,15 @@ jobs:
         uses: supabase/setup-cli@v1
         with:
           version: latest
+      - name: Check required secrets
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN" || (echo "Missing GitHub secret: SUPABASE_ACCESS_TOKEN" && exit 1)
+          test -n "$SUPABASE_PROJECT_REF" || (echo "Missing GitHub secret: SUPABASE_PROJECT_REF" && exit 1)
+          test -n "$SUPABASE_DB_PASSWORD" || (echo "Missing GitHub secret: SUPABASE_DB_PASSWORD" && exit 1)
       - name: Link Supabase project
         run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
         env:
