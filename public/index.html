@@ -86,6 +86,8 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
         <label for="email">E-mail cadastrado</label><input id="email" type="email" autocomplete="username" placeholder="seuemail@exemplo.com" required>
         <label for="password">Senha</label><input id="password" type="password" autocomplete="current-password" placeholder="Sua senha" required>
         <button id="login-button" class="btn btn-primary btn-block" type="submit">Entrar no aplicativo →</button>
+        <button id="passkey-login-button" class="btn btn-block" type="button">🔐 Acesso rápido e seguro</button>
+        <p class="muted small" style="text-align:center;line-height:1.45;margin:8px 0 0">Use o método de desbloqueio do seu aparelho, como reconhecimento facial, impressão digital, PIN, senha ou padrão. Disponível após cadastrar este aparelho.</p>
         <div class="login-bottom"><button id="first-access-button" class="btn btn-quiet" type="button">Primeiro acesso?</button></div>
       </form>
       <p class="muted small" style="text-align:center;line-height:1.5;margin:16px 0 0">Acesso exclusivo para integrantes autorizados pelo motoclube.</p>
@@ -398,6 +400,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@simplewebauthn/browser@13.1.0/dist/bundle/index.umd.min.js"></script>
 <script>
 (() => {
   const SUPABASE_URL = 'https://nlaywsguzsiwvexwnakp.supabase.co';
@@ -498,6 +501,47 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     }
     currentUser = user; currentProfile = data; fillProfile(user,data); showApp(); await Promise.all([loadMembers(),loadPilotOptions(),loadDocuments(),loadAnnouncements(),loadVotes(),loadAgenda(),loadAnnouncementMemberChoices(),loadVoteMemberChoices()]); await refreshNotificationDot(); resetAgendaForm(); const pushPage=new URLSearchParams(location.search).get('pushPage'); go(['votes','agenda'].includes(pushPage)?pushPage:'home'); if(pushPage){const cleanUrl=new URL(location.href);cleanUrl.searchParams.delete('pushPage');history.replaceState({},'',cleanUrl.pathname+cleanUrl.search+cleanUrl.hash);} if (!data.phone || (data.rider_type === 'Piloto' && !data.motorcycle) || (data.rider_type === 'Garupa' && !data.pilot_id)) { openProfileSetup(data); } return true;
   }
+  const passkeyApi = window.SimpleWebAuthnBrowser;
+  async function registerPasskey() {
+    if (!passkeyApi?.startRegistration || !window.PublicKeyCredential) {
+      notice('#app-notice','Este navegador não oferece suporte ao acesso rápido. Atualize o navegador e tente novamente.');
+      return;
+    }
+    try {
+      const { data: { session } } = await db.auth.getSession();
+      if (!session) { notice('#app-notice','Entre com e-mail e senha antes de cadastrar este aparelho.'); return; }
+      const { data: options, error } = await db.functions.invoke('passkey-register-options', { body: {} });
+      if (error || !options?.challenge) throw new Error('Não foi possível iniciar o cadastro. Publique as funções Passkeys no Supabase.');
+      const response = await passkeyApi.startRegistration({ optionsJSON: options });
+      const verified = await db.functions.invoke('passkey-register-verify', { body: { response, deviceName: /iPhone|iPad/.test(navigator.userAgent) ? 'Aparelho Apple' : /Android/.test(navigator.userAgent) ? 'Aparelho Android' : 'Este aparelho' } });
+      if (verified.error || !verified.data?.verified) throw new Error(verified.data?.error || 'Não foi possível validar a credencial.');
+      notice('#app-notice','Acesso rápido e seguro ativado neste aparelho.');
+    } catch (err) {
+      console.error('Cadastro Passkey:', err);
+      notice('#app-notice', err?.name === 'NotAllowedError' ? 'Cadastro cancelado ou não autorizado no aparelho.' : (err?.message || 'Falha ao cadastrar o acesso rápido.'));
+    }
+  }
+  $('#passkey-login-button')?.addEventListener('click', async () => {
+    const button = $('#passkey-login-button');
+    if (!passkeyApi?.startAuthentication || !window.PublicKeyCredential) {
+      notice('#login-notice','Este navegador não oferece suporte a esse método. Entre com e-mail e senha.');
+      return;
+    }
+    button.disabled = true; button.textContent = 'Verificando aparelho…'; clearNotice('#login-notice');
+    try {
+      const { data: options, error } = await db.functions.invoke('passkey-auth-options', { body: {} });
+      if (error || !options?.challenge) throw new Error('Acesso rápido ainda não está configurado no servidor. Entre com e-mail e senha.');
+      const response = await passkeyApi.startAuthentication({ optionsJSON: options });
+      const { data, error: verifyError } = await db.functions.invoke('passkey-auth-verify', { body: { response } });
+      if (verifyError || !data?.token_hash) throw new Error(data?.error || 'Este aparelho ainda não foi cadastrado ou não foi possível validar o acesso.');
+      const { data: authData, error: authError } = await db.auth.verifyOtp({ token_hash: data.token_hash, type: 'magiclink' });
+      if (authError || !authData.user) throw new Error('A credencial foi validada, mas não foi possível iniciar a sessão. Entre com e-mail e senha.');
+      await loadProfile(authData.user);
+    } catch (err) {
+      console.error('Login Passkey:', err);
+      notice('#login-notice', err?.name === 'NotAllowedError' ? 'Acesso cancelado. Você pode entrar com e-mail e senha.' : (err?.message || 'Falha no acesso rápido.'));
+    } finally { button.disabled = false; button.textContent = '🔐 Acesso rápido e seguro'; }
+  });
   $('#login-form').addEventListener('submit', async (event) => {
     event.preventDefault(); clearNotice('#login-notice');
     const button = $('#login-button'); button.disabled = true; button.textContent = 'Entrando...';
@@ -1351,6 +1395,22 @@ $('#member-card-photo-upload')?.addEventListener('change', async (event) => {
     if(error){console.error('Falha ao criar votação no Supabase:',error);notice('#vote-form-notice','Erro ao criar votação: '+(error.message||'erro desconhecido')+(error.code?' ('+error.code+')':''));}
     else {notice('#vote-form-notice','Votação publicada.');e.target.reset();$('#vote-type').value='simple';$('#vote-options-wrap').classList.remove('hidden');$('#vote-options').required=true;await loadVotes();}
   });
+  // Opção de cadastro disponível no perfil após o login.
+  function addPasskeyProfileAction() {
+    const profile = $('#page-profile');
+    if (!profile || $('#profile-passkey-card')) return;
+    const card = document.createElement('div');
+    card.id = 'profile-passkey-card';
+    card.className = 'card';
+    card.style.marginTop = '14px';
+    card.innerHTML = '<h3>🔐 Acesso rápido e seguro</h3><p class="muted small" style="line-height:1.5">Cadastre este aparelho para entrar usando o método de desbloqueio do aparelho, como reconhecimento facial, impressão digital, PIN, senha ou padrão.</p><button id="profile-passkey-register" class="btn btn-primary" type="button">Cadastrar este aparelho</button><div id="profile-passkey-notice" class="notice" role="status" aria-live="polite"></div>';
+    profile.appendChild(card);
+    card.querySelector('#profile-passkey-register').addEventListener('click', async () => {
+      const b=card.querySelector('button'); b.disabled=true; b.textContent='Preparando cadastro…';
+      await registerPasskey();
+      b.disabled=false; b.textContent='Cadastrar este aparelho';
+    });
+  }
   async function restoreSession() {
     try {
       const {data,error} = await db.auth.getSession();
@@ -1373,6 +1433,8 @@ $('#member-card-photo-upload')?.addEventListener('change', async (event) => {
       notice('#login-notice','Erro ao recuperar seu acesso. Atualize a página e tente novamente.');
     }
   }
+  const profileObserver = new MutationObserver(() => { if (currentUser && !$('#app-screen').classList.contains('hidden')) addPasskeyProfileAction(); });
+  profileObserver.observe($('#app-screen'), { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
   restoreSession();
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     window.addEventListener('load',() => navigator.serviceWorker.register('./sw.js').catch(() => {}));
