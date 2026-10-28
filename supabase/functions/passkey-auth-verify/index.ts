@@ -47,9 +47,14 @@ Deno.serve(async (req) => {
       last_used_at: new Date().toISOString(),
     }).eq("id", credential.id);
     if (updateError) throw updateError;
-    // This confirms the Passkey but deliberately does not mint a Supabase session.
-    // A verified assertion can unlock a session already stored on this device.
-    return new Response(JSON.stringify({ verified: true, user_id: credential.user_id }), { status: 200, headers: cors });
+    const { data: userResult, error: userError } = await admin.auth.admin.getUserById(credential.user_id);
+    if (userError || !userResult.user?.email) throw new Error("Não foi possível localizar a conta vinculada.");
+    const { data: link, error: linkError } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email: userResult.user.email,
+    });
+    if (linkError || !link.properties?.hashed_token) throw new Error("Não foi possível criar uma sessão segura.");
+    return new Response(JSON.stringify({ verified: true, token_hash: link.properties.hashed_token, type: "magiclink" }), { status: 200, headers: cors });
   } catch (e) {
     console.error("passkey-auth-verify", e);
     return new Response(JSON.stringify({ error: "Falha ao validar o acesso rápido." }), { status: 500, headers: cors });
