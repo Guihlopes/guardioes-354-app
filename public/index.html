@@ -781,6 +781,10 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     btn.disabled=true;setStatus('Verificando conta e suporte…');
     try{
       if(!currentUser)throw new Error('Entre no aplicativo antes de ativar as notificações.');
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const isInstalledIOS = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      if (isIOS && !isInstalledIOS) throw new Error('No iPhone, instale primeiro: Safari → Compartilhar → Adicionar à Tela de Início. Depois abra pelo ícone do aplicativo e ative as notificações por lá.');
+      if (isIOS && !/OS 16_[4-9]|OS 1[7-9]_/i.test(navigator.userAgent)) throw new Error('Notificações no iPhone exigem iOS 16.4 ou mais recente.');
       if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window))throw new Error('Este navegador não oferece push. Abra o app pelo Chrome atualizado ou instale-o na Tela de Início.');
       setStatus('Solicitando permissão…');
       const permission=await Notification.requestPermission();
@@ -916,7 +920,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     }
 
     const {data: profiles, error: profilesError} = await db
-      .from('member_profiles')
+      .from('public_member_profiles')
       .select('id, full_name, club_position, member_status, rider_type, phone, motorcycle, pilot_id, active, photo_url');
     if (profilesError) console.warn('Perfis pessoais não puderam complementar o diretório:', profilesError);
 
