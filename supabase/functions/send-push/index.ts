@@ -56,22 +56,37 @@ Deno.serve(async (req) => {
     });
 
     let sent = 0;
-    const errors: string[] = [];
+    const errors: Array<{ status: number | null; message: string; response: string; endpointHost: string }> = [];
     await Promise.all(devices.map(async (device: any) => {
       try {
         await webpush.sendNotification(device.subscription, message, { TTL: 60 * 60 * 24 });
         sent++;
       } catch (err: any) {
-        const status = err?.statusCode;
+        const status = Number(err?.statusCode || 0) || null;
+        let endpointHost = "unknown";
+        try { endpointHost = new URL(device.endpoint).host; } catch { /* keep unknown */ }
+        const response = String(err?.body || err?.response?.body || "").slice(0, 1200);
+        const messageText = String(err?.message || err);
+        console.error("Web Push delivery rejected", {
+          status,
+          message: messageText,
+          response,
+          endpointHost,
+        });
+        errors.push({ status, message: messageText, response, endpointHost });
         if (status === 404 || status === 410) {
           await db.from("push_subscriptions").delete().eq("id", device.id);
-        } else {
-          errors.push(String(err?.message || err));
         }
       }
     }));
 
-    return new Response(JSON.stringify({ sent, errors }), {
+    return new Response(JSON.stringify({
+      sent,
+      attempted: devices.length,
+      errors,
+      vapidPublicKeyConfigured: Boolean(publicKey),
+      vapidPrivateKeyConfigured: Boolean(privateKey),
+    }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
