@@ -29,3 +29,4 @@ jobs:
           supabase functions deploy passkey-register-verify --project-ref "$SUPABASE_PROJECT_REF"
           supabase functions deploy passkey-auth-options --project-ref "$SUPABASE_PROJECT_REF" --no-verify-jwt
           supabase functions deploy passkey-auth-verify --project-ref "$SUPABASE_PROJECT_REF" --no-verify-jwt
+          supabase functions deploy send-push --project-ref "$SUPABASE_PROJECT_REF" --no-verify-jwt
