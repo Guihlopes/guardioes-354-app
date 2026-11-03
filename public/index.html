@@ -784,7 +784,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
       const isInstalledIOS = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
       if (isIOS && !isInstalledIOS) throw new Error('No iPhone, instale primeiro: Safari → Compartilhar → Adicionar à Tela de Início. Depois abra pelo ícone do aplicativo e ative as notificações por lá.');
-      if (isIOS && !/OS 16_[4-9]|OS 1[7-9]_/i.test(navigator.userAgent)) throw new Error('Notificações no iPhone exigem iOS 16.4 ou mais recente.');
+      if (isIOS) { const match=navigator.userAgent.match(/OS (\\d+)[._](\\d+)/i); const iosVersion=match?Number(match[1])+Number(match[2])/10:0; if(iosVersion && iosVersion<16.4) throw new Error('Notificações no iPhone exigem iOS 16.4 ou mais recente.'); }
       if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window))throw new Error('Este navegador não oferece push. Abra o app pelo Chrome atualizado ou instale-o na Tela de Início.');
       setStatus('Solicitando permissão…');
       const permission=await Notification.requestPermission();
