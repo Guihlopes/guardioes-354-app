@@ -15,11 +15,17 @@ create index if not exists club_content_reads_source_idx
 
 alter table public.club_content_reads enable row level security;
 revoke all on public.club_content_reads from anon;
-grant select, insert on public.club_content_reads to authenticated;
+grant select, insert, update on public.club_content_reads to authenticated;
 
 drop policy if exists "Integrante registra a própria leitura" on public.club_content_reads;
 create policy "Integrante registra a própria leitura"
 on public.club_content_reads for insert to authenticated
+with check (user_id = auth.uid());
+
+drop policy if exists "Integrante atualiza a própria leitura" on public.club_content_reads;
+create policy "Integrante atualiza a própria leitura"
+on public.club_content_reads for update to authenticated
+using (user_id = auth.uid())
 with check (user_id = auth.uid());
 
 drop policy if exists "Integrante consulta as próprias leituras" on public.club_content_reads;
