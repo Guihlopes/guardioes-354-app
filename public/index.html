@@ -405,7 +405,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
 (() => {
   const SUPABASE_URL = 'https://nlaywsguzsiwvexwnakp.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_eIzAaMENq8u1smn5gVR3Lg_cj9bABxk';
-  const PUSH_VAPID_PUBLIC_KEY = 'BMHesRKdUbVl0jFSwy84ELM62KTh7Uu9UYOO-863vnZ_ou-pqGyJhzc5d94ZFP4CtrpjXAwudCedlOZW-fBAc1o';
+  const PUSH_VAPID_PUBLIC_KEY = 'BITB7mh-54PvWLajflwBdvzuqE7KOzIQkqPWJAaMmhcTR1wCPE7LRes1O7qEt7R16q5GQDa1Egl4NcZgiU1MS5k';
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
     auth: {
       persistSession: true,
@@ -801,8 +801,19 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       reg=await withTimeout(navigator.serviceWorker.ready,12000,'A ativação do Service Worker');
       setStatus('Registrando este aparelho…');
       let sub=await withTimeout(reg.pushManager.getSubscription(),12000,'A consulta de inscrição push');
+      const expectedKey=urlBase64ToUint8Array(PUSH_VAPID_PUBLIC_KEY);
+      if(sub){
+        const oldKey=sub.options && sub.options.applicationServerKey;
+        const oldBytes=oldKey ? new Uint8Array(oldKey) : null;
+        const sameKey=oldBytes && oldBytes.length===expectedKey.length && oldBytes.every((v,i)=>v===expectedKey[i]);
+        if(!sameKey){
+          setStatus('Atualizando chave de segurança das notificações…');
+          await withTimeout(sub.unsubscribe(),12000,'A renovação da inscrição antiga');
+          sub=null;
+        }
+      }
       if(!sub){
-        sub=await withTimeout(reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(PUSH_VAPID_PUBLIC_KEY)}),20000,'A inscrição push');
+        sub=await withTimeout(reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:expectedKey}),20000,'A inscrição push');
       }
       const json=sub.toJSON();
       if(!json.endpoint)throw new Error('O navegador não retornou um endpoint de push. Atualize o Chrome e tente novamente.');
