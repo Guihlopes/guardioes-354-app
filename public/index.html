@@ -370,6 +370,12 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       <section id="admin-security-panel" class="hidden" style="margin:20px 0">
         <div class="section-title"><div><h2>Permissões e histórico</h2><p>Área de uso exclusivo do desenvolvedor do aplicativo.</p></div><button class="btn" type="button" id="close-audit-log">Fechar</button></div><div class="notice" style="margin-bottom:14px">⚠️ <strong>Área restrita ao desenvolvedor do app.</strong> Este painel é destinado exclusivamente à manutenção técnica, auditoria e diagnóstico do aplicativo Guardiões da 354. Não é uma ferramenta de uso da diretoria ou dos membros.</div>
         <div class="card" style="margin-bottom:14px">
+          <div class="section-title"><div><h3 style="margin:0">Confirmações de leitura</h3><p class="muted small">Veja quem abriu cada comunicado ou votação pelo painel de notificações.</p></div></div>
+          <div id="content-read-summary" class="muted small" style="margin-bottom:10px">Os registros aparecem quando os integrantes abrem uma notificação.</div>
+          <div id="content-read-list" class="empty">Clique em Atualizar para consultar as confirmações.</div>
+          <div class="form-actions"><button class="btn btn-primary" type="button" id="content-read-refresh">↻ Atualizar confirmações</button></div>
+        </div>
+        <div class="card" style="margin-bottom:14px">
           <h3 style="margin-top:0">Regras de acesso</h3>
           <div class="grid">
             <div class="card"><strong>Fundadores</strong><p class="muted small">Guilherme Henrique Lopes e Welton Santana Silva: prioridade hierárquica conforme o estatuto. Acesso técnico segue as permissões concedidas na conta.</p></div>
@@ -717,6 +723,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     box.innerHTML=rows.length?rows.map(n=>'<article class="notification-item '+(!n.read_at?'unread':'')+'" data-notification-open="'+n.id+'" role="button" tabindex="0" style="cursor:pointer"><strong>'+(n.read_at?'':'🔴 ')+escapeHtml(n.title)+'</strong><p>'+escapeHtml(n.body||'')+'</p><small>'+new Date(n.created_at).toLocaleString('pt-BR')+'</small><div class="form-actions" style="margin-top:10px"><button class="btn" type="button" data-notification-read="'+n.id+'">'+(n.read_at?'Lida ✓':'Marcar como lida')+'</button><span class="muted small">Abrir seção →</span></div></article>').join(''):'<div class="empty">Nenhuma notificação por enquanto.</div>';
     const openTarget=async n=>{
       if(!n)return;
+      if(['announcement','vote'].includes(n.source_type)){const {error:receiptError}=await db.from('club_content_reads').upsert({user_id:currentUser.id,source_type:n.source_type,source_id:n.source_id,read_at:new Date().toISOString()},{onConflict:'user_id,source_type,source_id'});if(receiptError)console.warn('Confirmação de leitura não registrada:',receiptError);}
       if(!n.read_at){const {error}=await db.from('club_notifications').update({read_at:new Date().toISOString()}).eq('id',n.id);if(error){notice('#app-notice','Não foi possível marcar como lida.');return;}}
       closeNotifications();const page=n.source_type==='vote'?'votes':'agenda';go(page);if(page==='agenda')await loadAgenda();
       if(n.source_type==='event')setTimeout(()=>{const el=document.querySelector('[data-agenda-details="'+n.source_id+'"]');if(el){el.click();el.scrollIntoView({behavior:'smooth',block:'center'});}},150);
@@ -876,6 +883,27 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       list.innerHTML = '<ul style="margin:0;padding-left:22px;display:grid;gap:10px">' + attention.map(item => '<li>' + escapeHtml(item) + '</li>').join('') + '</ul>';
     }
   }
+  async function loadContentReadReceipts() {
+    const box=$('#content-read-list'),summary=$('#content-read-summary');
+    if(!box)return;
+    box.textContent='Carregando confirmações…';
+    const {data:reads,error}=await db.from('club_content_reads').select('user_id,source_type,source_id,read_at').order('read_at',{ascending:false}).limit(300);
+    if(error){box.textContent='Não foi possível consultar as confirmações. Verifique se a migração de leitura foi executada no Supabase.';if(summary)summary.textContent=error.message||'';return;}
+    const rows=reads||[];
+    const ids=[...new Set(rows.map(r=>r.user_id))];
+    const {data:profiles, error:profileError}=ids.length?await db.from('member_profiles').select('id,full_name').in('id',ids):{data:[],error:null};
+    const names=new Map((profiles||[]).map(p=>[p.id,p.full_name||'Integrante']));
+    const sourceIds=[...new Set(rows.map(r=>r.source_id))];
+    const [ann,votes]=await Promise.all([
+      sourceIds.length?db.from('club_announcements').select('id,title').in('id',sourceIds):Promise.resolve({data:[]}),
+      sourceIds.length?db.from('club_votes').select('id,title').in('id',sourceIds):Promise.resolve({data:[]})
+    ]);
+    const titles=new Map([...(ann.data||[]),...(votes.data||[])].map(x=>[x.id,x.title]));
+    if(summary)summary.textContent=rows.length+' abertura(s) registrada(s) · '+ids.length+' integrante(s)';
+    box.innerHTML=rows.length?'<div style="display:grid;gap:9px">'+rows.map(r=>'<div class="notification-item"><strong>'+escapeHtml(titles.get(r.source_id)||'Conteúdo removido')+'</strong><p style="margin:5px 0">'+escapeHtml(names.get(r.user_id)||'Integrante')+' · '+(r.source_type==='vote'?'Votação':'Comunicado')+'</p><small>'+new Date(r.read_at).toLocaleString('pt-BR')+'</small></div>').join('')+'</div>':'<div class="empty">Nenhuma confirmação registrada ainda.</div>';
+    if(profileError)console.warn('Alguns nomes não puderam ser carregados:',profileError);
+  }
+  $('#content-read-refresh')?.addEventListener('click',loadContentReadReceipts);
   async function loadAuditLog() {
     const box=$('#audit-log-list'); const status=$('#audit-log-status'); if(!box)return;
     box.textContent='Carregando histórico…'; if(status)status.textContent='';
