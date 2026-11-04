@@ -1548,18 +1548,55 @@ $('#member-card-photo-upload')?.addEventListener('change', async (event) => {
   // Opção de cadastro disponível no perfil após o login.
   function addPasskeyProfileAction() {
     const profile = $('#page-profile');
-    if (!profile || $('#profile-passkey-card')) return;
-    const card = document.createElement('div');
-    card.id = 'profile-passkey-card';
-    card.className = 'card';
-    card.style.marginTop = '14px';
-    card.innerHTML = '<h3>🔐 Acesso rápido e seguro</h3><p class="muted small" style="line-height:1.5">Cadastre este aparelho para entrar usando o método de desbloqueio do aparelho, como reconhecimento facial, impressão digital, PIN, senha ou padrão.</p><button id="profile-passkey-register" class="btn btn-primary" type="button">Cadastrar este aparelho</button><div id="profile-passkey-notice" class="notice" role="status" aria-live="polite"></div>';
-    profile.appendChild(card);
-    card.querySelector('#profile-passkey-register').addEventListener('click', async () => {
-      const b=card.querySelector('button'); b.disabled=true; b.textContent='Preparando cadastro…';
-      await registerPasskey();
-      b.disabled=false; b.textContent='Cadastrar este aparelho';
-    });
+    if (!profile) return;
+    if (!$('#profile-passkey-card')) {
+      const card = document.createElement('div');
+      card.id = 'profile-passkey-card';
+      card.className = 'card';
+      card.style.marginTop = '14px';
+      card.innerHTML = '<h3>🔐 Acesso rápido e seguro</h3><p class="muted small" style="line-height:1.5">Cadastre este aparelho para entrar usando o método de desbloqueio do aparelho, como reconhecimento facial, impressão digital, PIN, senha ou padrão.</p><button id="profile-passkey-register" class="btn btn-primary" type="button">Cadastrar este aparelho</button><div id="profile-passkey-notice" class="notice" role="status" aria-live="polite"></div>';
+      profile.appendChild(card);
+      card.querySelector('#profile-passkey-register').addEventListener('click', async () => {
+        const b=card.querySelector('button'); b.disabled=true; b.textContent='Preparando cadastro…';
+        await registerPasskey();
+        b.disabled=false; b.textContent='Cadastrar este aparelho';
+      });
+    }
+    if (!$('#profile-password-card')) {
+      const card = document.createElement('div');
+      card.id = 'profile-password-card';
+      card.className = 'card';
+      card.style.marginTop = '14px';
+      card.innerHTML = '<h3>🔑 Segurança da conta</h3><p class="muted small" style="line-height:1.5">Altere a senha usada para entrar no aplicativo. Use pelo menos 8 caracteres.</p><form id="profile-password-form"><label for="profile-new-password">Nova senha</label><input id="profile-new-password" type="password" autocomplete="new-password" minlength="8" required placeholder="Digite a nova senha"><label for="profile-confirm-password">Confirmar nova senha</label><input id="profile-confirm-password" type="password" autocomplete="new-password" minlength="8" required placeholder="Digite novamente a nova senha"><button class="btn btn-primary btn-block" id="profile-password-save" type="submit">Alterar minha senha</button></form><div id="profile-password-notice" class="notice" role="status" aria-live="polite"></div>';
+      profile.appendChild(card);
+      card.querySelector('#profile-password-form').addEventListener('submit', async event => {
+        event.preventDefault();
+        const password = card.querySelector('#profile-new-password').value;
+        const confirmation = card.querySelector('#profile-confirm-password').value;
+        const button = card.querySelector('#profile-password-save');
+        const status = card.querySelector('#profile-password-notice');
+        status.textContent = ''; status.classList.remove('show');
+        if (password.length < 8) { notice('#profile-password-notice','A nova senha precisa ter pelo menos 8 caracteres.'); return; }
+        if (password !== confirmation) { notice('#profile-password-notice','As senhas não coincidem. Confira e tente novamente.'); return; }
+        button.disabled = true; button.textContent = 'Atualizando senha…';
+        try {
+          const { data, error } = await db.auth.updateUser({ password });
+          if (error || !data?.user) {
+            console.error('Falha ao alterar senha:', error);
+            notice('#profile-password-notice', error?.message?.toLowerCase().includes('reauth') ? 'Por segurança, saia e entre novamente no aplicativo antes de tentar alterar a senha.' : 'Não foi possível alterar a senha. Entre novamente no aplicativo e tente outra vez.');
+            return;
+          }
+          currentUser = data.user;
+          card.querySelector('#profile-password-form').reset();
+          notice('#profile-password-notice','Senha alterada com sucesso.');
+        } catch (error) {
+          console.error('Erro ao alterar senha:', error);
+          notice('#profile-password-notice','Falha de conexão. Verifique sua internet e tente novamente.');
+        } finally {
+          button.disabled = false; button.textContent = 'Alterar minha senha';
+        }
+      });
+    }
   }
   async function restoreSession() {
     try {
