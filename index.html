@@ -947,20 +947,25 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   async function loadInstitutionalSummary(){
     const box=$('#institutional-summary');if(!box||!developerOnly())return;
     box.textContent='Carregando dados institucionais…';
-    const [profiles,directory,docs,meetings]=await Promise.all([
-      db.from('member_profiles').select('id,full_name,club_position,member_status,rider_type,active'),
-      db.from('member_directory').select('id,full_name,member_status'),
+    const [directory,profiles,docs,meetings]=await Promise.all([
+      db.from('member_directory').select('full_name,member_status,rider_type'),
+      db.from('member_profiles').select('id,member_status,active'),
       db.from('club_governance_documents').select('id,status'),
       db.from('club_meetings').select('id,status')
     ]);
-    const active=(profiles.data||[]).filter(x=>x.active).length;
-    const prospects=(profiles.data||[]).filter(x=>String(x.member_status||'').toLowerCase()==='prospect').length;
+    const people=directory.data||[];
+    const profileRows=profiles.data||[];
+    const totalPeople=directory.error?null:people.length;
+    const prospectNames=new Set(people.filter(x=>String(x.member_status||'').trim().toLowerCase()==='prospect').map(x=>String(x.full_name||'').trim().toLocaleLowerCase('pt-BR')));
+    const profileProspects=profileRows.filter(x=>String(x.member_status||'').trim().toLowerCase()==='prospect').length;
+    const prospects=directory.error?(profiles.error?'—':profileProspects):prospectNames.size;
     const count=(arr,key,val)=>arr.filter(x=>x[key]===val).length;
-    const tiles=[['Integrantes ativos',profiles.error?'—':active],['Prospects',profiles.error?'—':prospects],['Normas vigentes',docs.error?'—':count(docs.data||[],'status','Vigente')],['Reuniões agendadas',meetings.error?'—':count(meetings.data||[],'status','Agendada')]];
+    const tiles=[['Pessoas cadastradas',totalPeople===null?'—':totalPeople],['Prospects',prospects],['Normas vigentes',docs.error?'—':count(docs.data||[],'status','Vigente')],['Reuniões agendadas',meetings.error?'—':count(meetings.data||[],'status','Agendada')]];
     box.innerHTML=tiles.map(([label,value])=>'<div class="card"><div class="muted small">'+escapeHtml(label)+'</div><div class="status-value">'+value+'</div></div>').join('');
-    if(profiles.error||docs.error||meetings.error){
+    if(directory.error||profiles.error||docs.error||meetings.error){
       const details=[
-        profiles.error?'<li><strong>Integrantes/Prospects:</strong> '+escapeHtml(profiles.error.message||profiles.error.code||'Erro desconhecido')+'</li>':'',
+        directory.error?'<li><strong>Pessoas cadastradas:</strong> '+escapeHtml(directory.error.message||directory.error.code||'Erro desconhecido')+'</li>':'',
+        profiles.error?'<li><strong>Perfis:</strong> '+escapeHtml(profiles.error.message||profiles.error.code||'Erro desconhecido')+'</li>':'',
         docs.error?'<li><strong>Normas:</strong> '+escapeHtml(docs.error.message||docs.error.code||'Erro desconhecido')+'</li>':'',
         meetings.error?'<li><strong>Reuniões:</strong> '+escapeHtml(meetings.error.message||meetings.error.code||'Erro desconhecido')+'</li>':''
       ].filter(Boolean).join('');
