@@ -216,6 +216,17 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
           </form>
         </div>
       </div></div>
+      <div id="member-history-modal" class="setup-modal hidden" role="dialog" aria-modal="true" aria-labelledby="member-history-title">
+        <div class="setup-modal-card"><div class="eyebrow">Diretoria · Acesso privado</div><h2 id="member-history-title">Histórico do integrante</h2>
+          <p class="muted small" id="member-history-subtitle">Registros internos de acompanhamento.</p>
+          <div id="member-history-list" class="empty">Carregando histórico…</div>
+          <form id="member-history-form" style="margin-top:16px">
+            <label for="member-history-note">Novo registro</label><textarea id="member-history-note" required maxlength="3000" placeholder="Registre uma observação, acontecimento ou acompanhamento…"></textarea>
+            <div class="form-actions"><button class="btn btn-primary" type="submit">Adicionar ao histórico</button><button class="btn" id="member-history-close" type="button">Fechar</button></div>
+            <div id="member-history-notice" class="notice" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+      </div>
     </section>
 
     <section id="page-agenda" class="app-page hidden-page">
@@ -925,6 +936,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     }
   }
   const developerOnly=()=>String(currentUser?.email||'').trim().toLowerCase()==='gui.00sg@gmail.com';
+  const canManageMemberHistory=()=>{const position=String(currentProfile?.club_position||'').trim().toLocaleLowerCase('pt-BR');return developerOnly()||position==='presidente'||position.includes('presidente');};
   const canManageProspects=()=>{const position=String(currentProfile?.club_position||'').trim().toLocaleLowerCase('pt-BR');return developerOnly()||position==='presidente'||position.includes('presidente');};
   let prospectPeopleCache=[];
   async function loadProspectsPanel(){
@@ -1075,6 +1087,34 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   $('#admin-refresh')?.addEventListener('click',loadAdminDashboard);
   $$('[data-admin-go]').forEach(btn => btn.addEventListener('click',() => go(btn.dataset.adminGo)));
 
+  let currentHistoryPerson='';
+  async function openMemberHistory(personName){
+    if(!canManageMemberHistory()){notice('#app-notice','Histórico restrito ao desenvolvedor e ao Presidente.');return;}
+    currentHistoryPerson=personName;
+    $('#member-history-title').textContent='Histórico do integrante';
+    $('#member-history-subtitle').textContent=personName+' · Registros privados da diretoria';
+    $('#member-history-note').value='';
+    clearNotice('#member-history-notice');
+    $('#member-history-modal').classList.remove('hidden');
+    await loadMemberHistory();
+  }
+  async function loadMemberHistory(){
+    const list=$('#member-history-list');if(!list||!canManageMemberHistory())return;
+    list.textContent='Carregando histórico…';
+    const {data,error}=await db.from('club_member_history').select('id,person_name,note,created_at,author_email').eq('person_name',currentHistoryPerson).order('created_at',{ascending:false});
+    if(error){console.error('Erro ao carregar histórico do integrante:',error);list.textContent='Não foi possível carregar o histórico. Verifique se a migração SQL foi executada.';return;}
+    list.className=data?.length?'':'empty';
+    list.innerHTML=data?.length?data.map(item=>'<div class="list-row" style="display:block;margin-bottom:8px"><div class="muted small">'+new Date(item.created_at).toLocaleString('pt-BR')+' · '+escapeHtml(item.author_email||'Diretoria')+'</div><div style="white-space:pre-wrap;margin-top:6px">'+escapeHtml(item.note)+'</div></div>').join(''):'Nenhum registro neste histórico ainda.';
+  }
+  $('#member-history-form')?.addEventListener('submit',async event=>{
+    event.preventDefault();
+    if(!canManageMemberHistory()){notice('#member-history-notice','Apenas o desenvolvedor e o Presidente podem registrar informações.');return;}
+    const note=$('#member-history-note').value.trim();if(!note)return;
+    const {error}=await db.from('club_member_history').insert({person_name:currentHistoryPerson,note,created_by:currentUser.id,author_email:currentUser.email||''});
+    if(error){console.error(error);notice('#member-history-notice','Não foi possível salvar. Confira se a migração SQL foi executada.');return;}
+    $('#member-history-note').value='';await loadMemberHistory();notice('#member-history-notice','Registro adicionado ao histórico.');
+  });
+  $('#member-history-close')?.addEventListener('click',()=>$('#member-history-modal').classList.add('hidden'));
   async function loadMembers() {
     const box = $('#members-list'); if (!box) return;
     box.textContent = 'Carregando integrantes…';
@@ -1139,7 +1179,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     }).sort((a,b) => a.order-b.order || a.name.localeCompare(b.name,'pt-BR'));
 
     box.className = '';
-    box.innerHTML = members.map(m => `<div class="list-row member-row" data-member-name="${escapeHtml(m.name)}" data-member-position="${escapeHtml(m.position)}" data-member-status="${escapeHtml(m.status)}" data-member-type="${escapeHtml(m.riderType)}" role="button" tabindex="0" aria-expanded="false"><div class="member-summary"><div class="member-avatar">${m.photoUrl ? '<img src="'+escapeHtml(m.photoUrl)+'" alt="" loading="lazy">':'<span aria-hidden="true">♟</span>'}</div><div class="list-main"><strong>${escapeHtml(m.name||'Integrante')}</strong><small>${escapeHtml(m.position)}</small></div><span class="badge">${escapeHtml(m.status)} · ${escapeHtml(m.riderType)}</span><span class="member-chevron">＋</span>${currentProfile?.role==='admin' ? '<button class="btn member-edit-btn" type="button" style="flex-shrink:0">Editar</button>' : ''}</div><div class="member-details"><div><strong>Categoria:</strong> ${escapeHtml(m.riderType)}</div><div><strong>Situação:</strong> ${escapeHtml(m.status)}</div><div><strong>Telefone:</strong> ${m.phone ? escapeHtml(m.phone) : 'Não informado'}</div>${m.riderType==='Piloto' ? `<div><strong>Motocicleta:</strong> ${m.motorcycle ? escapeHtml(m.motorcycle) : 'Não informada'}</div>` : `<div><strong>Piloto vinculado:</strong> ${m.linkedPilot ? escapeHtml(m.linkedPilot) : 'Não informado'}</div>`}</div></div>`).join('');
+    box.innerHTML = members.map(m => `<div class="list-row member-row" data-member-name="${escapeHtml(m.name)}" data-member-position="${escapeHtml(m.position)}" data-member-status="${escapeHtml(m.status)}" data-member-type="${escapeHtml(m.riderType)}" role="button" tabindex="0" aria-expanded="false"><div class="member-summary"><div class="member-avatar">${m.photoUrl ? '<img src="'+escapeHtml(m.photoUrl)+'" alt="" loading="lazy">':'<span aria-hidden="true">♟</span>'}</div><div class="list-main"><strong>${escapeHtml(m.name||'Integrante')}</strong><small>${escapeHtml(m.position)}</small></div><span class="badge">${escapeHtml(m.status)} · ${escapeHtml(m.riderType)}</span><span class="member-chevron">＋</span>${currentProfile?.role==='admin' ? '<button class="btn member-edit-btn" type="button" style="flex-shrink:0">Editar</button>' : ''}${canManageMemberHistory() ? '<button class="btn member-history-btn" type="button" style="flex-shrink:0">Histórico</button>' : ''}</div><div class="member-details"><div><strong>Categoria:</strong> ${escapeHtml(m.riderType)}</div><div><strong>Situação:</strong> ${escapeHtml(m.status)}</div><div><strong>Telefone:</strong> ${m.phone ? escapeHtml(m.phone) : 'Não informado'}</div>${m.riderType==='Piloto' ? `<div><strong>Motocicleta:</strong> ${m.motorcycle ? escapeHtml(m.motorcycle) : 'Não informada'}</div>` : `<div><strong>Piloto vinculado:</strong> ${m.linkedPilot ? escapeHtml(m.linkedPilot) : 'Não informado'}</div>`}</div></div>`).join('');
     const openMemberEditor = row => {
       if (currentProfile?.role !== 'admin') return;
       $('#member-edit-name').value = row.dataset.memberName;
@@ -1166,6 +1206,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
         if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('button')) { event.preventDefault(); toggleDetails(); }
       });
       if (button) button.addEventListener('click', event => { event.stopPropagation(); openMemberEditor(row); });
+      const historyButton=row.querySelector('.member-history-btn');if(historyButton)historyButton.addEventListener('click',event=>{event.stopPropagation();openMemberHistory(row.dataset.memberName);});
     });
   }
   function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
