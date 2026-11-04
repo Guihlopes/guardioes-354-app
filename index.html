@@ -322,12 +322,16 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       <div class="section-title"><div><h2>Resumo do motoclube</h2><p>Os números são consultados no banco e ajudam a identificar onde agir.</p></div></div>
       <div class="grid" id="admin-stats-grid">
         <div class="card"><div class="muted small">👥 Integrantes cadastrados</div><div class="status-value" id="admin-count-members">—</div><p class="muted small">Confira cargos e cadastros na Gestão de membros.</p><button class="btn" type="button" data-admin-go="members">Ver integrantes →</button></div>
-        <div class="card"><div class="muted small">🏍️ Prospects</div><div class="status-value" id="admin-count-prospects">—</div><p class="muted small">Acompanhe a situação dos integrantes em formação.</p><button class="btn" type="button" data-admin-go="members">Acompanhar →</button></div>
+        <div class="card"><div class="muted small">🏍️ Prospects</div><div class="status-value" id="admin-count-prospects">—</div><p class="muted small">Acompanhe a situação dos integrantes em formação.</p><button class="btn" type="button" id="open-prospects-panel">Acompanhar →</button></div>
         <div class="card"><div class="muted small">📅 Atividades pendentes</div><div class="status-value" id="admin-count-pending-events">—</div><p class="muted small">Veja sugestões de passeios que podem precisar de decisão.</p><button class="btn" type="button" data-admin-go="agenda">Revisar agenda →</button></div>
         <div class="card"><div class="muted small">📁 Documentos oficiais</div><div class="status-value" id="admin-count-documents">—</div><p class="muted small">Estatuto, regulamentos, atas e arquivos do clube.</p><button class="btn" type="button" data-admin-go="documents">Abrir biblioteca →</button></div>
         <div class="card"><div class="muted small">📣 Comunicados publicados</div><div class="status-value" id="admin-count-announcements">—</div><p class="muted small">Mantenha os membros informados sobre decisões e avisos.</p><button class="btn" type="button" data-admin-go="agenda">Ver comunicados →</button></div>
         <div class="card"><div class="muted small">🗳️ Votações abertas</div><div class="status-value" id="admin-count-votes">—</div><p class="muted small">Acompanhe decisões que ainda estão recebendo votos.</p><button class="btn" type="button" data-admin-go="votes">Gerenciar votações →</button></div>
       </div>
+      <section id="admin-prospects-panel" class="hidden" style="margin:20px 0">
+        <div class="section-title"><div><h2>Gestão de prospects</h2><p>Acompanhamento privado de prospects e garupas vinculados, com ficha individual e histórico de comentários.</p></div><button class="btn" type="button" id="close-prospects-panel">Fechar ✕</button></div>
+        <div class="card" style="margin-bottom:14px"><div class="section-title"><div><h3 style="margin:0">Acompanhamento</h3><p class="muted small">Consulte a situação, abra fichas individuais e registre comentários.</p></div><button class="btn" type="button" id="prospects-refresh">↻ Atualizar</button></div><div class="grid" id="prospects-summary"><div class="empty">Carregando indicadores…</div></div><div class="form-grid" style="margin:14px 0"><div><label for="prospects-search">Pesquisar pessoa</label><input id="prospects-search" placeholder="Nome do prospect ou garupa"></div><div><label for="prospects-filter">Filtrar situação</label><select id="prospects-filter"><option value="">Todas as situações</option><option>Prospect</option><option>Ativo</option><option>Inativo</option></select></div></div><div id="prospects-list" class="empty">Carregando prospects…</div><div id="prospect-detail" class="hidden" style="margin-top:14px"></div></div>
+      </section>
       <div class="section-title"><div><h2>O que você pode fazer em cada área</h2><p>Escolha uma tarefa. Cada botão leva à tela onde ela é realizada.</p></div></div>
       <div class="grid">
         <div class="card">
@@ -369,7 +373,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       </div>
       <section id="admin-security-panel" class="hidden" style="margin:20px 0">
         <div class="section-title"><div><h2>Permissões e histórico</h2><p>Área de uso exclusivo do desenvolvedor do aplicativo.</p></div><button class="btn" type="button" id="close-audit-log">Fechar</button></div><div class="notice" style="margin-bottom:14px">⚠️ <strong>Área restrita ao desenvolvedor do app.</strong> Este painel é destinado exclusivamente à manutenção técnica, auditoria e diagnóstico do aplicativo Guardiões da 354. Não é uma ferramenta de uso da diretoria ou dos membros.</div>
-                 <div class="card" style="margin-bottom:14px"><div class="section-title"><div><h3 style="margin:0">Gestão de prospects</h3><p class="muted small">Acompanhamento privado de prospects e garupas vinculados, com ficha individual e histórico de comentários.</p></div><button class="btn" type="button" id="prospects-refresh">↻ Atualizar</button></div><div class="grid" id="prospects-summary"><div class="empty">Carregando indicadores…</div></div><div class="form-grid" style="margin:14px 0"><div><label for="prospects-search">Pesquisar pessoa</label><input id="prospects-search" placeholder="Nome do prospect ou garupa"></div><div><label for="prospects-filter">Filtrar situação</label><select id="prospects-filter"><option value="">Todas as situações</option><option>Prospect</option><option>Ativo</option><option>Inativo</option></select></div></div><div id="prospects-list" class="empty">Carregando prospects…</div><div id="prospect-detail" class="hidden" style="margin-top:14px"></div></div>
+                 
 <div class="card" style="margin-bottom:14px">
           <div class="section-title"><div><h3 style="margin:0">Confirmações de leitura</h3><p class="muted small">Veja quem abriu cada comunicado ou votação pelo painel de notificações.</p></div></div>
           <div id="content-read-summary" class="muted small" style="margin-bottom:10px">Os registros aparecem quando os integrantes abrem uma notificação.</div>
@@ -503,6 +507,8 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   }
   function fillProfile(user, p) {
     const developerEmail = String(user?.email || currentUser?.email || '').trim().toLowerCase();
+    const prospectsButton = $('#open-prospects-panel');
+    if (prospectsButton) prospectsButton.classList.toggle('hidden', developerEmail !== 'gui.00sg@gmail.com');
     const auditButton = $('#open-audit-log');
     if (auditButton) auditButton.classList.toggle('hidden', developerEmail !== 'gui.00sg@gmail.com');
     const firstName = (p.full_name || 'Integrante').trim().split(/\s+/)[0];
@@ -948,6 +954,8 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     $('#prospect-save-status').onclick=async()=>{const status=$('#prospect-status-edit').value,{error}=await db.from('member_directory').update({member_status:status}).eq('full_name',p.full_name);if(error){notice('#app-notice','Não foi possível alterar a situação: '+error.message);return;}notice('#app-notice','Situação atualizada no diretório.');await loadProspectsPanel();};
     $('#prospect-add-comment').onclick=async()=>{const comment=$('#prospect-new-comment').value.trim();if(!comment)return;const {error}=await db.from('club_prospect_notes').insert({person_name:p.full_name,comment,created_by:currentUser.id});if(error){notice('#app-notice','Não foi possível salvar. Confira se a migração SQL foi executada.');return;}await openProspectDetail(id);notice('#app-notice','Comentário adicionado ao histórico.');};
   }
+  $('#open-prospects-panel')?.addEventListener('click',async()=>{if(!developerOnly())return;$('#admin-prospects-panel')?.classList.remove('hidden');$('#admin-prospects-panel')?.scrollIntoView({behavior:'smooth',block:'start'});await loadProspectsPanel();});
+  $('#close-prospects-panel')?.addEventListener('click',()=>$('#admin-prospects-panel')?.classList.add('hidden'));
   $('#prospects-refresh')?.addEventListener('click',loadProspectsPanel);$('#prospects-search')?.addEventListener('input',renderProspectsList);$('#prospects-filter')?.addEventListener('change',renderProspectsList);
   async function loadInstitutionalSummary(){
     const box=$('#institutional-summary');if(!box||!developerOnly())return;
