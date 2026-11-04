@@ -376,6 +376,40 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
           <div class="form-actions"><button class="btn btn-primary" type="button" id="content-read-refresh">↻ Atualizar confirmações</button></div>
         </div>
         <div class="card" style="margin-bottom:14px">
+          <div class="section-title"><div><h3 style="margin:0">Gestão institucional</h3><p class="muted small">Painel experimental privado para organizar a estrutura do motoclube.</p></div></div>
+          <div class="grid" id="institutional-summary"><div class="empty">Carregue o resumo institucional.</div></div>
+          <div class="form-actions"><button class="btn btn-primary" id="institutional-refresh" type="button">↻ Atualizar gestão institucional</button></div>
+        </div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="section-title"><div><h3 style="margin:0">Central de documentos e normas</h3><p class="muted small">Cadastro experimental de estatuto, regulamentos, normas e atas. O arquivo pode ser vinculado por URL.</p></div></div>
+          <form id="governance-document-form" class="form-grid">
+            <div><label for="governance-doc-title">Título</label><input id="governance-doc-title" required placeholder="Ex.: Regulamento interno"></div>
+            <div><label for="governance-doc-category">Categoria</label><select id="governance-doc-category"><option>Estatuto</option><option>Regulamento</option><option>Norma</option><option>Ata</option><option>Procedimento</option><option>Outro</option></select></div>
+            <div><label for="governance-doc-version">Versão</label><input id="governance-doc-version" value="1.0"></div>
+            <div><label for="governance-doc-status">Situação</label><select id="governance-doc-status"><option>Vigente</option><option>Em revisão</option><option>Arquivado</option></select></div>
+            <div class="full"><label for="governance-doc-url">Link do arquivo (opcional)</label><input id="governance-doc-url" type="url" placeholder="https://..."></div>
+            <div class="full"><label for="governance-doc-description">Descrição</label><textarea id="governance-doc-description" rows="2" placeholder="Resumo e observações"></textarea></div>
+            <div class="full"><button class="btn btn-primary" type="submit">Salvar documento / norma</button></div>
+          </form>
+          <div id="governance-documents-list" class="empty">Nenhum documento carregado.</div>
+          <div class="form-actions"><button class="btn" id="governance-documents-refresh" type="button">↻ Atualizar documentos</button></div>
+        </div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="section-title"><div><h3 style="margin:0">Reuniões e decisões</h3><p class="muted small">Agende reuniões, registre pautas, atas e decisões.</p></div></div>
+          <form id="club-meeting-form" class="form-grid">
+            <div><label for="club-meeting-title">Título da reunião</label><input id="club-meeting-title" required placeholder="Ex.: Reunião ordinária"></div>
+            <div><label for="club-meeting-date">Data e horário</label><input id="club-meeting-date" type="datetime-local" required></div>
+            <div><label for="club-meeting-location">Local</label><input id="club-meeting-location" placeholder="Local da reunião"></div>
+            <div><label for="club-meeting-status">Situação</label><select id="club-meeting-status"><option>Agendada</option><option>Realizada</option><option>Cancelada</option></select></div>
+            <div class="full"><label for="club-meeting-agenda">Pauta</label><textarea id="club-meeting-agenda" rows="3" placeholder="Assuntos que serão discutidos"></textarea></div>
+            <div class="full"><label for="club-meeting-minutes">Ata / registro</label><textarea id="club-meeting-minutes" rows="3" placeholder="Resumo do que foi discutido"></textarea></div>
+            <div class="full"><label for="club-meeting-decisions">Decisões e encaminhamentos</label><textarea id="club-meeting-decisions" rows="3" placeholder="Decisão, responsável e prazo"></textarea></div>
+            <div class="full"><button class="btn btn-primary" type="submit">Salvar reunião</button></div>
+          </form>
+          <div id="club-meetings-list" class="empty">Nenhuma reunião carregada.</div>
+          <div class="form-actions"><button class="btn" id="club-meetings-refresh" type="button">↻ Atualizar reuniões</button></div>
+        </div>
+        <div class="card" style="margin-bottom:14px">
           <h3 style="margin-top:0">Regras de acesso</h3>
           <div class="grid">
             <div class="card"><strong>Fundadores</strong><p class="muted small">Guilherme Henrique Lopes e Welton Santana Silva: prioridade hierárquica conforme o estatuto. Acesso técnico segue as permissões concedidas na conta.</p></div>
@@ -883,6 +917,54 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
       list.innerHTML = '<ul style="margin:0;padding-left:22px;display:grid;gap:10px">' + attention.map(item => '<li>' + escapeHtml(item) + '</li>').join('') + '</ul>';
     }
   }
+  const developerOnly=()=>String(currentUser?.email||'').trim().toLowerCase()==='gui.00sg@gmail.com';
+  async function loadInstitutionalSummary(){
+    const box=$('#institutional-summary');if(!box||!developerOnly())return;
+    box.textContent='Carregando dados institucionais…';
+    const [profiles,directory,docs,meetings]=await Promise.all([
+      db.from('member_profiles').select('id,full_name,club_position,member_status,rider_type,active'),
+      db.from('member_directory').select('id,full_name,member_status'),
+      db.from('club_governance_documents').select('id,status'),
+      db.from('club_meetings').select('id,status')
+    ]);
+    const active=(profiles.data||[]).filter(x=>x.active).length;
+    const prospects=(profiles.data||[]).filter(x=>String(x.member_status||'').toLowerCase()==='prospect').length;
+    const count=(arr,key,val)=>arr.filter(x=>x[key]===val).length;
+    const tiles=[['Integrantes ativos',profiles.error?'—':active],['Prospects',profiles.error?'—':prospects],['Normas vigentes',docs.error?'—':count(docs.data||[],'status','Vigente')],['Reuniões agendadas',meetings.error?'—':count(meetings.data||[],'status','Agendada')]];
+    box.innerHTML=tiles.map(([label,value])=>'<div class="card"><div class="muted small">'+escapeHtml(label)+'</div><div class="status-value">'+value+'</div></div>').join('');
+    if(profiles.error||docs.error||meetings.error)box.insertAdjacentHTML('beforeend','<div class="notice">Alguns indicadores não puderam ser consultados. Confira se a migração foi executada.</div>');
+  }
+  async function loadGovernanceDocuments(){
+    const box=$('#governance-documents-list');if(!box||!developerOnly())return;
+    box.textContent='Carregando documentos…';
+    const {data,error}=await db.from('club_governance_documents').select('*').order('updated_at',{ascending:false});
+    if(error){box.textContent='Não foi possível carregar. Execute a migração institucional no Supabase.';return;}
+    box.innerHTML=(data||[]).length?(data||[]).map(d=>'<article class="notification-item"><strong>'+escapeHtml(d.title)+'</strong><p>'+escapeHtml(d.category)+' · Versão '+escapeHtml(d.version_label)+' · '+escapeHtml(d.status)+'</p><small>'+escapeHtml(d.description||'')+'</small>'+(d.file_url?'<p><a href="'+escapeHtml(d.file_url)+'" target="_blank" rel="noopener">Abrir arquivo ↗</a></p>':'')+'</article>').join(''):'<div class="empty">Nenhum documento cadastrado.</div>';
+  }
+  async function loadClubMeetings(){
+    const box=$('#club-meetings-list');if(!box||!developerOnly())return;
+    box.textContent='Carregando reuniões…';
+    const {data,error}=await db.from('club_meetings').select('*').order('meeting_date',{ascending:false});
+    if(error){box.textContent='Não foi possível carregar. Execute a migração institucional no Supabase.';return;}
+    box.innerHTML=(data||[]).length?(data||[]).map(m=>'<article class="notification-item"><strong>'+escapeHtml(m.title)+'</strong><p>'+new Date(m.meeting_date).toLocaleString('pt-BR')+' · '+escapeHtml(m.status)+' · '+escapeHtml(m.location||'Local não informado')+'</p>'+(m.agenda?'<p><strong>Pauta:</strong> '+escapeHtml(m.agenda)+'</p>':'')+(m.minutes?'<p><strong>Ata:</strong> '+escapeHtml(m.minutes)+'</p>':'')+(m.decisions?'<p><strong>Decisões:</strong> '+escapeHtml(m.decisions)+'</p>':'')+'</article>').join(''):'<div class="empty">Nenhuma reunião registrada.</div>';
+  }
+  $('#institutional-refresh')?.addEventListener('click',loadInstitutionalSummary);
+  $('#governance-documents-refresh')?.addEventListener('click',loadGovernanceDocuments);
+  $('#club-meetings-refresh')?.addEventListener('click',loadClubMeetings);
+  $('#governance-document-form')?.addEventListener('submit',async e=>{
+    e.preventDefault();if(!developerOnly())return;
+    const payload={title:$('#governance-doc-title').value.trim(),category:$('#governance-doc-category').value,version_label:$('#governance-doc-version').value.trim()||'1.0',status:$('#governance-doc-status').value,file_url:$('#governance-doc-url').value.trim()||null,description:$('#governance-doc-description').value.trim(),created_by:currentUser.id,updated_at:new Date().toISOString()};
+    const {error}=await db.from('club_governance_documents').insert(payload);
+    if(error){notice('#app-notice','Não foi possível salvar documento: '+error.message);return;}
+    e.target.reset();$('#governance-doc-version').value='1.0';await loadGovernanceDocuments();await loadInstitutionalSummary();notice('#app-notice','Documento cadastrado.');
+  });
+  $('#club-meeting-form')?.addEventListener('submit',async e=>{
+    e.preventDefault();if(!developerOnly())return;
+    const payload={title:$('#club-meeting-title').value.trim(),meeting_date:new Date($('#club-meeting-date').value).toISOString(),location:$('#club-meeting-location').value.trim(),status:$('#club-meeting-status').value,agenda:$('#club-meeting-agenda').value.trim(),minutes:$('#club-meeting-minutes').value.trim(),decisions:$('#club-meeting-decisions').value.trim(),created_by:currentUser.id,updated_at:new Date().toISOString()};
+    const {error}=await db.from('club_meetings').insert(payload);
+    if(error){notice('#app-notice','Não foi possível salvar reunião: '+error.message);return;}
+    e.target.reset();await loadClubMeetings();await loadInstitutionalSummary();notice('#app-notice','Reunião registrada.');
+  });
   async function loadContentReadReceipts() {
     const box=$('#content-read-list'),summary=$('#content-read-summary');
     if(!box)return;
@@ -931,7 +1013,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   }
   const isAppDeveloper = () => String(currentUser?.email || currentProfile?.email || '').trim().toLowerCase() === 'gui.00sg@gmail.com';
   $('#open-audit-log')?.classList.toggle('hidden', !isAppDeveloper());
-  $('#open-audit-log')?.addEventListener('click',()=>{if(!isAppDeveloper()){notice('#app-notice','Área de uso exclusivo do desenvolvedor do aplicativo.');return;}const panel=$('#admin-security-panel');panel?.classList.remove('hidden');loadAuditLog();panel?.scrollIntoView({behavior:'smooth',block:'start'});});
+  $('#open-audit-log')?.addEventListener('click',()=>{if(!isAppDeveloper()){notice('#app-notice','Área de uso exclusivo do desenvolvedor do aplicativo.');return;}const panel=$('#admin-security-panel');panel?.classList.remove('hidden');loadAuditLog();loadContentReadReceipts();loadInstitutionalSummary();loadGovernanceDocuments();loadClubMeetings();panel?.scrollIntoView({behavior:'smooth',block:'start'});});
   $('#close-audit-log')?.addEventListener('click',()=>$('#admin-security-panel')?.classList.add('hidden'));
   $('#audit-refresh')?.addEventListener('click',loadAuditLog);
   $('#audit-apply-filters')?.addEventListener('click',loadAuditLog);
