@@ -958,7 +958,14 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const count=(arr,key,val)=>arr.filter(x=>x[key]===val).length;
     const tiles=[['Integrantes ativos',profiles.error?'—':active],['Prospects',profiles.error?'—':prospects],['Normas vigentes',docs.error?'—':count(docs.data||[],'status','Vigente')],['Reuniões agendadas',meetings.error?'—':count(meetings.data||[],'status','Agendada')]];
     box.innerHTML=tiles.map(([label,value])=>'<div class="card"><div class="muted small">'+escapeHtml(label)+'</div><div class="status-value">'+value+'</div></div>').join('');
-    if(profiles.error||docs.error||meetings.error)box.insertAdjacentHTML('beforeend','<div class="notice">Alguns indicadores não puderam ser consultados. Confira se a migração foi executada.</div>');
+    if(profiles.error||docs.error||meetings.error){
+      const details=[
+        profiles.error?'<li><strong>Integrantes/Prospects:</strong> '+escapeHtml(profiles.error.message||profiles.error.code||'Erro desconhecido')+'</li>':'',
+        docs.error?'<li><strong>Normas:</strong> '+escapeHtml(docs.error.message||docs.error.code||'Erro desconhecido')+'</li>':'',
+        meetings.error?'<li><strong>Reuniões:</strong> '+escapeHtml(meetings.error.message||meetings.error.code||'Erro desconhecido')+'</li>':''
+      ].filter(Boolean).join('');
+      box.insertAdjacentHTML('beforeend','<div class="notice"><strong>Falha ao consultar alguns indicadores:</strong><ul style="margin:8px 0 0;padding-left:20px">'+details+'</ul></div>');
+    }
   }
   async function loadGovernanceDocuments(){
     const box=$('#governance-documents-list');if(!box||!developerOnly())return;
