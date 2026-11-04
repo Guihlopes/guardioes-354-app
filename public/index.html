@@ -922,12 +922,17 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   let prospectPeopleCache=[];
   async function loadProspectsPanel(){
     const box=$('#prospects-list');if(!box||!developerOnly())return;box.textContent='Carregando prospects e garupas…';
-    const [profiles,directory]=await Promise.all([db.from('public_member_profiles').select('id,full_name,club_position,member_status,rider_type,phone,motorcycle,pilot_id,active,photo_url'),db.from('member_directory').select('full_name,club_position,member_status,rider_type')]);
-    if(profiles.error){console.error(profiles.error);box.textContent='Não foi possível consultar os perfis. Verifique as permissões de public_member_profiles.';return;}
-    const byName=new Map((directory.data||[]).map(x=>[String(x.full_name||'').trim().toLocaleLowerCase('pt-BR'),x]));
-    const people=(profiles.data||[]).map(p=>{const d=byName.get(String(p.full_name||'').trim().toLocaleLowerCase('pt-BR'))||{};return {...p,member_status:d.member_status||p.member_status||'',rider_type:d.rider_type||p.rider_type||'Piloto',club_position:d.club_position||p.club_position||''};});
-    const prospects=people.filter(p=>String(p.member_status).toLowerCase()==='prospect'||String(p.club_position).toLowerCase()==='prospect'),ids=new Set(prospects.map(p=>p.id)),garupas=people.filter(p=>p.rider_type==='Garupa'&&p.pilot_id&&ids.has(p.pilot_id));
-    prospectPeopleCache=[...prospects,...garupas];$('#prospects-summary').innerHTML=[['Prospects',prospects.length],['Garupas vinculados',garupas.length],['Pessoas acompanhadas',prospects.length+garupas.length]].map(([a,b])=>'<div class="card"><div class="muted small">'+a+'</div><div class="status-value">'+b+'</div></div>').join('');renderProspectsList();
+    const [directory,profiles]=await Promise.all([db.from('member_directory').select('id,full_name,club_position,member_status,rider_type'),db.from('public_member_profiles').select('id,full_name,phone,motorcycle,pilot_id,photo_url')]);
+    if(directory.error){console.error(directory.error);box.textContent='Não foi possível consultar o diretório institucional. Verifique a política SELECT de member_directory.';return;}
+    if(profiles.error)console.warn('Dados complementares dos perfis indisponíveis:',profiles.error);
+    const profileByName=new Map((profiles.data||[]).map(p=>[String(p.full_name||'').trim().toLocaleLowerCase('pt-BR'),p]));
+    const people=(directory.data||[]).map(d=>{const p=profileByName.get(String(d.full_name||'').trim().toLocaleLowerCase('pt-BR'))||{};return {...p,...d,id:p.id||('directory:'+String(d.id||d.full_name)),directory_id:d.id,full_name:d.full_name,member_status:d.member_status||'',rider_type:d.rider_type||'Piloto',club_position:d.club_position||'',phone:p.phone||'',motorcycle:p.motorcycle||'',pilot_id:p.pilot_id||null};});
+    const prospects=people.filter(p=>String(p.member_status).trim().toLowerCase()==='prospect'||String(p.club_position).trim().toLowerCase()==='prospect');
+    const prospectProfileIds=new Set(prospects.filter(p=>!String(p.id).startsWith('directory:')).map(p=>p.id));
+    const garupas=people.filter(p=>p.rider_type==='Garupa'&&p.pilot_id&&prospectProfileIds.has(p.pilot_id));
+    prospectPeopleCache=[...prospects,...garupas];
+    $('#prospects-summary').innerHTML=[['Prospects',prospects.length],['Garupas vinculados',garupas.length],['Pessoas acompanhadas',prospects.length+garupas.length]].map(([a,b])=>'<div class="card"><div class="muted small">'+a+'</div><div class="status-value">'+b+'</div></div>').join('');
+    renderProspectsList();
   }
   function renderProspectsList(){
     const box=$('#prospects-list');if(!box)return;const q=String($('#prospects-search')?.value||'').trim().toLocaleLowerCase('pt-BR'),filter=$('#prospects-filter')?.value||'';
@@ -947,18 +952,18 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   async function loadInstitutionalSummary(){
     const box=$('#institutional-summary');if(!box||!developerOnly())return;
     box.textContent='Carregando dados institucionais…';
-    const [profiles,directory,docs,meetings]=await Promise.all([
-      db.from('member_profiles').select('id,full_name,club_position,member_status,rider_type,active'),
-      db.from('member_directory').select('id,full_name,member_status'),
+    const [directory,docs,meetings]=await Promise.all([
+      db.from('member_directory').select('full_name,club_position,member_status,rider_type'),
       db.from('club_governance_documents').select('id,status'),
       db.from('club_meetings').select('id,status')
     ]);
-    const active=(profiles.data||[]).filter(x=>x.active).length;
-    const prospects=(profiles.data||[]).filter(x=>String(x.member_status||'').toLowerCase()==='prospect').length;
+    const people=directory.data||[];
+    const active=people.filter(x=>String(x.member_status||'').trim().toLowerCase()==='ativo').length;
+    const prospects=new Set(people.filter(x=>String(x.member_status||'').trim().toLowerCase()==='prospect'||String(x.club_position||'').trim().toLowerCase()==='prospect').map(x=>String(x.full_name||'').trim().toLocaleLowerCase('pt-BR'))).size;
     const count=(arr,key,val)=>arr.filter(x=>x[key]===val).length;
-    const tiles=[['Integrantes ativos',profiles.error?'—':active],['Prospects',profiles.error?'—':prospects],['Normas vigentes',docs.error?'—':count(docs.data||[],'status','Vigente')],['Reuniões agendadas',meetings.error?'—':count(meetings.data||[],'status','Agendada')]];
+    const tiles=[['Integrantes ativos',directory.error?'—':active],['Prospects',directory.error?'—':prospects],['Normas vigentes',docs.error?'—':count(docs.data||[],'status','Vigente')],['Reuniões agendadas',meetings.error?'—':count(meetings.data||[],'status','Agendada')]];
     box.innerHTML=tiles.map(([label,value])=>'<div class="card"><div class="muted small">'+escapeHtml(label)+'</div><div class="status-value">'+value+'</div></div>').join('');
-    if(profiles.error||docs.error||meetings.error)box.insertAdjacentHTML('beforeend','<div class="notice">Alguns indicadores não puderam ser consultados. Confira se a migração foi executada.</div>');
+    if(directory.error||docs.error||meetings.error)box.insertAdjacentHTML('beforeend','<div class="notice">Alguns indicadores não puderam ser consultados. Confira as permissões das tabelas e as migrações.</div>');
   }
   async function loadGovernanceDocuments(){
     const box=$('#governance-documents-list');if(!box||!developerOnly())return;
