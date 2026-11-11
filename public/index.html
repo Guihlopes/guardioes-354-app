@@ -290,7 +290,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
 
     <section id="page-documents" class="app-page hidden-page">
       <div class="page-heading"><div><h1>Documentos</h1><p>Estatuto, regulamentos e arquivos oficiais do motoclube.</p></div><span class="badge">Biblioteca</span></div>
-      <div class="card hidden" id="document-upload-card"><h3>Enviar documento</h3><form id="document-form"><label for="document-title">Nome do documento</label><input id="document-title" required maxlength="160"><label for="document-file">Arquivo</label><input id="document-file" type="file" required accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"><button class="btn btn-primary btn-block" type="submit">Enviar documento</button></form></div>
+      <div class="card hidden" id="document-upload-card"><h3>Adicionar PDF à biblioteca</h3><form id="document-form"><label for="document-title">Nome do documento</label><input id="document-title" required maxlength="160" placeholder="Ex.: Estatuto do motoclube"><label for="document-file">Arquivo PDF</label><input id="document-file" type="file" required accept="application/pdf,.pdf"><small class="muted">Somente arquivos PDF. O documento ficará disponível para consulta dos integrantes.</small><button class="btn btn-primary btn-block" type="submit">Enviar PDF</button></form></div>
       <div class="card" style="margin-top:14px"><h3>Arquivos disponíveis</h3><div id="documents-list" class="empty">Carregando documentos…</div></div>
     </section>
     <section id="page-votes" class="app-page hidden-page">
@@ -1224,7 +1224,7 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
     const {data,error} = await db.from('club_documents').select('id,title,file_path,created_at').order('created_at',{ascending:false});
     if (error) { console.error('Erro ao carregar documentos:', error); box.textContent='Não foi possível carregar os documentos. Verifique as permissões de leitura no Supabase.'; return; }
     const canEdit = canManageDocuments();
-    box.innerHTML = data?.length ? data.map(d=>`<div class="list-row"><div class="list-icon">▧</div><div class="list-main"><strong>${escapeHtml(d.title)}</strong><small>${new Date(d.created_at).toLocaleDateString('pt-BR')}</small></div><button class="btn" data-download="${escapeHtml(d.file_path)}">Baixar</button>${canEdit?`<button class="btn" data-document-edit="${escapeHtml(d.id)}">Renomear</button><button class="btn" data-document-delete="${escapeHtml(d.id)}">Excluir</button>`:''}</div>`).join('') : '<div class="empty">Nenhum documento publicado.</div>';
+    box.innerHTML = data?.length ? data.map(d=>`<div class="list-row"><div class="list-icon">▧</div><div class="list-main"><strong>${escapeHtml(d.title)}</strong><small>${new Date(d.created_at).toLocaleDateString('pt-BR')}</small></div><button class="btn" data-download="${escapeHtml(d.file_path)}">Abrir PDF</button>${canEdit?`<button class="btn" data-document-edit="${escapeHtml(d.id)}">Renomear</button><button class="btn" data-document-delete="${escapeHtml(d.id)}">Excluir</button>`:''}</div>`).join('') : '<div class="empty">Nenhum documento publicado.</div>';
     box.querySelectorAll('[data-download]').forEach(b=>b.addEventListener('click',async()=>{const {data,error}=await db.storage.from('club-documents').createSignedUrl(b.dataset.download,120);if(error){notice('#app-notice','Não foi possível gerar o link do documento.');return;}window.open(data.signedUrl,'_blank','noopener');}));
     if(canEdit){
       box.querySelectorAll('[data-document-edit]').forEach(b=>b.addEventListener('click',async()=>{const item=(data||[]).find(d=>String(d.id)===b.dataset.documentEdit);if(!item)return;const title=prompt('Novo nome do documento:',item.title);if(title===null)return;if(!title.trim()){notice('#app-notice','Informe um nome para o documento.');return;}const {error}=await db.from('club_documents').update({title:title.trim()}).eq('id',item.id);if(error){notice('#app-notice','Não foi possível renomear. Verifique as permissões no Supabase.');return;}notice('#app-notice','Documento atualizado.');await loadDocuments();}));
@@ -1576,13 +1576,17 @@ $('#member-card-photo-upload')?.addEventListener('change', async (event) => {
     if(!canManageDocuments()){notice('#app-notice','Seu cargo não tem permissão para enviar documentos.');return;}
     const file=$('#document-file').files[0];
     const title=$('#document-title').value.trim();
-    if(!file||!title)return;
-    const path=Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-    const up=await db.storage.from('club-documents').upload(path,file,{upsert:false});
-    if(up.error){notice('#app-notice','Falha no envio do arquivo. Verifique as permissões do Storage.');return;}
+    if(!file||!title){notice('#app-notice','Informe o nome e selecione um arquivo PDF.');return;}
+    const isPdf=file.type==='application/pdf'||/\\.pdf$/i.test(file.name);
+    if(!isPdf){notice('#app-notice','Formato inválido. Envie somente arquivos PDF.');return;}
+    if(file.size===0){notice('#app-notice','O arquivo selecionado está vazio.');return;}
+    const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    const path=Date.now()+'-'+safeName;
+    const up=await db.storage.from('club-documents').upload(path,file,{upsert:false,contentType:'application/pdf'});
+    if(up.error){console.error('Falha no envio do PDF:',up.error);notice('#app-notice','Falha no envio do PDF. Verifique as permissões do Storage.');return;}
     const {error}=await db.from('club_documents').insert({title:title,file_path:path,uploaded_by:currentUser.id});
-    if(error){await db.storage.from('club-documents').remove([path]);notice('#app-notice','O arquivo foi enviado, mas não foi possível registrar o documento. Verifique as permissões da tabela.');return;}
-    notice('#app-notice','Documento publicado para os membros.');$('#document-form').reset();await loadDocuments();
+    if(error){await db.storage.from('club-documents').remove([path]);console.error('Falha ao registrar PDF:',error);notice('#app-notice','O PDF foi enviado, mas não foi possível cadastrá-lo. Verifique as permissões da tabela.');return;}
+    notice('#app-notice','PDF publicado na biblioteca dos Guardiões!');$('#document-form').reset();await loadDocuments();
   });
   async function loadAnnouncementMemberChoices(){
     const selectors=[$('#announcement-visible-members'),$('#announcement-notify-members'),$('#agenda-visible-members'),$('#agenda-notify-members')].filter(Boolean);
