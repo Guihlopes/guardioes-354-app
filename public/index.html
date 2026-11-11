@@ -823,32 +823,57 @@ button:focus-visible,[role="button"]:focus-visible{
 #brand-intro video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
 #brand-intro.is-ending{opacity:0;visibility:hidden;pointer-events:none}
 @media(prefers-reduced-motion:reduce){#brand-intro{transition:opacity .2s linear}}
+
+/* Tela inicial limpa — Guardiões da 354 */
+.login-screen-clean{width:min(100% - 28px,460px);min-height:100svh;display:flex;align-items:center;justify-content:center;padding:24px 0}
+.login-screen-clean .login-wrap{width:100%;padding:0;gap:0}
+.login-screen-clean .brand-login{margin:0 0 20px}
+.login-screen-clean .brand-logo{width:clamp(104px,30vw,142px);max-height:150px;filter:drop-shadow(0 8px 18px #0008)}
+.login-screen-clean .eyebrow{font-size:.65rem;letter-spacing:.13em;margin-top:10px}
+.login-panel-clean{padding:clamp(20px,5vw,30px);border-radius:20px;background:rgba(18,19,22,.94);box-shadow:0 16px 45px #0005}
+.login-heading-clean{text-align:center;margin-bottom:22px}
+.login-heading-clean h1{font-size:clamp(1.55rem,6vw,1.9rem);line-height:1.15;letter-spacing:-.025em;margin:0;font-weight:850}
+.login-heading-clean h1 span{color:var(--red)}
+.login-heading-clean p{font-size:.92rem;line-height:1.45;color:var(--muted);margin:9px 0 0}
+.login-screen-clean label{display:block;margin:13px 0 6px;font-size:.9rem}
+.login-screen-clean input{min-height:52px;padding:13px 15px;border-radius:13px}
+.login-screen-clean .btn-block{min-height:52px;margin-top:14px;border-radius:13px}
+.login-screen-clean #login-button{font-size:1rem;font-weight:800}
+.login-screen-clean .login-passkey-clean{min-height:46px;margin-top:9px;background:#202329;border:1px solid var(--line);font-size:.92rem}
+.login-screen-clean .login-bottom{display:flex;justify-content:center;margin-top:16px}
+.login-screen-clean .login-bottom .btn{background:transparent;border:0;padding:8px 12px;text-decoration:underline;text-underline-offset:4px}
+.login-screen-clean .login-install-clean{text-align:center;margin-top:16px}
+.login-screen-clean .login-install-clean .btn{min-height:42px}
+.login-screen-clean .login-footer{text-align:center;margin-top:15px;font-size:.68rem;letter-spacing:.16em;color:#777}
+@media(max-height:740px){.login-screen-clean{padding:14px 0}.login-screen-clean .brand-login{margin-bottom:12px}.login-screen-clean .brand-logo{width:94px;max-height:100px}.login-panel-clean{padding:17px}.login-heading-clean{margin-bottom:14px}.login-screen-clean input{min-height:46px}.login-screen-clean .btn-block{min-height:46px}}
 </style>
 </head>
 <body>
 <div id="brand-intro" aria-hidden="true"><video id="brand-intro-video" autoplay muted playsinline preload="auto"><source src="/videos/Bras%C3%A3o%20Guardi%C3%B5es%20354.mp4" type="video/mp4"></video></div>
-<div id="login-screen" class="app-shell">
+<div id="login-screen" class="app-shell login-screen-clean">
   <div class="login-wrap">
     <div class="brand-login">
       <img class="brand-logo" src="/icons/guardioes-logo.png?v=2" alt="Guardiões da 354" onerror="this.style.display='none'">
-      <div class="eyebrow">Motoclube · São Gotardo — MG</div>
+      <div class="eyebrow">MOTOCLUBE · SÃO GOTARDO — MG</div>
     </div>
-    <section class="panel">
-      <h1 class="login-title">Uma irmandade.<span>Uma estrada.</span></h1>
-      <p class="login-copy">O espaço exclusivo dos membros dos Guardiões da 354.</p>
+    <section class="panel login-panel-clean">
+      <div class="login-heading-clean">
+        <h1>Bem-vindo à <span>irmandade.</span></h1>
+        <p>Entre para acessar o espaço dos Guardiões da 354.</p>
+      </div>
       <form id="login-form">
-        <label for="email">E-mail cadastrado</label><input id="email" type="email" autocomplete="username" placeholder="seuemail@exemplo.com" required>
-        <label for="password">Senha</label><input id="password" type="password" autocomplete="current-password" placeholder="Sua senha" required>
-        <button id="login-button" class="btn btn-primary btn-block" type="submit">Entrar no aplicativo →</button>
-        <button id="passkey-login-button" class="btn btn-block" type="button">🔐 Acesso rápido e seguro</button>
-        <p class="muted small" style="text-align:center;line-height:1.45;margin:8px 0 0">Use o método de desbloqueio do seu aparelho, como reconhecimento facial, impressão digital, PIN, senha ou padrão. Disponível após cadastrar este aparelho.</p>
+        <label for="email">E-mail</label>
+        <input id="email" type="email" autocomplete="username" placeholder="seuemail@exemplo.com" required>
+        <label for="password">Senha</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="Sua senha" required>
+        <button id="login-button" class="btn btn-primary btn-block" type="submit">Entrar no aplicativo <span aria-hidden="true">→</span></button>
+        <button id="passkey-login-button" class="btn btn-block login-passkey-clean" type="button">🔐 Entrar com acesso rápido</button>
         <div class="login-bottom"><button id="first-access-button" class="btn btn-quiet" type="button">Primeiro acesso?</button></div>
       </form>
-      <p class="muted small" style="text-align:center;line-height:1.5;margin:16px 0 0">Acesso exclusivo para integrantes autorizados pelo motoclube.</p>
       <div id="login-notice" class="notice" role="status" aria-live="polite"></div>
     </section>
-    <div style="text-align:center;margin-top:18px"><button id="install-button" class="btn btn-quiet hidden" type="button">▯ Instalar aplicativo</button></div>
-    <div class="login-footer">GUARDIÕES DA 354 · APLICATIVO INDEPENDENTE</div>
+    <div class="login-install-clean"><button id="install-button" class="btn btn-quiet hidden" type="button">＋ Instalar aplicativo</button></div>
+    <div class="login-footer">GUARDIÕES DA 354</div>
   </div>
 </div>
 
