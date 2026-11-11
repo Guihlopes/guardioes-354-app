@@ -677,6 +677,21 @@ button:focus-visible,[role="button"]:focus-visible{
   border-radius:50%;background:#d51f3515;
 }
 #admin-stats-grid .status-value{font-size:clamp(1.35rem,3vw,2rem);font-weight:950;margin-top:9px}
+#admin-stats-grid>.admin-stat-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:5px;color:inherit;cursor:pointer;width:100%;font:inherit}
+#admin-stats-grid>.admin-stat-card small{color:var(--muted,#aab2bd);font-size:.78rem;position:relative;z-index:1}
+#admin-stats-grid>.admin-stat-card:hover,.admin-tool-trigger:hover{border-color:#d51f3577;transform:translateY(-1px)}
+.admin-tools-grid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.admin-tool-trigger{display:flex;align-items:center;gap:12px;text-align:left;width:100%;color:inherit;cursor:pointer;font:inherit}
+.admin-tool-trigger .expand-menu-copy{flex:1;min-width:0}
+.admin-tool-trigger .expand-menu-copy strong,.admin-tool-trigger .expand-menu-copy small{display:block}
+.admin-tool-trigger .expand-menu-copy small{margin-top:4px;color:var(--muted,#aab2bd);font-size:.78rem;font-weight:400}
+.admin-tool-trigger .expand-menu-chevron{margin-left:auto}
+#admin-detail-list{display:grid;gap:10px}
+.admin-detail-card{padding:14px;border:1px solid #ffffff16;border-radius:13px;background:#ffffff05;overflow-wrap:anywhere}
+.admin-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px}
+.admin-detail-field{padding:8px;border-radius:9px;background:#ffffff06;min-width:0}
+.admin-detail-field small{display:block;color:var(--muted,#aab2bd);margin-bottom:3px}
+.admin-detail-field strong{overflow-wrap:anywhere}
 #page-admin .form-actions{align-items:center}
 #page-admin .form-actions #admin-updated-at{line-height:1.5}
 #prospects-list .card,#prospect-detail .card{border-color:#ffffff1c}
@@ -1052,58 +1067,27 @@ button:focus-visible,[role="button"]:focus-visible{
       </div>
       <div class="section-title"><div><h2>Resumo do motoclube</h2><p>Os números são consultados no banco e ajudam a identificar onde agir.</p></div></div>
       <div class="grid" id="admin-stats-grid">
-        <div class="card"><div class="muted small">👥 Integrantes cadastrados</div><div class="status-value" id="admin-count-members">—</div><p class="muted small">Confira cargos e cadastros na Gestão de membros.</p><button class="btn" type="button" data-admin-go="members">Ver integrantes →</button></div>
-        <div class="card"><div class="muted small">🏍️ Prospects</div><div class="status-value" id="admin-count-prospects">—</div><p class="muted small">Acompanhe a situação dos integrantes em formação.</p><button class="btn" type="button" id="open-prospects-panel">Acompanhar →</button></div>
-        <div class="card"><div class="muted small">📅 Atividades pendentes</div><div class="status-value" id="admin-count-pending-events">—</div><p class="muted small">Veja sugestões de passeios que podem precisar de decisão.</p><button class="btn" type="button" data-admin-go="agenda">Revisar agenda →</button></div>
-        <div class="card"><div class="muted small">📁 Documentos oficiais</div><div class="status-value" id="admin-count-documents">—</div><p class="muted small">Estatuto, regulamentos, atas e arquivos do clube.</p><button class="btn" type="button" data-admin-go="documents">Abrir biblioteca →</button></div>
-        <div class="card"><div class="muted small">📣 Comunicados publicados</div><div class="status-value" id="admin-count-announcements">—</div><p class="muted small">Mantenha os membros informados sobre decisões e avisos.</p><button class="btn" type="button" data-admin-go="agenda">Ver comunicados →</button></div>
-        <div class="card"><div class="muted small">🗳️ Votações abertas</div><div class="status-value" id="admin-count-votes">—</div><p class="muted small">Acompanhe decisões que ainda estão recebendo votos.</p><button class="btn" type="button" data-admin-go="votes">Gerenciar votações →</button></div>
+        <button class="card admin-stat-card" type="button" data-admin-detail="members"><span class="muted small">👥 Integrantes cadastrados</span><strong class="status-value" id="admin-count-members">—</strong><small>Ver fichas e dados informados →</small></button>
+        <button class="card admin-stat-card" type="button" id="open-prospects-panel" aria-expanded="false"><span class="muted small">🏍️ Prospects</span><strong class="status-value" id="admin-count-prospects">—</strong><small>Abrir acompanhamento →</small></button>
+        <button class="card admin-stat-card" type="button" data-admin-detail="events"><span class="muted small">📅 Atividades pendentes</span><strong class="status-value" id="admin-count-pending-events">—</strong><small>Ver sugestões recebidas →</small></button>
+        <button class="card admin-stat-card" type="button" data-admin-detail="documents"><span class="muted small">📁 Documentos oficiais</span><strong class="status-value" id="admin-count-documents">—</strong><small>Ver arquivos cadastrados →</small></button>
+        <button class="card admin-stat-card" type="button" data-admin-detail="announcements"><span class="muted small">📣 Comunicados publicados</span><strong class="status-value" id="admin-count-announcements">—</strong><small>Ver comunicados →</small></button>
+        <button class="card admin-stat-card" type="button" data-admin-detail="votes"><span class="muted small">🗳️ Votações abertas</span><strong class="status-value" id="admin-count-votes">—</strong><small>Ver votações e andamento →</small></button>
       </div>
+      <section id="admin-detail-panel" class="card hidden" style="margin:18px 0"><div class="section-title" style="margin-top:0"><div><h2 id="admin-detail-title">Detalhes</h2><p id="admin-detail-subtitle" class="muted small"></p></div><button class="btn" id="admin-detail-close" type="button">Fechar ✕</button></div><div id="admin-detail-list" class="empty">Selecione um indicador.</div></section>
       <section id="admin-prospects-panel" class="hidden" style="margin:20px 0">
         <div class="section-title"><div><h2>Gestão de prospects</h2><p>Acompanhamento privado de prospects e garupas vinculados, com ficha individual e histórico de comentários.</p></div><button class="btn" type="button" id="close-prospects-panel">Fechar ✕</button></div>
-        <div class="card" style="margin-bottom:14px"><div class="section-title"><div><h3 style="margin:0">Acompanhamento</h3><p class="muted small">Consulte a situação, abra fichas individuais e registre comentários.</p></div><button class="btn" type="button" id="prospects-refresh">↻ Atualizar</button></div><div class="grid" id="prospects-summary"><div class="empty">Carregando indicadores…</div></div><div class="form-grid" style="margin:14px 0"><div><label for="prospects-search">Pesquisar pessoa</label><input id="prospects-search" placeholder="Nome do prospect ou garupa"></div><div><label for="prospects-filter">Filtrar situação</label><select id="prospects-filter"><option value="">Todas as situações</option><option>Prospect</option><option>Ativo</option><option>Inativo</option></select></div></div><div id="prospects-list" class="empty">Carregando prospects…</div><div id="prospect-detail" class="hidden" style="margin-top:14px"></div></div>
+        <div class="card" style="margin-bottom:14px admin-subpanel admin-receipts-panel hidden admin-subpanel admin-institution-panel hidden admin-subpanel admin-audit-panel hidden"><div class="section-title"><div><h3 style="margin:0">Acompanhamento</h3><p class="muted small">Consulte a situação, abra fichas individuais e registre comentários.</p></div><button class="btn" type="button" id="prospects-refresh">↻ Atualizar</button></div><div class="grid" id="prospects-summary"><div class="empty">Carregando indicadores…</div></div><div class="form-grid" style="margin:14px 0"><div><label for="prospects-search">Pesquisar pessoa</label><input id="prospects-search" placeholder="Nome do prospect ou garupa"></div><div><label for="prospects-filter">Filtrar situação</label><select id="prospects-filter"><option value="">Todas as situações</option><option>Prospect</option><option>Ativo</option><option>Inativo</option></select></div></div><div id="prospects-list" class="empty">Carregando prospects…</div><div id="prospect-detail" class="hidden" style="margin-top:14px"></div></div>
       </section>
-      <div class="section-title"><div><h2>O que você pode fazer em cada área</h2><p>Escolha uma tarefa. Cada botão leva à tela onde ela é realizada.</p></div></div>
-      <div class="grid">
-        <div class="card">
-          <div class="muted small">01 · PESSOAS</div><h3>Gestão de membros</h3>
-          <p>Use quando entrar um novo integrante ou quando precisar corrigir um cadastro.</p>
-          <ul class="small muted" style="padding-left:20px"><li>Conferir nome, telefone e motocicleta.</li><li>Revisar categoria e situação.</li><li>Manter cargos alinhados à decisão oficial da diretoria.</li></ul>
-          <button class="btn btn-primary" type="button" data-admin-go="members">Abrir gestão de membros →</button>
-        </div>
-        <div class="card">
-          <div class="muted small">02 · PASSEIOS</div><h3>Eventos e agenda</h3>
-          <p>Use antes de um passeio e sempre que alguém sugerir uma atividade.</p>
-          <ul class="small muted" style="padding-left:20px"><li>Revisar sugestões recebidas.</li><li>Conferir data, destino e ponto de encontro.</li><li>Acompanhar confirmações de presença.</li></ul>
-          <button class="btn btn-primary" type="button" data-admin-go="agenda">Abrir agenda →</button>
-        </div>
-        <div class="card">
-          <div class="muted small">03 · AVISOS</div><h3>Comunicados oficiais</h3>
-          <p>Use para que decisões e avisos importantes não fiquem perdidos no WhatsApp.</p>
-          <ul class="small muted" style="padding-left:20px"><li>Publicar avisos para os integrantes.</li><li>Corrigir ou retirar comunicados antigos.</li><li>Usar mensagens claras com data e instruções.</li></ul>
-          <button class="btn btn-primary" type="button" data-admin-go="agenda">Abrir comunicados →</button>
-        </div>
-        <div class="card">
-          <div class="muted small">04 · ARQUIVOS</div><h3>Documentos oficiais</h3>
-          <p>Use como arquivo central dos documentos que os membros precisam consultar.</p>
-          <ul class="small muted" style="padding-left:20px"><li>Publicar estatuto, regulamentos e atas.</li><li>Usar nomes claros e datas nas versões.</li><li>Renomear ou excluir arquivos desatualizados.</li></ul>
-          <button class="btn btn-primary" type="button" data-admin-go="documents">Abrir documentos →</button>
-        </div>
-        <div class="card">
-          <div class="muted small">05 · DECISÕES</div><h3>Votações</h3>
-          <p>Use quando a irmandade precisar registrar uma decisão de forma organizada.</p>
-          <ul class="small muted" style="padding-left:20px"><li>Definir pergunta e prazo de encerramento.</li><li>Selecionar quem pode participar.</li><li>Conferir o resultado e registrar a decisão.</li></ul>
-          <button class="btn btn-primary" type="button" data-admin-go="votes">Abrir votações →</button>
-        </div>
-        <div class="card">
-          <div class="muted small">06 · SEGURANÇA</div><h3>Permissões e histórico</h3>
-          <p>Área para acompanhar a segurança e a responsabilidade administrativa.</p>
-          <ul class="small muted" style="padding-left:20px"><li>Restringir ações conforme o cargo.</li><li>Manter os Fundadores na hierarquia definida pelo motoclube.</li><li>Planejar um histórico de quem alterou cada informação.</li></ul>
-          <button class="btn btn-primary" type="button" id="open-audit-log">Abrir histórico de alterações →</button>
-        </div>
+      <div class="section-title"><div><h2>Ferramentas administrativas</h2><p>Abra somente a área que deseja consultar ou gerenciar.</p></div></div>
+      <div class="grid admin-tools-grid">
+        <button class="card expand-menu-trigger admin-tool-trigger" type="button" id="admin-prospects-toggle" aria-expanded="false" aria-controls="admin-prospects-panel"><span class="expand-menu-icon">🏍️</span><span class="expand-menu-copy"><strong>Acompanhamento de prospects</strong><small>Fichas, situação e histórico</small></span><span class="expand-menu-chevron">⌄</span></button>
+        <button class="card expand-menu-trigger admin-tool-trigger" type="button" id="admin-read-toggle"><span class="expand-menu-icon">✓</span><span class="expand-menu-copy"><strong>Confirmações de leitura</strong><small>Quem abriu comunicados e votações</small></span><span class="expand-menu-chevron">⌄</span></button>
+        <button class="card expand-menu-trigger admin-tool-trigger" type="button" id="admin-institution-toggle"><span class="expand-menu-icon">🏛️</span><span class="expand-menu-copy"><strong>Gestão institucional</strong><small>Normas, documentos e reuniões</small></span><span class="expand-menu-chevron">⌄</span></button>
+        <button class="card expand-menu-trigger admin-tool-trigger" type="button" id="admin-audit-toggle"><span class="expand-menu-icon">📋</span><span class="expand-menu-copy"><strong>Histórico de alterações</strong><small>Auditoria técnica dos registros</small></span><span class="expand-menu-chevron">⌄</span></button>
       </div>
       <section id="admin-security-panel" class="hidden" style="margin:20px 0">
-        <div class="section-title"><div><h2>Permissões e histórico</h2><p>Área de uso exclusivo do desenvolvedor do aplicativo.</p></div><button class="btn" type="button" id="close-audit-log">Fechar</button></div><div class="notice" style="margin-bottom:14px">⚠️ <strong>Área restrita ao desenvolvedor do app.</strong> Este painel é destinado exclusivamente à manutenção técnica, auditoria e diagnóstico do aplicativo Guardiões da 354. Não é uma ferramenta de uso da diretoria ou dos membros.</div>
+        <div class="section-title"><div><h2>Ferramentas técnicas</h2><p>Área de uso exclusivo do desenvolvedor do aplicativo.</p></div><button class="btn" type="button" id="close-audit-log">Fechar</button></div><div class="notice" style="margin-bottom:14px">⚠️ <strong>Área restrita ao desenvolvedor do app.</strong> Este painel é destinado exclusivamente à manutenção técnica, auditoria e diagnóstico do aplicativo Guardiões da 354. Não é uma ferramenta de uso da diretoria ou dos membros.</div>
                  
 <div class="card" style="margin-bottom:14px">
           <div class="section-title"><div><h3 style="margin:0">Confirmações de leitura</h3><p class="muted small">Veja quem abriu cada comunicado ou votação pelo painel de notificações.</p></div></div>
@@ -1116,7 +1100,7 @@ button:focus-visible,[role="button"]:focus-visible{
           <div class="grid" id="institutional-summary"><div class="empty">Carregue o resumo institucional.</div></div>
           <div class="form-actions"><button class="btn btn-primary" id="institutional-refresh" type="button">↻ Atualizar gestão institucional</button></div>
         </div>
-        <div class="card" style="margin-bottom:14px">
+        <div class="card" style="margin-bottom:14px admin-subpanel admin-institution-panel hidden">
           <div class="section-title"><div><h3 style="margin:0">Central de documentos e normas</h3><p class="muted small">Cadastro experimental de estatuto, regulamentos, normas e atas. O arquivo pode ser vinculado por URL.</p></div></div>
           <form id="governance-document-form" class="form-grid">
             <div><label for="governance-doc-title">Título</label><input id="governance-doc-title" required placeholder="Ex.: Regulamento interno"></div>
@@ -1130,7 +1114,7 @@ button:focus-visible,[role="button"]:focus-visible{
           <div id="governance-documents-list" class="empty">Nenhum documento carregado.</div>
           <div class="form-actions"><button class="btn" id="governance-documents-refresh" type="button">↻ Atualizar documentos</button></div>
         </div>
-        <div class="card" style="margin-bottom:14px">
+        <div class="card" style="margin-bottom:14px admin-subpanel admin-institution-panel hidden">
           <div class="section-title"><div><h3 style="margin:0">Reuniões e decisões</h3><p class="muted small">Agende reuniões, registre pautas, atas e decisões.</p></div></div>
           <form id="club-meeting-form" class="form-grid">
             <div><label for="club-meeting-title">Título da reunião</label><input id="club-meeting-title" required placeholder="Ex.: Reunião ordinária"></div>
@@ -1145,7 +1129,7 @@ button:focus-visible,[role="button"]:focus-visible{
           <div id="club-meetings-list" class="empty">Nenhuma reunião carregada.</div>
           <div class="form-actions"><button class="btn" id="club-meetings-refresh" type="button">↻ Atualizar reuniões</button></div>
         </div>
-        <div class="card" style="margin-bottom:14px">
+        <div class="card" style="margin-bottom:14px admin-subpanel admin-institution-panel hidden">
           <h3 style="margin-top:0">Regras de acesso</h3>
           <div class="grid">
             <div class="card"><strong>Fundadores</strong><p class="muted small">Guilherme Henrique Lopes e Welton Santana Silva: prioridade hierárquica conforme o estatuto. Acesso técnico segue as permissões concedidas na conta.</p></div>
@@ -1615,48 +1599,34 @@ button:focus-visible,[role="button"]:focus-visible{
     if(event.data?.type==='PUSH_NOTIFICATION_CLICK')go(event.data.page==='votes'?'votes':'agenda');
   });
   updatePushStatus();
-  async function loadAdminDashboard() {
-    const list = $('#admin-attention-list');
-    if (!list || currentProfile?.role !== 'admin') return;
-    list.textContent = 'Atualizando indicadores…';
-    const [membersRes, eventsRes, docsRes, announcementsRes, votesRes] = await Promise.all([
-      db.from('member_directory').select('full_name,member_status,rider_type,club_position').order('full_name',{ascending:true}),
-      db.from('club_events').select('id,title,status,starts_at').order('starts_at',{ascending:true}),
-      db.from('club_documents').select('id,title,created_at').order('created_at',{ascending:false}),
-      db.from('club_announcements').select('id,title,created_at').order('created_at',{ascending:false}),
-      db.from('club_votes').select('id,title,closes_at,created_at').order('created_at',{ascending:false})
-    ]);
-    const members = membersRes.error ? [] : (membersRes.data || []);
-    const events = eventsRes.error ? [] : (eventsRes.data || []);
-    const docs = docsRes.error ? [] : (docsRes.data || []);
-    const announcements = announcementsRes.error ? [] : (announcementsRes.data || []);
-    const votes = votesRes.error ? [] : (votesRes.data || []);
-    const pendingEvents = events.filter(e => e.status && e.status !== 'published' && new Date(e.starts_at).getTime() >= Date.now());
-    const prospects = members.filter(m => String(m.member_status||'').toLocaleLowerCase('pt-BR') === 'prospect');
-    const openVotes = votes.filter(v => !v.closes_at || new Date(v.closes_at).getTime() > Date.now());
-    const set = (id,value) => { const el = $(id); if (el) el.textContent = String(value); };
-    set('#admin-count-members', membersRes.error ? '—' : members.length);
-    set('#admin-count-prospects', membersRes.error ? '—' : prospects.length);
-    set('#admin-count-pending-events', eventsRes.error ? '—' : pendingEvents.length);
-    set('#admin-count-documents', docsRes.error ? '—' : docs.length);
-    set('#admin-count-announcements', announcementsRes.error ? '—' : announcements.length);
-    set('#admin-count-votes', votesRes.error ? '—' : openVotes.length);
-    set('#admin-updated-at','Atualizado às ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
-    const attention = [];
-    if (membersRes.error) attention.push('Não foi possível consultar o diretório de integrantes.');
-    if (eventsRes.error) attention.push('Não foi possível consultar a agenda.');
-    if (docsRes.error) attention.push('Não foi possível consultar a biblioteca de documentos.');
-    if (announcementsRes.error) attention.push('Não foi possível consultar os comunicados.');
-    if (votesRes.error) attention.push('Não foi possível consultar as votações.');
-    if (!membersRes.error && prospects.length) attention.push(prospects.length + ' prospect(s) no diretório — revisar acompanhamento.');
-    if (!eventsRes.error && pendingEvents.length) attention.push(pendingEvents.length + ' atividade(s) aguardando decisão.');
-    if (!votesRes.error && openVotes.length) attention.push(openVotes.length + ' votação(ões) aberta(s).');
-    if (!attention.length) {
-      list.innerHTML = '<div class="empty">Tudo em dia! Nenhuma pendência identificada pelos indicadores disponíveis.</div>';
-    } else {
-      list.innerHTML = '<ul style="margin:0;padding-left:22px;display:grid;gap:10px">' + attention.map(item => '<li>' + escapeHtml(item) + '</li>').join('') + '</ul>';
-    }
+  let adminDataCache={members:[],events:[],documents:[],announcements:[],votes:[]};
+  async function loadAdminDashboard(){
+    const list=$('#admin-attention-list');if(!list||currentProfile?.role!=='admin')return;list.textContent='Atualizando indicadores…';
+    const [mr,pr,er,dr,ar,vr]=await Promise.all([db.from('member_directory').select('*').order('full_name',{ascending:true}),db.from('public_member_profiles').select('*'),db.from('club_events').select('*').order('starts_at',{ascending:true}),db.from('club_documents').select('*').order('created_at',{ascending:false}),db.from('club_announcements').select('*').order('created_at',{ascending:false}),db.from('club_votes').select('*').order('created_at',{ascending:false})]);
+    const members=mr.error?[]:(mr.data||[]),profiles=pr.error?[]:(pr.data||[]),byName=new Map(profiles.map(p=>[String(p.full_name||'').trim().toLocaleLowerCase('pt-BR'),p]));
+    adminDataCache={members:members.map(m=>({...((byName.get(String(m.full_name||'').trim().toLocaleLowerCase('pt-BR')))||{}),...m})),events:er.data||[],documents:dr.data||[],announcements:ar.data||[],votes:vr.data||[]};
+    const pending=adminDataCache.events.filter(e=>e.status&&e.status!=='published'&&(!e.starts_at||new Date(e.starts_at).getTime()>=Date.now())),prospects=members.filter(m=>String(m.member_status||'').toLowerCase()==='prospect'),openVotes=adminDataCache.votes.filter(v=>!v.closes_at||new Date(v.closes_at).getTime()>Date.now());
+    const set=(id,v)=>{const el=$(id);if(el)el.textContent=String(v)};set('#admin-count-members',mr.error?'—':members.length);set('#admin-count-prospects',mr.error?'—':prospects.length);set('#admin-count-pending-events',er.error?'—':pending.length);set('#admin-count-documents',dr.error?'—':adminDataCache.documents.length);set('#admin-count-announcements',ar.error?'—':adminDataCache.announcements.length);set('#admin-count-votes',vr.error?'—':openVotes.length);set('#admin-updated-at','Atualizado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
+    const issues=[];if(mr.error)issues.push('Falha ao consultar integrantes.');if(pr.error)issues.push('Dados complementares de perfis indisponíveis.');if(er.error)issues.push('Falha ao consultar agenda.');if(dr.error)issues.push('Falha ao consultar documentos.');if(ar.error)issues.push('Falha ao consultar comunicados.');if(vr.error)issues.push('Falha ao consultar votações.');if(prospects.length)issues.push(prospects.length+' prospect(s) para acompanhamento.');if(pending.length)issues.push(pending.length+' atividade(s) aguardando decisão.');if(openVotes.length)issues.push(openVotes.length+' votação(ões) aberta(s).');
+    list.innerHTML=issues.length?'<ul style="margin:0;padding-left:22px;display:grid;gap:10px">'+issues.map(x=>'<li>'+escapeHtml(x)+'</li>').join('')+'</ul>':'<div class="empty">Tudo em dia! Nenhuma pendência identificada.</div>';
   }
+  function adminField(label,value){if(value===null||value===undefined||value==='')return '';if(typeof value==='object')value=Array.isArray(value)?value.join(', '):JSON.stringify(value);return '<div class="admin-detail-field"><small>'+escapeHtml(label)+'</small><strong>'+escapeHtml(String(value))+'</strong></div>'}
+  function adminCard(title,sub,fields){return '<article class="admin-detail-card"><strong>'+escapeHtml(title||'Registro sem título')+'</strong>'+(sub?'<p class="muted small">'+escapeHtml(sub)+'</p>':'')+'<div class="admin-detail-grid">'+fields.filter(Boolean).join('')+'</div></article>'}
+  async function openAdminDetails(kind){
+    const panel=$('#admin-detail-panel'),box=$('#admin-detail-list'),title=$('#admin-detail-title'),sub=$('#admin-detail-subtitle'),labels={members:['Integrantes cadastrados','Dados pessoais e informações de vínculo disponíveis no cadastro.'],events:['Atividades pendentes','Sugestões e atividades que aguardam decisão.'],documents:['Documentos cadastrados','Arquivos publicados na biblioteca oficial.'],announcements:['Comunicados publicados','Avisos e públicos de visualização e notificação.'],votes:['Votações abertas','Prazos, público e andamento das votações.']};
+    title.textContent=labels[kind][0];sub.textContent=labels[kind][1];box.className='empty';box.textContent='Carregando registros…';panel.classList.remove('hidden');panel.scrollIntoView({behavior:'smooth',block:'start'});
+    if(kind==='members'&&!adminDataCache.members.length)await loadAdminDashboard();
+    const rows=kind==='events'?adminDataCache.events.filter(e=>e.status&&e.status!=='published'&&(!e.starts_at||new Date(e.starts_at).getTime()>=Date.now())):kind==='votes'?adminDataCache.votes.filter(v=>!v.closes_at||new Date(v.closes_at).getTime()>Date.now()):adminDataCache[kind]||[];
+    if(kind==='members'){const names={email:'E-mail',phone:'Telefone',birth_date:'Nascimento',date_of_birth:'Nascimento',rider_type:'Categoria',motorcycle:'Motocicleta',pilot_id:'Vínculo/Piloto',club_position:'Cargo',member_status:'Situação'};box.innerHTML=rows.length?rows.map(m=>adminCard(m.full_name||'Integrante',m.club_position||m.member_status,Object.keys(names).map(k=>adminField(names[k],m[k])))).join(''):'<div class="empty">Nenhum integrante encontrado.</div>';return}
+    const render={
+      events:r=>adminCard(r.title,r.starts_at?new Date(r.starts_at).toLocaleString('pt-BR'):'Data não informada',[adminField('Status',r.status),adminField('Local',r.location||r.meeting_point),adminField('Destino',r.destination),adminField('Descrição',r.description||r.details),adminField('Criado em',r.created_at),adminField('Responsável',r.created_by_name||r.proposer_name)]),
+      documents:r=>adminCard(r.title,r.created_at?new Date(r.created_at).toLocaleString('pt-BR'):'',[adminField('Arquivo',r.file_path),adminField('Categoria',r.category),adminField('Enviado por',r.created_by_name)]),
+      announcements:r=>adminCard(r.title,r.created_at?new Date(r.created_at).toLocaleString('pt-BR'):'',[adminField('Conteúdo',r.body),adminField('Quem pode ver',r.visible_to_groups),adminField('Pessoas que podem ver',r.visible_to_emails),adminField('Grupos notificados',r.notify_to_groups),adminField('Pessoas notificadas',r.notify_to_emails)]),
+      votes:r=>adminCard(r.title,r.closes_at?'Encerra em '+new Date(r.closes_at).toLocaleString('pt-BR'):'Sem prazo',[adminField('Pergunta',r.question||r.description),adminField('Tipo',r.vote_type||r.type),adminField('Opções',r.options),adminField('Público',r.target_groups||r.target_group),adminField('Integrantes',r.target_emails),adminField('Criada em',r.created_at)])};
+    box.innerHTML=rows.length?rows.map(render[kind]).join(''):'<div class="empty">Nenhum registro encontrado nesta categoria.</div>';
+  }
+  $$('[data-admin-detail]').forEach(btn=>btn.addEventListener('click',()=>openAdminDetails(btn.dataset.adminDetail)));
+  $('#admin-detail-close')?.addEventListener('click',()=>$('#admin-detail-panel')?.classList.add('hidden'));
   const developerOnly=()=>String(currentUser?.email||'').trim().toLowerCase()==='gui.00sg@gmail.com';
   const canManageMemberHistory=()=>{const position=String(currentProfile?.club_position||'').trim().toLocaleLowerCase('pt-BR');return developerOnly()||position==='presidente'||position.includes('presidente');};
   const canManageProspects=()=>{const position=String(currentProfile?.club_position||'').trim().toLocaleLowerCase('pt-BR');return developerOnly()||position==='presidente'||position.includes('presidente');};
@@ -1689,7 +1659,7 @@ button:focus-visible,[role="button"]:focus-visible{
     $('#prospect-save-status').onclick=async()=>{const status=$('#prospect-status-edit').value,{error}=await db.from('member_directory').update({member_status:status}).eq('full_name',p.full_name);if(error){notice('#app-notice','Não foi possível alterar a situação: '+error.message);return;}notice('#app-notice','Situação atualizada no diretório.');await loadProspectsPanel();};
     $('#prospect-add-comment').onclick=async()=>{const comment=$('#prospect-new-comment').value.trim();if(!comment)return;const {error}=await db.from('club_prospect_notes').insert({person_name:p.full_name,comment,created_by:currentUser.id});if(error){notice('#app-notice','Não foi possível salvar. Confira se a migração SQL foi executada.');return;}await openProspectDetail(id);notice('#app-notice','Comentário adicionado ao histórico.');};
   }
-  $('#open-prospects-panel')?.addEventListener('click',async(event)=>{event.preventDefault();event.stopPropagation();if(!canManageProspects())return;go('admin');const panel=$('#admin-prospects-panel');if(!panel)return;panel.classList.remove('hidden');panel.scrollIntoView({behavior:'smooth',block:'start'});await loadProspectsPanel();});
+  $('#open-prospects-panel')?.addEventListener('click',async()=>{if(!canManageProspects())return;const p=$('#admin-prospects-panel'),btn=$('#open-prospects-panel'),opening=p.classList.contains('hidden');p.classList.toggle('hidden',!opening);btn.setAttribute('aria-expanded',String(opening));if(opening){p.scrollIntoView({behavior:'smooth',block:'start'});await loadProspectsPanel()}});
   $('#close-prospects-panel')?.addEventListener('click',()=>$('#admin-prospects-panel')?.classList.add('hidden'));
   $('#prospects-refresh')?.addEventListener('click',loadProspectsPanel);$('#prospects-search')?.addEventListener('input',renderProspectsList);$('#prospects-filter')?.addEventListener('change',renderProspectsList);
   async function loadInstitutionalSummary(){
@@ -1802,7 +1772,9 @@ button:focus-visible,[role="button"]:focus-visible{
   }
   const isAppDeveloper = () => String(currentUser?.email || currentProfile?.email || '').trim().toLowerCase() === 'gui.00sg@gmail.com';
   $('#open-audit-log')?.classList.toggle('hidden', !isAppDeveloper());
-  $('#open-audit-log')?.addEventListener('click',()=>{if(!isAppDeveloper()){notice('#app-notice','Área de uso exclusivo do desenvolvedor do aplicativo.');return;}const panel=$('#admin-security-panel');panel?.classList.remove('hidden');loadAuditLog();loadContentReadReceipts();loadInstitutionalSummary();loadGovernanceDocuments();loadClubMeetings();loadProspectsPanel();panel?.scrollIntoView({behavior:'smooth',block:'start'});});
+  function openAdminToolPanel(kind){if(!isAppDeveloper()){notice('#app-notice','Área de uso exclusivo do desenvolvedor do aplicativo.');return;}const panel=$('#admin-security-panel');panel?.classList.remove('hidden');$('.admin-subpanel').forEach(x=>x.classList.add('hidden'));const sel={read:'.admin-receipts-panel',institution:'.admin-institution-panel',audit:'.admin-audit-panel'}[kind];if(sel)$(sel).forEach(x=>x.classList.remove('hidden'));if(kind==='read')loadContentReadReceipts();if(kind==='institution'){loadInstitutionalSummary();loadGovernanceDocuments();loadClubMeetings()}if(kind==='audit')loadAuditLog();panel?.scrollIntoView({behavior:'smooth',block:'start'})}
+  $('#admin-read-toggle')?.addEventListener('click',()=>openAdminToolPanel('read'));$('#admin-institution-toggle')?.addEventListener('click',()=>openAdminToolPanel('institution'));$('#admin-audit-toggle')?.addEventListener('click',()=>openAdminToolPanel('audit'));
+  $('#admin-prospects-toggle')?.addEventListener('click',async()=>{const p=$('#admin-prospects-panel'),btn=$('#admin-prospects-toggle'),opening=p.classList.contains('hidden');p.classList.toggle('hidden',!opening);btn.setAttribute('aria-expanded',String(opening));if(opening){p.scrollIntoView({behavior:'smooth',block:'start'});await loadProspectsPanel()}});
   $('#close-audit-log')?.addEventListener('click',()=>$('#admin-security-panel')?.classList.add('hidden'));
   $('#audit-refresh')?.addEventListener('click',loadAuditLog);
   $('#audit-apply-filters')?.addEventListener('click',loadAuditLog);
