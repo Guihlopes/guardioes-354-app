@@ -817,9 +817,21 @@ button:focus-visible,[role="button"]:focus-visible{
   #admin-stats-grid > #admin-prospects-panel{padding:14px;margin:12px 0}
 }
 
+
+/* Abertura animada da identidade Guardiões da 354 */
+#brand-intro{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse at 50% 48%,#202226 0%,#090a0c 48%,#000 100%);animation:brandIntroFade .55s ease 3.15s forwards;pointer-events:auto}
+#brand-intro::before{content:"";position:absolute;width:min(82vw,520px);aspect-ratio:1;border-radius:50%;background:#df1e31;filter:blur(95px);opacity:.10;animation:brandIntroGlow 2.8s ease-out both}
+#brand-intro img{position:relative;z-index:1;display:block;width:min(78vw,430px);height:auto;max-height:82svh;object-fit:contain;filter:drop-shadow(0 12px 34px #000c);opacity:0;clip-path:inset(31% 17% 22% 17%);transform:scale(.92);animation:brandIntroReveal 2.85s cubic-bezier(.2,.72,.18,1) .12s forwards}
+@keyframes brandIntroReveal{0%{opacity:0;clip-path:inset(31% 17% 22% 17%);transform:scale(.92);filter:drop-shadow(0 0 0 #000)}18%{opacity:1;clip-path:inset(31% 17% 22% 17%);transform:scale(1);filter:drop-shadow(0 10px 24px #000b)}56%{opacity:1;clip-path:inset(31% 17% 22% 17%);transform:scale(1)}100%{opacity:1;clip-path:inset(0 0 0 0);transform:scale(1);filter:drop-shadow(0 12px 34px #000c)}}
+@keyframes brandIntroFade{to{opacity:0;visibility:hidden;pointer-events:none}}
+@keyframes brandIntroGlow{0%{opacity:0;transform:scale(.65)}45%{opacity:.14;transform:scale(1)}100%{opacity:.08;transform:scale(1.12)}}
+@media(max-width:600px){#brand-intro img{width:min(86vw,380px);max-height:76svh}}
+@media(prefers-reduced-motion:reduce){#brand-intro{animation:brandIntroFade .2s linear .25s forwards}#brand-intro img{animation:none;opacity:1;clip-path:none;transform:none}}
+
 </style>
 </head>
 <body>
+<div id="brand-intro" aria-hidden="true"><img src="/icons/guardioes-logo.png?v=2" alt=""></div>
 <div id="login-screen" class="app-shell">
   <div class="login-wrap">
     <div class="brand-login">
