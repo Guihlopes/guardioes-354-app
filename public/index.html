@@ -612,6 +612,131 @@ button:focus-visible,[role="button"]:focus-visible{
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
 
+
+/* GUARDIOES 354 — acabamento visual integrado das telas */
+.app-page{min-width:0}
+.app-page>.card,.app-page>.callout{margin-bottom:16px}
+#page-home .push-setup-card{
+  position:relative;border:1px solid #d51f3545!important;
+  border-radius:15px!important;background:linear-gradient(115deg,#d51f3515,#ffffff04)!important;
+}
+#page-home .push-setup-card>strong{font-size:.88rem;letter-spacing:.01em}
+#page-home .push-setup-card .btn{min-height:40px}
+#page-home .two-col>.card{min-height:175px}
+#page-members .callout{margin-bottom:16px}
+#members-list{min-height:80px}
+#members-list:not(.empty){border-radius:14px}
+#members-list .member-row{padding:13px 10px;border-bottom:1px solid #ffffff12}
+#members-list .member-row:last-child{border-bottom:0}
+#members-list .member-row:hover{background:#ffffff05}
+#page-agenda #agenda-next{font-weight:900;letter-spacing:-.025em}
+#page-agenda>#agenda-form-card,#page-agenda>#announcement-compose-card,
+#page-agenda #agenda-form-card,#page-agenda #announcement-compose-card{
+  border-color:#d51f3545;background:linear-gradient(145deg,#1c2027,#11151a);
+}
+#page-agenda .audience-box,#page-votes .audience-box{
+  border-color:#ffffff1c;background:linear-gradient(145deg,#191e25,#11151a);
+}
+#agenda-list,#agenda-history-list,#announcements-list,#documents-list,#votes-list,#vote-results{
+  min-width:0;overflow-wrap:anywhere;
+}
+#agenda-list .announcement-card,#announcements-list .announcement-card,
+#home-announcements-list .announcement-card,#votes-list .announcement-card{
+  border-color:#ffffff1b;border-radius:16px;
+  background:linear-gradient(145deg,#1c2129,#12161b);
+  box-shadow:0 10px 26px #0002;
+}
+#agenda-list .announcement-card:hover,#announcements-list .announcement-card:hover,
+#votes-list .announcement-card:hover{border-color:#d51f3555}
+#documents-list .list-row,#documents-list .document-item{
+  padding:15px 12px;border:1px solid #ffffff14;border-radius:14px;
+  background:linear-gradient(145deg,#1a1f26,#11151a);margin:9px 0;
+}
+#documents-list a,.app-page a:not(.btn){color:#ff7887;text-underline-offset:3px}
+#documents-list .btn{min-height:38px}
+#page-votes #vote-create-card{border-color:#d51f3555}
+#votes-list .vote-card .vote-options{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+#votes-list .vote-options .btn{flex:1 1 105px;min-height:44px}
+#votes-list .vote-options .btn:disabled{opacity:.72}
+#votes-list .vote-partials{padding:12px;border:1px solid #ffffff14;border-radius:12px;background:#ffffff05;margin:12px 0}
+#votes-list .vote-count{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #ffffff10}
+#votes-list .vote-count:last-child{border-bottom:0}
+#page-profile #member-digital-card{margin:0 auto 18px}
+#page-profile .member-pass{box-shadow:0 18px 45px #0006,0 0 0 1px #d51f3520}
+#page-profile .profile-grid{gap:10px}
+#page-profile .profile-field{min-height:76px}
+#page-profile #profile-edit-form{margin-top:4px}
+#page-admin .section-title{margin-top:25px}
+#admin-stats-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+#admin-stats-grid>.card{
+  position:relative;overflow:hidden;min-height:108px;
+  border-radius:16px;padding:17px;
+}
+#admin-stats-grid>.card:after{
+  content:"";position:absolute;width:72px;height:72px;right:-24px;bottom:-30px;
+  border-radius:50%;background:#d51f3515;
+}
+#admin-stats-grid .status-value{font-size:clamp(1.35rem,3vw,2rem);font-weight:950;margin-top:9px}
+#page-admin .form-actions{align-items:center}
+#page-admin .form-actions #admin-updated-at{line-height:1.5}
+#prospects-list .card,#prospect-detail .card{border-color:#ffffff1c}
+#member-edit-modal,#member-history-modal{backdrop-filter:blur(8px)}
+#member-edit-modal .setup-modal-card,#member-history-modal .setup-modal-card{width:min(100%,560px)}
+.notice.show{box-shadow:0 8px 24px #0002}
+.app-footer{border-top:1px solid #ffffff0d;margin-top:28px}
+@media(max-width:900px){
+  body{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+  .desktop-nav{display:none!important}
+  .mobile-nav{
+    display:flex!important;position:fixed!important;z-index:90;
+    left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));
+    width:auto;gap:3px;align-items:stretch;justify-content:flex-start;
+    overflow-x:auto;overscroll-behavior-x:contain;
+    padding:7px;border:1px solid #ffffff20;border-radius:18px;
+    background:#11151aeb;backdrop-filter:blur(20px);
+    box-shadow:0 12px 40px #000b,0 1px #ffffff0b inset;
+    scrollbar-width:none;
+  }
+  .mobile-nav::-webkit-scrollbar{display:none}
+  .mobile-nav button{
+    display:flex;flex:1 0 66px;min-width:66px;min-height:54px;
+    flex-direction:column;align-items:center;justify-content:center;
+    gap:4px;padding:5px 4px;border:1px solid transparent;border-radius:12px;
+    background:transparent;color:#9da5b0;font-size:.64rem;font-weight:800;white-space:nowrap;
+  }
+  .mobile-nav button span{font-size:1.12rem;line-height:1.1;color:#aeb6c1}
+  .mobile-nav button.active{color:#fff;border-color:#d51f3555;background:linear-gradient(145deg,#d51f3529,#d51f3509)}
+  .mobile-nav button.active span{color:#ff687b}
+  .mobile-nav button.admin-only.hidden{display:none!important}
+}
+@media(min-width:601px) and (max-width:900px){
+  .app-shell{width:min(100% - 34px,820px);padding-top:18px}
+  .hero{grid-template-columns:minmax(0,1.4fr) minmax(220px,.8fr)}
+  .hero-main{padding:25px;min-height:220px}
+  .hero-side{min-height:190px;padding:20px}
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #admin-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .two-col{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:600px){
+  #admin-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  #admin-stats-grid>.card{min-height:94px;padding:13px}
+  #admin-stats-grid .status-value{font-size:1.45rem}
+  #page-agenda .form-actions,#page-votes .form-actions{grid-template-columns:1fr}
+  #page-agenda .form-actions .btn,#page-votes .form-actions .btn{width:100%}
+  #page-documents .page-heading,#page-votes .page-heading{gap:8px}
+  #documents-list .list-row,#documents-list .document-item{padding:12px 10px}
+  #votes-list .vote-options .btn{flex-basis:calc(50% - 8px)}
+  #page-profile .member-pass{margin-left:auto;margin-right:auto}
+  #page-admin .section-title{margin-top:21px}
+}
+@media(max-width:380px){
+  #admin-stats-grid>.card{padding:11px}
+  #admin-stats-grid .status-value{font-size:1.25rem}
+  .mobile-nav{left:7px;right:7px}
+  .mobile-nav button{flex-basis:59px;min-width:59px;font-size:.59rem}
+}
+
 </style>
 </head>
 <body>
@@ -1515,18 +1640,33 @@ button:focus-visible,[role="button"]:focus-visible{
   async function loadInstitutionalSummary(){
     const box=$('#institutional-summary');if(!box||!developerOnly())return;
     box.textContent='Carregando dados institucionais…';
-    const [directory,docs,meetings]=await Promise.all([
+    const [directory,docs,meetings,userCount]=await Promise.all([
       db.from('member_directory').select('full_name,club_position,member_status,rider_type'),
       db.from('club_governance_documents').select('id,status'),
-      db.from('club_meetings').select('id,status')
+      db.from('club_meetings').select('id,status'),
+      db.rpc('club_admin_user_count')
     ]);
     const people=directory.data||[];
     const active=people.filter(x=>String(x.member_status||'').trim().toLowerCase()==='ativo').length;
     const prospects=new Set(people.filter(x=>String(x.member_status||'').trim().toLowerCase()==='prospect'||String(x.club_position||'').trim().toLowerCase()==='prospect').map(x=>String(x.full_name||'').trim().toLocaleLowerCase('pt-BR'))).size;
     const count=(arr,key,val)=>arr.filter(x=>x[key]===val).length;
-    const tiles=[['Integrantes ativos',directory.error?'—':active],['Prospects',directory.error?'—':prospects],['Normas vigentes',docs.error?'—':count(docs.data||[],'status','Vigente')],['Reuniões agendadas',meetings.error?'—':count(meetings.data||[],'status','Agendada')]];
+    const tiles=[
+      ['Contas cadastradas',userCount.error?'—':userCount.data],
+      ['Integrantes ativos',directory.error?'—':active],
+      ['Prospects',directory.error?'—':prospects],
+      ['Normas vigentes',docs.error?'—':count(docs.data||[],'status','Vigente')],
+      ['Reuniões agendadas',meetings.error?'—':count(meetings.data||[],'status','Agendada')]
+    ];
     box.innerHTML=tiles.map(([label,value])=>'<div class="card"><div class="muted small">'+escapeHtml(label)+'</div><div class="status-value">'+value+'</div></div>').join('');
-    if(directory.error||docs.error||meetings.error)box.insertAdjacentHTML('beforeend','<div class="notice">Alguns indicadores não puderam ser consultados. Confira as permissões das tabelas e as migrações.</div>');
+    if(directory.error||docs.error||meetings.error||userCount.error){
+      const details=[
+        directory.error?'<li><strong>Diretório:</strong> '+escapeHtml(directory.error.message||directory.error.code||'Erro desconhecido')+'</li>':'',
+        userCount.error?'<li><strong>Contas cadastradas:</strong> '+escapeHtml(userCount.error.message||userCount.error.code||'Erro desconhecido')+'</li>':'',
+        docs.error?'<li><strong>Normas:</strong> '+escapeHtml(docs.error.message||docs.error.code||'Erro desconhecido')+'</li>':'',
+        meetings.error?'<li><strong>Reuniões:</strong> '+escapeHtml(meetings.error.message||meetings.error.code||'Erro desconhecido')+'</li>':''
+      ].filter(Boolean).join('');
+      box.insertAdjacentHTML('beforeend','<div class="notice"><strong>Falha ao consultar alguns indicadores:</strong><ul style="margin:8px 0 0;padding-left:20px">'+details+'</ul></div>');
+    }
   }
   async function loadGovernanceDocuments(){
     const box=$('#governance-documents-list');if(!box||!developerOnly())return;
