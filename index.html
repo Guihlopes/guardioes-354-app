@@ -873,11 +873,6 @@ button:focus-visible,[role="button"]:focus-visible{
         <button class="tile" data-go="votes"><span class="tile-icon">✓</span><strong>Votações</strong><small>Participe das votações autorizadas.</small><span class="tag">Deliberações</span></button>
         <button class="tile" data-go="profile"><span class="tile-icon">♙</span><strong>Meu perfil</strong><small>Confira seus dados e categoria.</small><span class="tag">Minha conta</span></button>
       </div>
-      <div class="section-title"><div><h2>Próximas atividades</h2><p>Eventos e avisos atualizados automaticamente.</p></div><button class="btn" data-go="agenda">Ver agenda</button></div>
-      <div class="two-col">
-        <div class="card"><h3>Agenda do motoclube</h3><div id="home-agenda-list" class="empty">Carregando agenda…</div></div>
-        <div class="card"><h3>Últimos comunicados</h3><div id="home-announcements-list" class="empty">Carregando comunicados…</div></div>
-      </div>
     </section>
 
     <section id="page-members" class="app-page hidden-page">
@@ -912,6 +907,7 @@ button:focus-visible,[role="button"]:focus-visible{
 
     <section id="page-agenda" class="app-page hidden-page">
       <div class="page-heading"><div><h1>Agenda e Comunicados</h1><p>Atividades, reuniões e avisos oficiais dos Guardiões da 354 em um só lugar.</p></div><span class="badge">Mural oficial</span></div>
+      <div class="card" style="margin-bottom:14px"><h3>Comunicados recentes</h3><p class="muted small">Avisos oficiais publicados pela diretoria.</p><div id="announcements-list" class="empty">Carregando comunicados…</div></div>
       <div class="card" style="margin-bottom:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
           <div><div class="muted small">Próxima atividade</div><div id="agenda-next" class="status-value" style="font-size:1.15rem">—</div></div>
@@ -949,17 +945,16 @@ button:focus-visible,[role="button"]:focus-visible{
           <label for="announcement-notify-groups">Grupos (opcional)</label><select id="announcement-notify-groups" multiple size="4"><option value="all">Todos os membros ativos</option><option value="pilots">Pilotos</option><option value="pillion">Garupas</option><option value="prospects">Prospects</option></select>
           <label for="announcement-notify-members">Pessoas específicas (opcional)</label><select id="announcement-notify-members" multiple size="5"></select><small class="muted">Você pode escolher um grupo, pessoas específicas ou ambos.</small></div>
         <button class="btn btn-primary btn-block" type="submit">Publicar comunicado</button></form></div>
-      <div class="card" style="margin-top:14px"><h3>Comunicados recentes</h3><div id="announcements-list" class="empty">Carregando comunicados…</div></div>
     </section>
 
     <section id="page-documents" class="app-page hidden-page">
       <div class="page-heading"><div><h1>Documentos</h1><p>Estatuto, regulamentos e arquivos oficiais do motoclube.</p></div><span class="badge">Biblioteca</span></div>
-      <div class="card hidden" id="document-upload-card"><h3>Adicionar PDF à biblioteca</h3><form id="document-form"><label for="document-title">Nome do documento</label><input id="document-title" required maxlength="160" placeholder="Ex.: Estatuto do motoclube"><label for="document-file">Arquivo PDF</label><input id="document-file" type="file" required accept="application/pdf,.pdf"><small class="muted">Somente arquivos PDF. O documento ficará disponível para consulta dos integrantes.</small><button class="btn btn-primary btn-block" type="submit">Enviar PDF</button></form></div>
+      <div class="card" style="margin-bottom:14px" id="document-upload-toggle-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h3 style="margin:0 0 5px">Biblioteca de documentos</h3><p class="muted small" style="margin:0">Consulte os arquivos oficiais ou adicione um novo PDF, se tiver autorização.</p></div><button class="btn btn-primary hidden" id="document-upload-toggle" type="button" aria-expanded="false">＋ Adicionar PDF</button></div></div><div class="card hidden" id="document-upload-card"><h3>Adicionar PDF à biblioteca</h3><form id="document-form"><label for="document-title">Nome do documento</label><input id="document-title" required maxlength="160" placeholder="Ex.: Estatuto do motoclube"><label for="document-file">Arquivo PDF</label><input id="document-file" type="file" required accept="application/pdf,.pdf"><small class="muted">Somente arquivos PDF. O documento ficará disponível para consulta dos integrantes.</small><button class="btn btn-primary btn-block" type="submit">Enviar PDF</button></form></div>
       <div class="card" style="margin-top:14px"><h3>Arquivos disponíveis</h3><div id="documents-list" class="empty">Carregando documentos…</div></div>
     </section>
     <section id="page-votes" class="app-page hidden-page">
       <div class="page-heading"><div><h1>Votações</h1><p>Deliberações com acesso definido pela diretoria.</p></div><span class="badge">Restrito</span></div>
-      <div class="card hidden" id="vote-create-card" style="margin-bottom:16px"><h3>＋ Criar votação</h3><p class="muted small">Defina o formato, o público e as opções. Os resultados parciais ficam visíveis durante a votação.</p><form id="vote-form">
+      <div class="card" style="margin-bottom:14px" id="vote-create-toggle-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h3 style="margin:0 0 5px">Participação dos integrantes</h3><p class="muted small" style="margin:0">Acompanhe as votações disponíveis e participe das decisões.</p></div><button class="btn btn-primary hidden" id="vote-create-toggle" type="button" aria-expanded="false">＋ Criar votação</button></div></div><div class="card hidden" id="vote-create-card" style="margin-bottom:16px"><h3>＋ Criar votação</h3><p class="muted small">Defina o formato, o público e as opções. Os resultados parciais ficam visíveis durante a votação.</p><form id="vote-form">
         <label for="vote-title">Título da votação</label><input id="vote-title" required maxlength="180" placeholder="Ex.: Escolha da data do próximo passeio">
         <label for="vote-description">Descrição / contexto</label><textarea id="vote-description" maxlength="5000" placeholder="Explique o assunto para os integrantes"></textarea>
         <label for="vote-type">Modalidade</label><select id="vote-type"><option value="simple">Escolher entre opções</option><option value="approval">Aprovação: Sim / Não / Abstenção</option></select>
@@ -990,9 +985,6 @@ button:focus-visible,[role="button"]:focus-visible{
         <div class="section-title"><div><h2>Carteirinha digital</h2><p>Identificação oficial do integrante dos Guardiões da 354.</p></div></div>
         <div class="form-actions"><label class="btn" for="member-card-photo-upload">Enviar / trocar minha foto</label><input id="member-card-photo-upload" type="file" accept="image/jpeg,image/png,image/webp" hidden><span class="muted small" id="member-card-photo-status">Use uma foto de rosto nítida.</span></div>
         <div class="member-pass" id="member-digital-card"><div class="member-pass-top"><div class="member-pass-photo-wrap"><img id="member-card-photo" class="member-pass-photo" src="/icons/guardioes-logo.png?v=2" alt="Foto do integrante"></div><div class="member-pass-heading"><div class="member-pass-sub">MOTOCLUBE · SÃO GOTARDO/MG</div><div class="member-pass-name" id="member-card-name">Integrante</div><div class="member-pass-position" id="member-card-position">Membro Ativo</div></div><div class="member-pass-crest"><img class="member-pass-logo" src="/icons/guardioes-logo.png?v=2" alt="Brasão Guardiões da 354"></div></div><div class="member-pass-divider"></div><div class="member-pass-grid"><div class="member-pass-field"><small>Cargo</small><strong id="member-card-position-copy">Membro Ativo</strong></div><div class="member-pass-field"><small>Categoria</small><strong id="member-card-rider">—</strong></div><div class="member-pass-field"><small>Situação</small><strong id="member-card-status">—</strong></div><div class="member-pass-field member-pass-bike"><small>Motocicleta</small><strong id="member-card-bike">—</strong></div></div><div class="member-pass-footer">GUARDIÕES DA 354 <span>·</span> MAIS QUE MOTOS, UMA IRMANDADE</div></div>
-        <div class="section-title"><div><h2>Notificações no celular</h2><p>Receba avisos mesmo quando o aplicativo estiver fechado.</p></div></div>
-        <div class="callout">Ative as notificações neste aparelho. No iPhone, o aplicativo precisa estar instalado na Tela de Início e o pedido deve ser aceito.</div>
-        <div class="form-actions"><button class="btn btn-primary" id="enable-push-button" type="button">Ativar notificações neste aparelho</button><span id="push-status" class="muted small" aria-live="polite">Verificando suporte…</span></div>
         <div class="profile-grid">
           <div class="profile-field"><div class="muted">Cargo</div><strong id="profile-position">—</strong></div>
           <div class="profile-field"><div class="muted">Situação</div><strong id="profile-status">—</strong></div>
