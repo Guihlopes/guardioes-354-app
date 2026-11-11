@@ -737,6 +737,20 @@ button:focus-visible,[role="button"]:focus-visible{
   .mobile-nav button{flex-basis:59px;min-width:59px;font-size:.59rem}
 }
 
+
+/* Restaura a navegação móvel original: menu suspenso no cabeçalho */
+@media(max-width:900px){
+  .desktop-nav{display:none!important}
+  .mobile-nav{display:none!important}
+  .mobile-menu-wrap{display:block!important}
+  .header-actions #header-logout{display:none!important}
+}
+@media(min-width:901px){
+  .mobile-nav{display:none!important}
+  .mobile-menu-wrap{display:none!important}
+  .desktop-nav{display:flex}
+}
+
 </style>
 </head>
 <body>
