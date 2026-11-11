@@ -1099,7 +1099,7 @@ button:focus-visible,[role="button"]:focus-visible{
           <div class="grid" id="institutional-summary"><div class="empty">Carregue o resumo institucional.</div></div>
           <div class="form-actions"><button class="btn btn-primary" id="institutional-refresh" type="button">↻ Atualizar gestão institucional</button></div>
         </div>
-        <div class="card" style="margin-bottom:14px admin-subpanel admin-institution-panel hidden">
+        <div class="card admin-subpanel admin-institution-panel hidden" style="margin-bottom:14px">
           <div class="section-title"><div><h3 style="margin:0">Central de documentos e normas</h3><p class="muted small">Cadastro experimental de estatuto, regulamentos, normas e atas. O arquivo pode ser vinculado por URL.</p></div></div>
           <form id="governance-document-form" class="form-grid">
             <div><label for="governance-doc-title">Título</label><input id="governance-doc-title" required placeholder="Ex.: Regulamento interno"></div>
@@ -1113,7 +1113,7 @@ button:focus-visible,[role="button"]:focus-visible{
           <div id="governance-documents-list" class="empty">Nenhum documento carregado.</div>
           <div class="form-actions"><button class="btn" id="governance-documents-refresh" type="button">↻ Atualizar documentos</button></div>
         </div>
-        <div class="card" style="margin-bottom:14px admin-subpanel admin-institution-panel hidden">
+        <div class="card admin-subpanel admin-institution-panel hidden" style="margin-bottom:14px">
           <div class="section-title"><div><h3 style="margin:0">Reuniões e decisões</h3><p class="muted small">Agende reuniões, registre pautas, atas e decisões.</p></div></div>
           <form id="club-meeting-form" class="form-grid">
             <div><label for="club-meeting-title">Título da reunião</label><input id="club-meeting-title" required placeholder="Ex.: Reunião ordinária"></div>
@@ -1128,7 +1128,7 @@ button:focus-visible,[role="button"]:focus-visible{
           <div id="club-meetings-list" class="empty">Nenhuma reunião carregada.</div>
           <div class="form-actions"><button class="btn" id="club-meetings-refresh" type="button">↻ Atualizar reuniões</button></div>
         </div>
-        <div class="card" style="margin-bottom:14px admin-subpanel admin-institution-panel hidden">
+        <div class="card admin-subpanel admin-institution-panel hidden" style="margin-bottom:14px">
           <h3 style="margin-top:0">Regras de acesso</h3>
           <div class="grid">
             <div class="card"><strong>Fundadores</strong><p class="muted small">Guilherme Henrique Lopes e Welton Santana Silva: prioridade hierárquica conforme o estatuto. Acesso técnico segue as permissões concedidas na conta.</p></div>
@@ -1777,8 +1777,8 @@ button:focus-visible,[role="button"]:focus-visible{
     const alreadyOpen=!panel.classList.contains('hidden')&&panel.dataset.activeTool===kind&&panel.previousElementSibling===button;
     if(alreadyOpen){panel.classList.add('hidden');panel.removeAttribute('data-active-tool');button.setAttribute('aria-expanded','false');return;}
     const selector={read:'.admin-receipts-panel',institution:'.admin-institution-panel',audit:'.admin-audit-panel'}[kind];
-    $('.admin-subpanel').forEach(x=>x.classList.add('hidden'));
-    if(selector)$(selector).forEach(x=>x.classList.remove('hidden'));
+    $$('.admin-subpanel').forEach(x=>x.classList.add('hidden'));
+    if(selector)$$(selector).forEach(x=>x.classList.remove('hidden'));
     button.insertAdjacentElement('afterend',panel);
     panel.dataset.activeTool=kind;panel.classList.remove('hidden');
     ['#admin-read-toggle','#admin-institution-toggle','#admin-audit-toggle'].forEach(id=>$(id)?.setAttribute('aria-expanded',String(id==='#'+button.id)));
