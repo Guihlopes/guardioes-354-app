@@ -964,7 +964,12 @@ button:focus-visible,[role="button"]:focus-visible{
         </form>
       </div>
       <div class="card"><div class="section-title" style="margin-top:0"><div><h3 style="margin:0">Atividades agendadas</h3><p>Toque em uma atividade para ver os detalhes e confirmar sua participação.</p></div><button id="agenda-history-toggle" class="btn" type="button" aria-expanded="false">Passeios anteriores</button></div><div id="agenda-list" class="empty">Carregando agenda…</div><div id="agenda-history-wrap" class="hidden" style="margin-top:18px;padding-top:14px;border-top:1px solid #ffffff18"><h3>Histórico de atividades</h3><p class="muted small">Últimas atividades já realizadas.</p><div id="agenda-history-list" class="empty">Carregando histórico…</div></div></div>
-      <div class="card admin-only hidden" id="announcement-compose-card" style="margin-bottom:14px"><h3>Novo comunicado</h3>
+      <div class="card admin-only hidden" style="margin-bottom:14px">
+        <button id="announcement-compose-toggle" class="expand-menu-trigger" type="button" aria-expanded="false" aria-controls="announcement-compose-card">
+          <span class="expand-menu-icon">＋</span><span class="expand-menu-copy"><strong>Publicar comunicado</strong><small>Abra para escrever um aviso e escolher quem poderá ver e receber a notificação</small></span><span class="expand-menu-chevron">⌄</span>
+        </button>
+      </div>
+      <div class="card admin-only hidden hidden" id="announcement-compose-card" style="margin-bottom:14px"><h3>Novo comunicado</h3>
         <form id="announcement-form"><label for="announcement-title">Título</label><input id="announcement-title" required maxlength="160">
         <label for="announcement-body">Comunicado</label><textarea id="announcement-body" required maxlength="10000"></textarea>
         <div class="audience-box"><div class="audience-section-title"><span class="step">1</span><h4>Quem poderá ver este comunicado?</h4></div><p class="audience-help">Escolha grupos, pessoas específicas ou combine as opções. Se quiser apenas uma pessoa, selecione somente ela na lista individual abaixo.</p>
@@ -2327,6 +2332,13 @@ $('#member-card-photo-upload')?.addEventListener('change', async (event) => {
     const members=(data||[]).filter(m=>m.email && m.member_status!=='Inativo');
     selectors.forEach(sel=>{sel.innerHTML=members.map(m=>'<option value="'+escapeHtml(m.email)+'">'+escapeHtml(m.full_name)+' ('+escapeHtml(m.rider_type||'Integrante')+')</option>').join('');});
   }
+  $('#announcement-compose-toggle')?.addEventListener('click',()=>{
+    const form=$('#announcement-compose-card'),button=$('#announcement-compose-toggle');
+    const opening=form.classList.contains('hidden');
+    form.classList.toggle('hidden',!opening);
+    button.setAttribute('aria-expanded',String(opening));
+    if(opening)form.scrollIntoView({behavior:'smooth',block:'start'});
+  });
   $('#announcement-form')?.addEventListener('submit',async e=>{
     e.preventDefault();if(!canManageAgenda()){notice('#app-notice','Apenas a diretoria e os fundadores podem publicar comunicados.');return;}
     const selected = id => Array.from($(id).selectedOptions).map(o=>o.value);
