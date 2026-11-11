@@ -751,6 +751,35 @@ button:focus-visible,[role="button"]:focus-visible{
   .desktop-nav{display:flex}
 }
 
+
+/* Menus expansíveis de atividade e votação */
+.expand-menu-trigger{
+  display:flex;width:100%;align-items:center;gap:13px;margin-top:14px;
+  padding:14px 15px;border:1px solid #d51f3555;border-radius:14px;
+  background:linear-gradient(105deg,#d51f351b,#ffffff04);
+  color:var(--text,#f5f5f5);text-align:left;cursor:pointer;
+  transition:border-color .18s ease,background .18s ease,transform .18s ease;
+}
+.expand-menu-trigger:hover{border-color:#ed5365;background:linear-gradient(105deg,#d51f352b,#ffffff08)}
+.expand-menu-trigger:active{transform:scale(.995)}
+.expand-menu-icon{
+  display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;
+  border-radius:11px;background:#d51f3523;color:#ff687b;font-size:1.45rem;font-weight:500;
+}
+.expand-menu-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+.expand-menu-copy strong{font-size:.94rem;font-weight:850}
+.expand-menu-copy small{color:var(--muted,#9ca3af);font-size:.76rem;line-height:1.4}
+.expand-menu-chevron{font-size:1.35rem;color:#ff687b;transition:transform .2s ease}
+.expand-menu-trigger[aria-expanded="true"] .expand-menu-chevron{transform:rotate(180deg)}
+.agenda-next-summary{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.vote-intro{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#agenda-form-card,#vote-create-card{border-color:#d51f3555}
+@media(max-width:600px){
+ .expand-menu-trigger{padding:12px;gap:10px}
+ .expand-menu-copy small{font-size:.72rem}
+ .agenda-next-summary{align-items:flex-start}
+}
+
 </style>
 </head>
 <body>
@@ -908,11 +937,11 @@ button:focus-visible,[role="button"]:focus-visible{
     <section id="page-agenda" class="app-page hidden-page">
       <div class="page-heading"><div><h1>Agenda e Comunicados</h1><p>Atividades, reuniões e avisos oficiais dos Guardiões da 354 em um só lugar.</p></div><span class="badge">Mural oficial</span></div>
       <div class="card" style="margin-bottom:14px"><h3>Comunicados recentes</h3><p class="muted small">Avisos oficiais publicados pela diretoria.</p><div id="announcements-list" class="empty">Carregando comunicados…</div></div>
-      <div class="card" style="margin-bottom:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-          <div><div class="muted small">Próxima atividade</div><div id="agenda-next" class="status-value" style="font-size:1.15rem">—</div></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap"><button id="agenda-suggest-toggle" class="btn btn-primary" type="button">＋ Sugerir atividade</button><button id="agenda-refresh" class="btn" type="button">Atualizar</button></div>
-        </div>
+      <div class="card agenda-tools-menu" style="margin-bottom:14px">
+        <div class="agenda-next-summary"><div><div class="muted small">Próxima atividade</div><div id="agenda-next" class="status-value" style="font-size:1.15rem">—</div></div><button id="agenda-refresh" class="btn" type="button">↻ Atualizar</button></div>
+        <button id="agenda-suggest-toggle" class="expand-menu-trigger" type="button" aria-expanded="false" aria-controls="agenda-form-card">
+          <span class="expand-menu-icon">＋</span><span class="expand-menu-copy"><strong>Sugerir atividade</strong><small>Abra para preencher os dados de um passeio, reunião ou evento</small></span><span class="expand-menu-chevron">⌄</span>
+        </button>
       </div>
       <div id="agenda-form-card" class="card hidden" style="margin-bottom:14px">
         <h3 id="agenda-form-title">Sugerir atividade</h3>
@@ -954,7 +983,12 @@ button:focus-visible,[role="button"]:focus-visible{
     </section>
     <section id="page-votes" class="app-page hidden-page">
       <div class="page-heading"><div><h1>Votações</h1><p>Deliberações com acesso definido pela diretoria.</p></div><span class="badge">Restrito</span></div>
-      <div class="card" style="margin-bottom:14px" id="vote-create-toggle-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h3 style="margin:0 0 5px">Participação dos integrantes</h3><p class="muted small" style="margin:0">Acompanhe as votações disponíveis e participe das decisões.</p></div><button class="btn btn-primary hidden" id="vote-create-toggle" type="button" aria-expanded="false">＋ Criar votação</button></div></div><div class="card hidden" id="vote-create-card" style="margin-bottom:16px"><h3>＋ Criar votação</h3><p class="muted small">Defina o formato, o público e as opções. Os resultados parciais ficam visíveis durante a votação.</p><form id="vote-form">
+      <div class="card" style="margin-bottom:14px" id="vote-create-toggle-card">
+        <div class="vote-intro"><div><h3 style="margin:0 0 5px">Participação dos integrantes</h3><p class="muted small" style="margin:0">Acompanhe as votações disponíveis e participe das decisões.</p></div></div>
+        <button class="expand-menu-trigger hidden" id="vote-create-toggle" type="button" aria-expanded="false" aria-controls="vote-create-card">
+          <span class="expand-menu-icon">＋</span><span class="expand-menu-copy"><strong>Criar votação</strong><small>Abra para definir a pergunta, as opções e quem poderá votar</small></span><span class="expand-menu-chevron">⌄</span>
+        </button>
+      </div><div class="card hidden" id="vote-create-card" style="margin-bottom:16px"><h3>＋ Criar votação</h3><p class="muted small">Defina o formato, o público e as opções. Os resultados parciais ficam visíveis durante a votação.</p><form id="vote-form">
         <label for="vote-title">Título da votação</label><input id="vote-title" required maxlength="180" placeholder="Ex.: Escolha da data do próximo passeio">
         <label for="vote-description">Descrição / contexto</label><textarea id="vote-description" maxlength="5000" placeholder="Explique o assunto para os integrantes"></textarea>
         <label for="vote-type">Modalidade</label><select id="vote-type"><option value="simple">Escolher entre opções</option><option value="approval">Aprovação: Sim / Não / Abstenção</option></select>
@@ -1930,7 +1964,7 @@ button:focus-visible,[role="button"]:focus-visible{
     $('#agenda-cancel-edit').textContent = 'Cancelar';
     $('#agenda-cancel-edit').classList.remove('hidden');
     $('#agenda-form-card').classList.add('hidden');
-    $('#agenda-suggest-toggle').classList.remove('hidden');
+    $('#agenda-suggest-toggle').setAttribute('aria-expanded','false');
     clearNotice('#agenda-form-notice');
   }
   function formatAgendaDate(value, withTime=true) {
@@ -2057,7 +2091,7 @@ button:focus-visible,[role="button"]:focus-visible{
       const d=new Date(e.starts_at); $('#agenda-start').value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
       $('#agenda-location').value=e.location||''; $('#agenda-description').value=e.description||'';
       $('#agenda-form-title').textContent='Editar atividade'; $('#agenda-submit').textContent='Salvar alterações';
-      $('#agenda-form-card').classList.remove('hidden'); $('#agenda-suggest-toggle').classList.add('hidden');
+      $('#agenda-form-card').classList.remove('hidden'); $('#agenda-suggest-toggle').setAttribute('aria-expanded','true');
       $('#agenda-cancel-edit').classList.remove('hidden'); clearNotice('#agenda-form-notice');
       $('#agenda-form-card').scrollIntoView({behavior:'smooth',block:'start'});
     }));
@@ -2069,9 +2103,11 @@ button:focus-visible,[role="button"]:focus-visible{
     }));
   }
   $('#agenda-suggest-toggle').addEventListener('click',()=>{
-    $('#agenda-form-card').classList.toggle('hidden');
-    $('#agenda-suggest-toggle').classList.toggle('hidden',!$('#agenda-form-card').classList.contains('hidden'));
-    if(!$('#agenda-form-card').classList.contains('hidden')) $('#agenda-form-card').scrollIntoView({behavior:'smooth',block:'start'});
+    const form=$('#agenda-form-card'),button=$('#agenda-suggest-toggle');
+    const opening=form.classList.contains('hidden');
+    form.classList.toggle('hidden',!opening);
+    button.setAttribute('aria-expanded',String(opening));
+    if(opening)form.scrollIntoView({behavior:'smooth',block:'start'});
   });
   $('#agenda-form').addEventListener('submit',async event=>{
     event.preventDefault(); clearNotice('#agenda-form-notice');
@@ -2248,7 +2284,7 @@ $('#member-card-photo-upload')?.addEventListener('change', async (event) => {
   $('#vote-create-toggle')?.addEventListener('click',()=>{
     const form=$('#vote-create-card'),button=$('#vote-create-toggle');
     const opening=form.classList.contains('hidden');form.classList.toggle('hidden',!opening);
-    button.setAttribute('aria-expanded',String(opening));button.textContent=opening?'Ocultar formulário':'＋ Criar votação';
+    button.setAttribute('aria-expanded',String(opening));
     if(opening)form.scrollIntoView({behavior:'smooth',block:'start'});
   });
   $('#members-refresh')?.addEventListener('click',loadMembers);
