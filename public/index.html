@@ -848,14 +848,14 @@ button:focus-visible,[role="button"]:focus-visible{
       <img src="/icons/guardioes-logo.png?v=2" alt="Guardiões da 354" onerror="this.style.display='none'">
       <div><div class="brand-title">GUARDIÕES DA 354</div><div class="brand-sub">Área exclusiva dos integrantes</div></div>
     </div>
-    <div class="header-actions"><button class="icon-btn" id="header-notifications" title="Notificações" aria-label="Notificações">♧<span id="notification-dot" class="hidden" aria-hidden="true"></span></button><button class="btn" id="header-logout" type="button">Sair <span class="logout-text">da conta</span></button><div class="mobile-menu-wrap" id="mobile-menu-wrap"><button class="btn" id="mobile-menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu-panel">☰ Menu</button><div class="mobile-menu-panel hidden" id="mobile-menu-panel" role="menu" aria-label="Menu do aplicativo"><button type="button" data-mobile-page="home" role="menuitem"><span>⌂</span>Início</button><button type="button" data-mobile-page="members" role="menuitem"><span>♟</span>Membros</button><button type="button" data-mobile-page="agenda" role="menuitem"><span>▦</span>Agenda e comunicados</button><button type="button" data-mobile-page="documents" role="menuitem"><span>▧</span>Documentos</button><button type="button" data-mobile-page="votes" role="menuitem"><span>✓</span>Votações</button><button type="button" data-mobile-page="profile" role="menuitem"><span>♙</span>Meu perfil</button><button type="button" class="admin-only hidden" data-mobile-page="admin" role="menuitem"><span>⚙</span>Administração</button><button type="button" class="menu-logout" id="mobile-menu-logout" role="menuitem"><span>↪</span>Sair da conta</button></div></div></div>
+    <div class="header-actions"><button class="icon-btn" id="header-notifications" title="Notificações" aria-label="Notificações">♧<span id="notification-dot" class="hidden" aria-hidden="true"></span></button><button class="btn" id="header-logout" type="button">Sair <span class="logout-text">da conta</span></button><div class="mobile-menu-wrap" id="mobile-menu-wrap"><button class="btn" id="mobile-menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu-panel">☰ Menu</button><div class="mobile-menu-panel hidden" id="mobile-menu-panel" role="menu" aria-label="Menu do aplicativo"><button type="button" data-mobile-page="home" role="menuitem"><span>⌂</span>Início</button><button type="button" data-mobile-page="members" role="menuitem"><span>♟</span>Membros</button><button type="button" data-mobile-page="agenda" role="menuitem"><span>▦</span>Agenda e comunicados</button><button type="button" data-mobile-page="documents" role="menuitem"><span>▧</span>Documentos</button><button type="button" data-mobile-page="votes" role="menuitem"><span>✓</span>Votações</button><button type="button" data-mobile-page="profile" role="menuitem"><span>♙</span>Meu perfil</button><button type="button" data-mobile-page="settings" role="menuitem"><span>⚙</span>Configurações</button><button type="button" class="admin-only hidden" data-mobile-page="admin" role="menuitem"><span>⚙</span>Administração</button><button type="button" class="menu-logout" id="mobile-menu-logout" role="menuitem"><span>↪</span>Sair da conta</button></div></div></div>
   </header>
   <div id="notifications-overlay" class="notification-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="notifications-title" style="display:none"><section class="notification-panel"><div class="notification-head"><h2 id="notifications-title">🔔 Notificações</h2><button id="notifications-close" class="btn" type="button">Fechar ✕</button></div><div id="notifications-unread-summary" class="muted small" style="margin-bottom:12px"></div><div id="notifications-list"></div></section></div>
   <nav class="mobile-nav" aria-label="Navegação móvel">
     <button class="active" data-page="home"><span>⌂</span>Início</button><button data-page="members"><span>♟</span>Membros</button><button data-page="agenda"><span>▦</span>Agenda e avisos</button><button data-page="documents"><span>▧</span>Docs</button><button data-page="votes"><span>✓</span>Votos</button><button data-page="profile"><span>♙</span>Perfil</button><button class="admin-only hidden" data-page="admin"><span>⚙</span>Admin</button>
   </nav>
   <nav id="desktop-nav" class="desktop-nav" aria-label="Navegação principal">
-    <button class="nav-btn active" data-page="home">Início</button><button class="nav-btn" data-page="members">Membros</button><button class="nav-btn" data-page="agenda">Agenda e comunicados</button><button class="nav-btn" data-page="documents">Documentos</button><button class="nav-btn" data-page="votes">Votações</button><button class="nav-btn" data-page="profile">Meu perfil</button><button class="nav-btn admin-only hidden" data-page="admin">Administração</button>
+    <button class="nav-btn active" data-page="home">Início</button><button class="nav-btn" data-page="members">Membros</button><button class="nav-btn" data-page="agenda">Agenda e comunicados</button><button class="nav-btn" data-page="documents">Documentos</button><button class="nav-btn" data-page="votes">Votações</button><button class="nav-btn" data-page="profile">Meu perfil</button><button class="nav-btn" data-page="settings">Configurações</button><button class="nav-btn admin-only hidden" data-page="admin">Administração</button>
   </nav>
 
   <main>
@@ -1001,6 +1001,14 @@ button:focus-visible,[role="button"]:focus-visible{
       </div>
     </section>
 
+    <section id="page-settings" class="app-page hidden-page">
+      <div class="page-heading"><div><h1>Configurações</h1><p>Gerencie notificações, acesso rápido e segurança da sua conta.</p></div><span class="badge">Preferências</span></div>
+      <div class="card" id="settings-notifications-card">
+        <h3>🔔 Notificações no celular</h3>
+        <p class="muted small" style="line-height:1.55">Receba avisos mesmo quando o aplicativo estiver fechado. No iPhone, o aplicativo precisa estar instalado na Tela de Início e o pedido deve ser aceito.</p>
+        <div class="form-actions"><button class="btn btn-primary" id="enable-push-button" type="button">Ativar notificações neste aparelho</button><span id="push-status" class="muted small" aria-live="polite">Verificando suporte…</span></div>
+      </div>
+    </section>
     <section id="page-admin" class="app-page hidden-page">
       <div class="page-heading"><div><h1>Central da Diretoria</h1><p>Use esta página como ponto de partida para organizar o motoclube.</p></div><span class="badge">Área restrita</span></div>
       <div class="card" style="margin-bottom:16px;border-color:#b9152b">
@@ -1187,7 +1195,7 @@ button:focus-visible,[role="button"]:focus-visible{
     $('#login-screen').classList.add('hidden'); $('#app-screen').classList.remove('hidden');
   }
   function go(page) {
-    const allowed = ['home','members','agenda','documents','votes','profile','admin'];
+    const allowed = ['home','members','agenda','documents','votes','profile','settings','admin'];
     if (!allowed.includes(page)) page = 'home';
     if (page === 'admin' && currentProfile?.role !== 'admin') page = 'home';
     $$('.app-page').forEach(el => el.classList.add('hidden-page'));
@@ -1224,8 +1232,10 @@ button:focus-visible,[role="button"]:focus-visible{
     if ($('#edit-motorcycle')) $('#edit-motorcycle').value = p.motorcycle || '';
     $('#profile-pillion-wrap')?.classList.toggle('hidden', p.rider_type !== 'Garupa');
     $('#vote-create-card')?.classList.toggle('hidden', !canManageAgenda());
+    $('#vote-create-toggle')?.classList.toggle('hidden', !canManageAgenda());
     $$('.admin-only').forEach(el => el.classList.toggle('hidden', p.role !== 'admin'));
     $('#document-upload-card')?.classList.toggle('hidden', !canManageDocuments());
+    $('#document-upload-toggle')?.classList.toggle('hidden', !canManageDocuments());
   }
   async function loadProfile(user) {
     clearNotice('#login-notice');
@@ -2237,6 +2247,18 @@ $('#member-card-photo-upload')?.addEventListener('change', async (event) => {
       console.error(error); notice('#member-edit-notice','Falha de conexão ao salvar as alterações.');
     } finally { button.disabled = false; button.textContent = 'Salvar alterações'; }
   });
+  $('#document-upload-toggle')?.addEventListener('click',()=>{
+    const form=$('#document-upload-card'),button=$('#document-upload-toggle');
+    const opening=form.classList.contains('hidden');form.classList.toggle('hidden',!opening);
+    button.setAttribute('aria-expanded',String(opening));button.textContent=opening?'Ocultar formulário':'＋ Adicionar PDF';
+    if(opening)form.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  $('#vote-create-toggle')?.addEventListener('click',()=>{
+    const form=$('#vote-create-card'),button=$('#vote-create-toggle');
+    const opening=form.classList.contains('hidden');form.classList.toggle('hidden',!opening);
+    button.setAttribute('aria-expanded',String(opening));button.textContent=opening?'Ocultar formulário':'＋ Criar votação';
+    if(opening)form.scrollIntoView({behavior:'smooth',block:'start'});
+  });
   $('#members-refresh')?.addEventListener('click',loadMembers);
   $('#profile-edit-form')?.addEventListener('submit',async e=>{
     e.preventDefault(); if(!currentUser || !currentProfile)return;
@@ -2304,7 +2326,7 @@ $('#member-card-photo-upload')?.addEventListener('change', async (event) => {
   });
   // Opção de cadastro disponível no perfil após o login.
   function addPasskeyProfileAction() {
-    const profile = $('#page-profile');
+    const profile = $('#page-settings');
     if (!profile) return;
     if (!$('#profile-passkey-card')) {
       const card = document.createElement('div');
