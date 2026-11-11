@@ -1248,7 +1248,9 @@ label{display:block;margin:14px 0 7px;font-size:.88rem;color:#e3e4e6}input,selec
   }
   function canManageDocuments() {
     const p = currentProfile;
-    return !!p && p.active === true && (p.role === 'admin' || ['Fundador','Fundador/Vice-Presidente','Presidente','Vice-Presidente','Diretor Geral','Diretor Social'].includes(p.club_position));
+    if (!p || p.active !== true) return false;
+    const founderName = String(p.full_name || '').trim().toLocaleLowerCase('pt-BR');
+    return ['guilherme henrique lopes','welton santana silva'].includes(founderName);
   }
   function canManageAgenda() {
     const p = currentProfile;
