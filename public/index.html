@@ -795,6 +795,28 @@ button:focus-visible,[role="button"]:focus-visible{
  .agenda-next-summary{align-items:flex-start}
 }
 
+
+/* Correção: painéis abertos a partir dos indicadores ocupam a largura total da grade */
+#admin-stats-grid > #admin-detail-panel,
+#admin-stats-grid > #admin-prospects-panel{
+  grid-column:1 / -1;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  justify-self:stretch;
+  overflow-wrap:anywhere;
+}
+#admin-stats-grid > #admin-detail-panel *,
+#admin-stats-grid > #admin-prospects-panel *{min-width:0;box-sizing:border-box}
+#admin-stats-grid > #admin-detail-panel .admin-detail-grid{
+  grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));
+}
+@media(max-width:600px){
+  #admin-stats-grid > #admin-detail-panel,
+  #admin-stats-grid > #admin-prospects-panel{padding:14px;margin:12px 0}
+}
+
 </style>
 </head>
 <body>
