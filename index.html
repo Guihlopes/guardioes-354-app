@@ -824,6 +824,29 @@ button:focus-visible,[role="button"]:focus-visible{
 #brand-intro.is-ending{opacity:0;visibility:hidden;pointer-events:none}
 @media(prefers-reduced-motion:reduce){#brand-intro{transition:opacity .2s linear}}
 
+/* Ajustes responsivos — gestão de prospects no celular */
+#admin-prospects-panel{min-width:0;max-width:100%;box-sizing:border-box}
+#admin-prospects-panel .section-title{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:14px;min-width:0}
+#admin-prospects-panel .section-title>div{flex:1 1 auto;min-width:0}
+#admin-prospects-panel .section-title>button{flex:0 0 auto;width:auto;min-width:92px;max-width:none;min-height:46px;padding:10px 14px;white-space:nowrap;word-break:normal;overflow-wrap:normal;line-height:1.2}
+#admin-prospects-panel #prospects-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#admin-prospects-panel #prospects-summary>.card{min-width:0;width:auto;margin:0;padding:18px}
+#admin-prospects-panel #prospects-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:12px;border:1px dashed var(--line);border-radius:18px}
+#admin-prospects-panel #prospects-list>article{min-width:0;width:100%;margin:0;padding:18px;border:1px solid var(--line);border-radius:17px;background:#171a20}
+#admin-prospects-panel #prospects-list>article>.section-title{align-items:flex-start;gap:10px;margin:0 0 12px}
+#admin-prospects-panel #prospects-list>article>.section-title>div{overflow-wrap:anywhere}
+#admin-prospects-panel #prospects-list .badge{flex:0 0 auto;width:auto;max-width:none;white-space:nowrap;word-break:normal;overflow-wrap:normal;line-height:1.2}
+#admin-prospects-panel #prospects-list .form-actions{display:flex;justify-content:flex-start;flex-wrap:wrap;gap:8px;margin-top:16px}
+#admin-prospects-panel #prospects-list .form-actions button{flex:0 1 auto;width:auto;max-width:100%;min-width:0;white-space:normal;word-break:normal;overflow-wrap:normal;line-height:1.3;padding:11px 14px}
+@media(max-width:600px){
+ #admin-prospects-panel .section-title{align-items:center;gap:10px}
+ #admin-prospects-panel .section-title>button{min-width:82px;padding:9px 11px;font-size:.86rem}
+ #admin-prospects-panel #prospects-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #admin-prospects-panel #prospects-list{grid-template-columns:minmax(0,1fr);padding:10px}
+ #admin-prospects-panel #prospects-list>article{padding:16px}
+ #admin-prospects-panel #prospects-list .form-actions button{font-size:.92rem}
+}
+
 /* Tela inicial limpa — Guardiões da 354 */
 .login-screen-clean{width:min(100% - 28px,460px);min-height:100svh;display:flex;align-items:center;justify-content:center;padding:24px 0}
 .login-screen-clean .login-wrap{width:100%;padding:0;gap:0}
