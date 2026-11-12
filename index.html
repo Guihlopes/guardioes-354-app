@@ -826,25 +826,29 @@ button:focus-visible,[role="button"]:focus-visible{
 
 /* Ajustes responsivos — gestão de prospects no celular */
 #admin-prospects-panel{min-width:0;max-width:100%;box-sizing:border-box}
-#admin-prospects-panel .section-title{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:14px;min-width:0}
+#admin-prospects-panel .section-title{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;min-width:0}
 #admin-prospects-panel .section-title>div{flex:1 1 auto;min-width:0}
-#admin-prospects-panel .section-title>button{flex:0 0 auto;width:auto;min-width:92px;max-width:none;min-height:46px;padding:10px 14px;white-space:nowrap;word-break:normal;overflow-wrap:normal;line-height:1.2}
+#admin-prospects-panel .section-title>button{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:auto;min-width:104px;max-width:none;min-height:44px;padding:9px 13px;white-space:nowrap!important;word-break:keep-all!important;overflow-wrap:normal!important;line-height:1.15;text-align:center}
 #admin-prospects-panel #prospects-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 #admin-prospects-panel #prospects-summary>.card{min-width:0;width:auto;margin:0;padding:18px}
 #admin-prospects-panel #prospects-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:12px;border:1px dashed var(--line);border-radius:18px}
-#admin-prospects-panel #prospects-list>article{min-width:0;width:100%;margin:0;padding:18px;border:1px solid var(--line);border-radius:17px;background:#171a20}
-#admin-prospects-panel #prospects-list>article>.section-title{align-items:flex-start;gap:10px;margin:0 0 12px}
-#admin-prospects-panel #prospects-list>article>.section-title>div{overflow-wrap:anywhere}
-#admin-prospects-panel #prospects-list .badge{flex:0 0 auto;width:auto;max-width:none;white-space:nowrap;word-break:normal;overflow-wrap:normal;line-height:1.2}
-#admin-prospects-panel #prospects-list .form-actions{display:flex;justify-content:flex-start;flex-wrap:wrap;gap:8px;margin-top:16px}
-#admin-prospects-panel #prospects-list .form-actions button{flex:0 1 auto;width:auto;max-width:100%;min-width:0;white-space:normal;word-break:normal;overflow-wrap:normal;line-height:1.3;padding:11px 14px}
+#admin-prospects-panel #prospects-list>article{display:block;min-width:0;width:100%;margin:0;padding:18px;border:1px solid var(--line);border-radius:17px;background:#171a20;box-sizing:border-box}
+#admin-prospects-panel #prospects-list .prospect-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;min-width:0;margin:0 0 12px}
+#admin-prospects-panel #prospects-list .prospect-card-name{flex:1 1 auto;min-width:0;overflow-wrap:break-word;word-break:normal;line-height:1.35}
+#admin-prospects-panel #prospects-list .badge{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:auto;max-width:none;min-height:34px;padding:6px 11px;white-space:nowrap!important;word-break:keep-all!important;overflow-wrap:normal!important;line-height:1.2}
+#admin-prospects-panel #prospects-list .form-actions{display:flex;justify-content:flex-start;align-items:center;flex-wrap:wrap;gap:8px;margin-top:16px}
+#admin-prospects-panel #prospects-list .form-actions button{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:auto;max-width:100%;min-width:0;white-space:nowrap!important;word-break:keep-all!important;overflow-wrap:normal!important;line-height:1.2;padding:11px 14px}
 @media(max-width:600px){
  #admin-prospects-panel .section-title{align-items:center;gap:10px}
- #admin-prospects-panel .section-title>button{min-width:82px;padding:9px 11px;font-size:.86rem}
+ #admin-prospects-panel .section-title>button{min-width:96px;padding:9px 11px;font-size:.84rem}
  #admin-prospects-panel #prospects-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
  #admin-prospects-panel #prospects-list{grid-template-columns:minmax(0,1fr);padding:10px}
  #admin-prospects-panel #prospects-list>article{padding:16px}
- #admin-prospects-panel #prospects-list .form-actions button{font-size:.92rem}
+ #admin-prospects-panel #prospects-list .form-actions button{font-size:.9rem}
+}
+@media(max-width:380px){
+ #admin-prospects-panel .section-title>button{min-width:88px;padding:8px;font-size:.8rem}
+ #admin-prospects-panel #prospects-list .badge{font-size:.72rem;padding:5px 8px}
 }
 
 /* Tela inicial limpa — Guardiões da 354 */
@@ -1728,7 +1732,7 @@ button:focus-visible,[role="button"]:focus-visible{
   function renderProspectsList(){
     const box=$('#prospects-list');if(!box)return;const q=String($('#prospects-search')?.value||'').trim().toLocaleLowerCase('pt-BR'),filter=$('#prospects-filter')?.value||'';
     const rows=prospectPeopleCache.filter(p=>(!q||String(p.full_name||'').toLocaleLowerCase('pt-BR').includes(q))&&(!filter||p.member_status===filter));
-    box.innerHTML=rows.length?rows.map(p=>'<article class="notification-item"><div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><strong>'+escapeHtml(p.full_name||'Sem nome')+'</strong><p class="muted small">'+escapeHtml(p.rider_type||'Piloto')+' · '+escapeHtml(p.club_position||'Prospect')+'</p><small>'+escapeHtml(p.phone||'Telefone não informado')+(p.rider_type==='Piloto'&&p.motorcycle?' · '+escapeHtml(p.motorcycle):'')+'</small></div><span class="badge">'+escapeHtml(p.member_status||'Prospect')+'</span></div>'+(p.rider_type==='Piloto'?prospectPeopleCache.filter(g=>g.rider_type==='Garupa'&&g.pilot_id===p.id).map(g=>'<p class="muted small">↳ Garupa: '+escapeHtml(g.full_name)+'</p>').join(''):'')+'<div class="form-actions"><button class="btn btn-primary" type="button" data-prospect-open="'+escapeHtml(p.id)+'">Abrir ficha e histórico</button></div></article>').join(''):'<div class="empty">Nenhum prospect encontrado com esse filtro.</div>';
+    box.innerHTML=rows.length?rows.map(p=>'<article class="notification-item prospect-card"><div class="prospect-card-head"><div class="prospect-card-name"><strong>'+escapeHtml(p.full_name||'Sem nome')+'</strong><p class="muted small">'+escapeHtml(p.rider_type||'Piloto')+' · '+escapeHtml(p.club_position||'Prospect')+'</p><small>'+escapeHtml(p.phone||'Telefone não informado')+(p.rider_type==='Piloto'&&p.motorcycle?' · '+escapeHtml(p.motorcycle):'')+'</small></div><span class="badge">'+escapeHtml(p.member_status||'Prospect')+'</span></div>'+(p.rider_type==='Piloto'?prospectPeopleCache.filter(g=>g.rider_type==='Garupa'&&g.pilot_id===p.id).map(g=>'<p class="muted small">↳ Garupa: '+escapeHtml(g.full_name)+'</p>').join(''):'')+'<div class="form-actions"><button class="btn btn-primary" type="button" data-prospect-open="'+escapeHtml(p.id)+'">Abrir ficha e histórico</button></div></article>').join(''):'<div class="empty">Nenhum prospect encontrado com esse filtro.</div>';
     box.querySelectorAll('[data-prospect-open]').forEach(b=>b.addEventListener('click',()=>openProspectDetail(b.dataset.prospectOpen)));
   }
   async function openProspectDetail(id){
